@@ -469,14 +469,122 @@ void Model :: add2dRenewableResource(
 }
 
 
+void Model :: addSolar(
+    structNondispatchable struct_nondisp,
+    structSolar struct_solar
+) {
+    /*
+     *  Method to add Solar asset to the Model
+     */
+    
+    struct_nondisp.nondisp_type = SOLAR;
+    struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
+    
+    Nondispatchable* nondisp_ptr = new Solar(
+        struct_nondisp,
+        struct_solar
+    );
+    
+    this->nondisp_ptr_vec.push_back(nondisp_ptr);
+    
+    return;
+}
+
+
+void Model :: addTidal(
+    structNondispatchable struct_nondisp,
+    structTidal struct_tidal
+) {
+    /*
+     *  Method to add Tidal asset to the Model
+     */
+    
+    struct_nondisp.nondisp_type = TIDAL;
+    struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
+    
+    Nondispatchable* nondisp_ptr = new Tidal(
+        struct_nondisp,
+        struct_tidal
+    );
+    
+    this->nondisp_ptr_vec.push_back(nondisp_ptr);
+    
+    return;
+}
+
+
+void Model :: addWave(
+    structNondispatchable struct_nondisp,
+    structWave struct_wave
+) {
+    /*
+     *  Method to add Wave asset to the Model
+     */
+    
+    struct_nondisp.nondisp_type = WAVE;
+    struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
+    
+    Nondispatchable* nondisp_ptr = new Wave(
+        struct_nondisp,
+        struct_wave
+    );
+    
+    this->nondisp_ptr_vec.push_back(nondisp_ptr);
+    
+    return;
+}
+
+
+void Model :: addWind(
+    structNondispatchable struct_nondisp,
+    structWind struct_wind
+) {
+    /*
+     *  Method to add Wind asset to the Model
+     */
+    
+    struct_nondisp.nondisp_type = WIND;
+    struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
+    
+    Nondispatchable* nondisp_ptr = new Wind(
+        struct_nondisp,
+        struct_wind
+    );
+    
+    this->nondisp_ptr_vec.push_back(nondisp_ptr);
+    
+    return;
+}
+
+
 void Model :: run() {
     /*
      *  Method to run the Model
      */
     
-    // generate net load vector
+    try {
+        // generate net load vector
+        //...
     
-    // handle dispatch control
+        // handle dispatch control
+        //...
+    } catch (...) {
+        this->clearAssets();
+        throw;
+    }
+    
+    return;
+}
+
+
+void Model :: clearAssets() {
+    /*
+     *  Method to clear pointer vector attributes
+     */
+    
+    for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
+        delete this->nondisp_ptr_vec[i];
+    }
     
     return;
 }
@@ -487,7 +595,7 @@ Model :: ~Model() {
      *  Model class destructor
      */
     
-    /// clean up assets
+    this->clearAssets();
     
     if (this->struct_model.test_flag) {
         std::cout << "Model object at " << this << " destroyed" <<

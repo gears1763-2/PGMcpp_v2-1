@@ -16,7 +16,6 @@ Wind :: Wind(
      *  Wind class constructor
      */
     
-    this->struct_nondisp.nondisp_type = WIND;
     this->struct_wind = struct_wind;
     
     //...

@@ -7,6 +7,7 @@
 #define MODEL_INCLUDES_H
 
 
+#include "assets/nondispatchable/Nondispatchable.h"
 #include "assets/nondispatchable/Solar.h"
 #include "assets/nondispatchable/Tidal.h"
 #include "assets/nondispatchable/Wave.h"

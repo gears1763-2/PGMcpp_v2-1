@@ -3,7 +3,8 @@
  */
 
 std::cout << std::endl;
-std::cout << "Testing Nondispatchable <-- Solar ... " << std::endl;
+printGreen("Testing Nondispatchable <-- Solar ... ");
+std::cout << std::endl;
 
 try {
     //  construction

@@ -16,7 +16,6 @@ Wave :: Wave(
      *  Wave class constructor
      */
     
-    this->struct_nondisp.nondisp_type = WAVE;
     this->struct_wave = struct_wave;
     
     //...

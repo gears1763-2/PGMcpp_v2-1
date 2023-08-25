@@ -24,6 +24,8 @@ struct structNondispatchable {
     
     NondispatchableType nondisp_type;
     
+    int n_timesteps;
+    
     double cap_kW = 100;
 };
 

@@ -34,6 +34,8 @@ class Model {
         std::map<int, std::vector<double>> resource_map_1D;
         std::map<int, std::vector<std::vector<double>>> resource_map_2D;
         
+        std::vector<Nondispatchable*> nondisp_ptr_vec;
+        
         
         //  methods
         void _populateDeltaVecHr(void);
@@ -55,13 +57,14 @@ class Model {
         void add1dRenewableResource(std::string, std::string, int);
         void add2dRenewableResource(std::string, std::string, int);
         
-        void addSolar();
-        void addTidal();
-        void addWave();
-        void addWind();
+        void addSolar(structNondispatchable, structSolar);
+        void addTidal(structNondispatchable, structTidal);
+        void addWave(structNondispatchable, structWave);
+        void addWind(structNondispatchable, structWind);
         
         void run(void);
         
+        void clearAssets(void);
         virtual ~Model(void);
 };
 

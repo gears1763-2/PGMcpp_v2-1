@@ -3,7 +3,8 @@
  */
 
 std::cout << std::endl;
-std::cout << "Testing Nondispatchable <-- Wind ... " << std::endl;
+printGreen("Testing Nondispatchable <-- Wind ... ");
+std::cout << std::endl;
 
 try {
     //  construction

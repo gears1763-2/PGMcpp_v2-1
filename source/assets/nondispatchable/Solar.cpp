@@ -16,7 +16,6 @@ Solar :: Solar(
      *  Solar class constructor
      */
     
-    this->struct_nondisp.nondisp_type = SOLAR;
     this->struct_solar = struct_solar;
     
     //...

@@ -3,7 +3,8 @@
  */
 
 std::cout << std::endl;
-std::cout << "Testing Model ... " << std::endl;
+printGreen("Testing Model ... ");
+std::cout << std::endl;
 
 try {
     //  construction
@@ -393,6 +394,158 @@ try {
         );
     }
     
+    
+    // test addSolar()
+    std::cout << "\tTesting Model::addSolar() ..." <<
+        std::endl;
+        
+    structNondispatchable struct_nondisp;
+    
+    struct_nondisp.print_flag = true;
+    struct_nondisp.test_flag = true;
+    
+    structSolar struct_solar;
+    
+    test_model.addSolar(struct_nondisp, struct_solar);
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec.size(),
+        1,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->struct_nondisp.n_timesteps,
+        test_model.struct_model.n_timesteps,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->struct_nondisp.nondisp_type,
+        SOLAR,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    
+    // test addTidal()
+    std::cout << "\tTesting Model::addTidal() ..." <<
+        std::endl;
+    
+    structTidal struct_tidal;
+    
+    test_model.addTidal(struct_nondisp, struct_tidal);
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec.size(),
+        2,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->struct_nondisp.n_timesteps,
+        test_model.struct_model.n_timesteps,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->struct_nondisp.nondisp_type,
+        TIDAL,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    
+    // test addWave()
+    std::cout << "\tTesting Model::addWave() ..." <<
+        std::endl;
+    
+    structWave struct_wave;
+    
+    test_model.addWave(struct_nondisp, struct_wave);
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec.size(),
+        3,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->struct_nondisp.n_timesteps,
+        test_model.struct_model.n_timesteps,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->struct_nondisp.nondisp_type,
+        WAVE,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    
+    // test addWind()
+    std::cout << "\tTesting Model::addWind() ..." <<
+        std::endl;
+    
+    structWind struct_wind;
+    
+    test_model.addWind(struct_nondisp, struct_wind);
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec.size(),
+        4,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->struct_nondisp.n_timesteps,
+        test_model.struct_model.n_timesteps,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->struct_nondisp.nondisp_type,
+        WIND,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
     
 } catch (...) {
     printRed("\n\t\t\t\tModel Tests:  FAIL\n");
