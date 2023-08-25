@@ -1,0 +1,405 @@
+/*
+ *  Testing for Model class
+ */
+
+std::cout << std::endl;
+std::cout << "Testing Model ... " << std::endl;
+
+try {
+    //  construction
+    structModel struct_model;
+    
+    struct_model.print_flag = true;
+    struct_model.test_flag = true;
+    
+    struct_model.path_2_load_data = "data/input/test/electrical_load_generic_peak-500kW_1yr_dt-1hr.csv";
+    
+    Model test_model(struct_model);
+    
+    
+    //  test _readInLoadData()
+    std::cout << "\tTesting Model::_readInLoadData() ..." <<
+        std::endl;
+    
+    testFloatEquals(
+        test_model.struct_model.n_timesteps,
+        8760,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    std::vector<double> exp_load_vec_kW = {
+        360.253836463674,
+        355.171277826775,
+        353.776453532298,
+        353.75405737934,
+        346.592867404975,
+        340.132411175118,
+        337.354867340578,
+        340.644115618736,
+        363.639028500678,
+        378.787797779238,
+        372.215798201712,
+        395.093925731298,
+        402.325427142659,
+        386.907725462306,
+        380.709170928091,
+        372.062070914977
+    };
+    
+    for (int i = 0; i < exp_load_vec_kW.size(); i++) {
+        testFloatEquals(
+            test_model.time_vec_hr[i],
+            i,
+            FLOAT_TOLERANCE,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_model.load_vec_kW[i],
+            exp_load_vec_kW[i],
+            FLOAT_TOLERANCE,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    
+    // test _populateDeltaVecHr()
+    std::cout << "\tTesting Model::_populateDeltaVecHr() ..." <<
+        std::endl;
+    
+    for (int i = 0; i < 16; i++) {
+        testFloatEquals(
+            test_model.dt_vec_hr[i],
+            1,
+            FLOAT_TOLERANCE,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    testFloatEquals(
+        test_model.dt_vec_hr[test_model.struct_model.n_timesteps - 1],
+        1,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    
+    // test add1dRenewableResource()
+    std::cout << "\tTesting Model::add1dRenewableResource() ..." <<
+        std::endl;
+        
+    int hydro_key = 0;
+
+    try {
+        test_model.add1dRenewableResource("balls", "", hydro_key);
+        
+        std::string error_str = "Model::add1dRenewableResource() fails ";
+        error_str += "to throw expected runtime error at line ";
+        error_str += std::to_string(__LINE__);
+        throw std::runtime_error(error_str);
+    } catch (...) {
+        // task failed successfully! =P
+    }
+    
+    try {
+        test_model.add1dRenewableResource(
+            "Hydro",
+            "data/input/test/hydro_flow_peak-3810m3hr_1yr_dt-1hr_bad_length.csv",
+            hydro_key
+        );
+        
+        std::string error_str = "Model::add1dRenewableResource() fails ";
+        error_str += "to throw expected runtime error at line ";
+        error_str += std::to_string(__LINE__);
+        throw std::runtime_error(error_str);
+    } catch (...) {
+        // task failed successfully! =P
+    }
+    
+    try {
+        test_model.add1dRenewableResource(
+            "Hydro",
+            "data/input/test/hydro_flow_peak-3810m3hr_1yr_dt-1hr_bad_times.csv",
+            hydro_key
+        );
+        
+        std::string error_str = "Model::add1dRenewableResource() fails ";
+        error_str += "to throw expected runtime error at line ";
+        error_str += std::to_string(__LINE__);
+        throw std::runtime_error(error_str);
+    } catch (...) {
+        // task failed successfully! =P
+    }
+    
+    test_model.add1dRenewableResource(
+        "Hydro",
+        "data/input/test/hydro_flow_peak-3810m3hr_1yr_dt-1hr.csv",
+        hydro_key
+    );
+    
+    std::vector<double> exp_hydro_resource_vec_m3hr = {
+        1779,
+        1748,
+        1720,
+        1697,
+        1678,
+        1664,
+        1653,
+        1647,
+        1645,
+        1647,
+        1653,
+        1664,
+        1678,
+        1697,
+        1720,
+        1748
+    };
+    
+    for (int i = 0; i < exp_hydro_resource_vec_m3hr.size(); i++) {
+        testFloatEquals(
+            test_model.resource_map_1D[hydro_key][i],
+            exp_hydro_resource_vec_m3hr[i],
+            FLOAT_TOLERANCE,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    int solar_key = 1;
+     
+    test_model.add1dRenewableResource(
+        "Solar",
+        "data/input/test/solar_GHI_peak-1kWm2_1yr_dt-1hr.csv",
+        solar_key
+    );
+    
+    std::vector<double> exp_solar_resource_vec_kWm2 = {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        8.51702662684015E-05,
+        0.000348341567045,
+        0.00213793728593,
+        0.004099863613322,
+        0.000997135230553,
+        0.009534527624657,
+        0.022927996790616,
+        0.0136071715294,
+        0.002535134127751,
+        0.005206897515821
+    };
+    
+    for (int i = 0; i < exp_solar_resource_vec_kWm2.size(); i++) {
+        testFloatEquals(
+            test_model.resource_map_1D[solar_key][i],
+            exp_solar_resource_vec_kWm2[i],
+            FLOAT_TOLERANCE,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    int tidal_key = 2;
+     
+    test_model.add1dRenewableResource(
+        "Tidal",
+        "data/input/test/tidal_speed_peak-3ms_1yr_dt-1hr.csv",
+        tidal_key
+    );
+    
+    std::vector<double> exp_tidal_resource_vec_ms = {
+        0.347439913040533,
+        0.770545522195602,
+        0.731352084836198,
+        0.293389814389542,
+        0.209959110813115,
+        0.610609623896497,
+        1.78067162013604,
+        2.53522775118089,
+        2.75966627832024,
+        2.52101111143895,
+        2.05389330201031,
+        1.3461515862445,
+        0.28909254878384,
+        0.897754086048563,
+        1.71406453837407,
+        1.85047408742869
+    };
+    
+    for (int i = 0; i < exp_tidal_resource_vec_ms.size(); i++) {
+        testFloatEquals(
+            test_model.resource_map_1D[tidal_key][i],
+            exp_tidal_resource_vec_ms[i],
+            FLOAT_TOLERANCE,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    int wind_key = 3;
+     
+    test_model.add1dRenewableResource(
+        "Wind",
+        "data/input/test/wind_speed_peak-25ms_1yr_dt-1hr.csv",
+        wind_key
+    );
+    
+    std::vector<double> exp_wind_resource_vec_ms = {
+        6.88566688469997,
+        5.02177105466549,
+        3.74211715899568,
+        5.67169579985362,
+        4.90670669971858,
+        4.29586955031368,
+        7.41155377205065,
+        10.2243290476943,
+        13.1258696725555,
+        13.7016198628274,
+        16.2481482330233,
+        16.5096744355418,
+        13.4354482206162,
+        14.0129230731609,
+        14.5554549260515,
+        13.4454539065912
+    };
+    
+    for (int i = 0; i < exp_wind_resource_vec_ms.size(); i++) {
+        testFloatEquals(
+            test_model.resource_map_1D[wind_key][i],
+            exp_wind_resource_vec_ms[i],
+            FLOAT_TOLERANCE,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    
+    // test add2dRenewableResource()
+    std::cout << "\tTesting Model::add2dRenewableResource() ..." <<
+        std::endl;
+        
+    int wave_key = 0;
+
+    try {
+        test_model.add2dRenewableResource("balls", "", wave_key);
+        
+        std::string error_str = "Model::add2dRenewableResource() fails ";
+        error_str += "to throw expected runtime error at line ";
+        error_str += std::to_string(__LINE__);
+        throw std::runtime_error(error_str);
+    } catch (...) {
+        // task failed successfully! =P
+    }
+    
+    try {
+        test_model.add2dRenewableResource(
+            "Wave",
+            "data/input/test/waves_H_s_peak-8m_T_e_peak-15s_1yr_dt-1hr_bad_length.csv",
+            wave_key
+        );
+        
+        std::string error_str = "Model::add2dRenewableResource() fails ";
+        error_str += "to throw expected runtime error at line ";
+        error_str += std::to_string(__LINE__);
+        throw std::runtime_error(error_str);
+    } catch (...) {
+        // task failed successfully! =P
+    }
+    
+    try {
+        test_model.add2dRenewableResource(
+            "Wave",
+            "data/input/test/waves_H_s_peak-8m_T_e_peak-15s_1yr_dt-1hr_bad_times.csv",
+            wave_key
+        );
+        
+        std::string error_str = "Model::add2dRenewableResource() fails ";
+        error_str += "to throw expected runtime error at line ";
+        error_str += std::to_string(__LINE__);
+        throw std::runtime_error(error_str);
+    } catch (...) {
+        // task failed successfully! =P
+    }
+    
+    test_model.add2dRenewableResource(
+        "Wave",
+        "data/input/test/waves_H_s_peak-8m_T_e_peak-15s_1yr_dt-1hr.csv",
+        wave_key
+    );
+    
+    std::vector<double> exp_significant_wave_height_vec_m = {
+        4.26175222125028,
+        4.25020976167872,
+        4.25656524330349,
+        4.27193854786718,
+        4.28744955711233,
+        4.29421815278154,
+        4.2839937266082,
+        4.25716982457976,
+        4.22419391611483,
+        4.19588925217606,
+        4.17338788587412,
+        4.14672746914214,
+        4.10560041173665,
+        4.05074966447193,
+        3.9953696962433,
+        3.95316976150866
+    };
+    
+    std::vector<double> exp_energy_period_vec_s = {
+        10.4456008226821,
+        10.4614151137651,
+        10.4462827795433,
+        10.4127692097884,
+        10.3734397942723,
+        10.3408599227669,
+        10.32637292093,
+        10.3245412676322,
+        10.310409818185,
+        10.2589529840966,
+        10.1728100603103,
+        10.0862908658929,
+        10.03480243813,
+        10.023673635806,
+        10.0243418565116,
+        10.0063487117653
+    };
+    
+    for (int i = 0; i < exp_energy_period_vec_s.size(); i++) {
+        testFloatEquals(
+            test_model.resource_map_2D[wave_key][i][0],
+            exp_significant_wave_height_vec_m[i],
+            FLOAT_TOLERANCE,
+            __FILE__,
+            __LINE__
+        );
+        
+        testFloatEquals(
+            test_model.resource_map_2D[wave_key][i][1],
+            exp_energy_period_vec_s[i],
+            FLOAT_TOLERANCE,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    
+} catch (...) {
+    printRed("\n\t\t\t\tModel Tests:  FAIL\n");
+    std::cout << std::endl;
+    
+    throw;
+}
+
+printGreen("\n\t\t\t\tModel Tests:  PASS");
+std::cout << std::endl;

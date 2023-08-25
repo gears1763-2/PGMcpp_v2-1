@@ -1,0 +1,9 @@
+The normalized performance matrix is for a wave energy converter (WEC), and is structured as follows:
+
+    1.  Cell (0, 0) is axis labels and is ignored when read into PGMcpp.
+
+    2.  As indicated, the first row is significant wave height (H_s) values in metres [m], and the first column is energy period (T_e) values in seconds. These are both wave spectrum statistics and constitute the independent variables for this matrix (for the purpose of 2D interpolation).
+
+    3.  The interior cells of the matrix are normalized performance values, and are defined as P_norm = P / P_cap, where P is the dimensioned performance (or power output) of the WEC in the corresponding (H_s, T_e) sea state, and P_cap is the dimensioned capacity of the WEC. Both P and P_cap can be expressed in terms of kW. The interior cells constitute the dependent variables for this matrix (for the purpose of 2D interpolation).
+
+    4.  While the first row, first column, and interior structure must remain unchanged for the data to be readable by PGMcpp, the number of rows and columns one provides is arbitrary, and which values one uses for the first row/column is likewise arbitrary. The only other constraints are that the interior of the matrix must be fully defined (i.e., no blank cells), and no other content may be present (i.e., don't include comments, notes, etc. in the file; put those elsewhere).
