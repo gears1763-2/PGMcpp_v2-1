@@ -43,11 +43,9 @@ double Solar :: getProductionkW(double solar_resource_kWm2) {
     } 
     
     // otherwise, simple linear model
-    else {
-        double production_kW = this->struct_solar.derating *
-            this->struct_nondisp.cap_kW * solar_resource_kWm2;
-        return production_kW;
-    }
+    double production_kW = this->struct_solar.derating *
+        this->struct_nondisp.cap_kW * solar_resource_kWm2;
+    return production_kW;
 }
 
 

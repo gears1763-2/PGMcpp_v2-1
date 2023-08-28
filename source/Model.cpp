@@ -384,14 +384,16 @@ double Model :: _getRenewableProduction(
 
 void Model :: _generateNetLoadVector() {
     /*
-     *  Helper method to populate net load vector
+     *  Helper method to populate net load vector, as well as compute
+     *  and record renewable production, dispatch, and curtailment
      */
     
     for (int i = 0; i < this->struct_model.n_timesteps; i++) {
+        double load_kW = this->load_vec_kW[i];
         double net_load_kW = this->load_vec_kW[i];
         
         for (size_t j = 0; j < this->nondisp_ptr_vec.size(); j++) {
-            // get renewable production
+            // compute and record production
             Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[j];
             
             double production_kW = this->_getRenewableProduction(
@@ -399,10 +401,22 @@ void Model :: _generateNetLoadVector() {
                 i
             );
             
-            // record renewable production
             nondisp_ptr->production_vec_kW[i] = production_kW;
             
-            // update net load
+            // compute and record dispatch
+            double dispatch_kW = nondisp_ptr->getDispatchkW(
+                load_kW,
+                production_kW
+            );
+            
+            nondisp_ptr->dispatch_vec_kW[i] = dispatch_kW;
+            
+            // compute and record curtailment
+            double curtailment_kW = production_kW - dispatch_kW;
+            nondisp_ptr->curtailment_vec_kW[i] = curtailment_kW;
+            
+            // update load and net load
+            load_kW -= dispatch_kW;
             net_load_kW -= production_kW;
         }
     }
@@ -417,6 +431,13 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
      *  storage charging, for a single timestep
      */
     
+    // request zero production from all dispatchable assets
+    //...
+    
+    // charge from dispatchable curtailment
+    //...
+    
+    // charge from nondispatchable curtailment
     //...
     
     return;
@@ -429,6 +450,13 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
      *  storage discharging, for a single timestep
      */
     
+    // discharge
+    //...
+    
+    // request appropriate production from noncombustion dispatchable
+    //...
+    
+    // request appropriate production from combustion dispatchable
     //...
     
     return;
