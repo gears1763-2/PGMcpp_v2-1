@@ -3,7 +3,7 @@
  */
 
 std::cout << std::endl;
-printGreen("Testing Nondispatchable <-- Solar ... ");
+printGold("Testing Nondispatchable <-- Solar ... ");
 std::cout << std::endl;
 
 try {

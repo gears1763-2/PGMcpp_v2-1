@@ -3,7 +3,7 @@
  */
 
 std::cout << std::endl;
-printGreen("Testing Nondispatchable <-- Wave ... ");
+printGold("Testing Nondispatchable <-- Wave ... ");
 std::cout << std::endl;
 
 try {

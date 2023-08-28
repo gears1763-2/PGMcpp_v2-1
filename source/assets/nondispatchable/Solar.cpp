@@ -29,6 +29,28 @@ Solar :: Solar(
 }
 
 
+double Solar :: getProductionkW(double solar_resource_kWm2) {
+    /*
+     *  Method to compute and return production under given solar
+     *  resource. Temperature effects are not modelled.
+     * 
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.11/how_homer_calculates_the_pv_array_power_output.html
+     */
+     
+    // first, check if no resource 
+    if (solar_resource_kWm2 <= 0) {
+        return 0;
+    } 
+    
+    // otherwise, simple linear model
+    else {
+        double production_kW = this->struct_solar.derating *
+            this->struct_nondisp.cap_kW * solar_resource_kWm2;
+        return production_kW;
+    }
+}
+
+
 //...
 
 

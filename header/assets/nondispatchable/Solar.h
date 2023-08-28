@@ -13,6 +13,8 @@
 
 struct structSolar {
     int resource_key = 0;
+    
+    double derating = 0.8;
 };
 
 
@@ -25,7 +27,7 @@ class Solar : public Nondispatchable {
         //  2. methods
         Solar(structNondispatchable, structSolar);
         
-        //...
+        double getProductionkW(double);
         
         ~Solar(void);
 };

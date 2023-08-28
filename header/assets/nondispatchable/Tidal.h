@@ -13,6 +13,9 @@
 
 struct structTidal {
     int resource_key = 0;
+    int power_curve = 0;
+    
+    double design_speed_ms = 2;
 };
 
 
@@ -25,7 +28,7 @@ class Tidal : public Nondispatchable {
         //  2. methods
         Tidal(structNondispatchable, structTidal);
         
-        //...
+        double getProductionkW(double);
         
         ~Tidal(void);
 };

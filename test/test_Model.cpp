@@ -3,7 +3,7 @@
  */
 
 std::cout << std::endl;
-printGreen("Testing Model ... ");
+printGold("Testing Model ... ");
 std::cout << std::endl;
 
 try {
@@ -289,7 +289,7 @@ try {
     std::cout << "\tTesting Model::add2dRenewableResource() ..." <<
         std::endl;
         
-    int wave_key = 0;
+    int wave_key = 4;
 
     try {
         test_model.add2dRenewableResource("balls", "", wave_key);
@@ -405,6 +405,7 @@ try {
     struct_nondisp.test_flag = true;
     
     structSolar struct_solar;
+    struct_solar.resource_key = solar_key;
     
     test_model.addSolar(struct_nondisp, struct_solar);
     
@@ -442,6 +443,7 @@ try {
         std::endl;
     
     structTidal struct_tidal;
+    struct_tidal.resource_key = tidal_key;
     
     test_model.addTidal(struct_nondisp, struct_tidal);
     
@@ -479,6 +481,7 @@ try {
         std::endl;
     
     structWave struct_wave;
+    struct_wave.resource_key = wave_key;
     
     test_model.addWave(struct_nondisp, struct_wave);
     
@@ -516,6 +519,7 @@ try {
         std::endl;
     
     structWind struct_wind;
+    struct_wind.resource_key = wind_key;
     
     test_model.addWind(struct_nondisp, struct_wind);
     
@@ -546,6 +550,16 @@ try {
         __FILE__,
         __LINE__
     );
+    
+    
+    //...
+    
+    
+    // test run()
+    std::cout << "\tTesting Model::run() ..." <<
+        std::endl;
+    
+    test_model.run();
     
 } catch (...) {
     printRed("\n\t\t\t\tModel Tests:  FAIL\n");

@@ -38,7 +38,9 @@ class Model {
         
         
         //  methods
+        void _readInLoadData(void);
         void _populateDeltaVecHr(void);
+        
         void _readIn1dRenewableResource(
             std::string,
             std::vector<std::string>,
@@ -49,8 +51,9 @@ class Model {
             std::vector<std::string>,
             int
         );
-        void _readInLoadData(void);
         
+        double _getRenewableProduction(Nondispatchable*, int);
+        void _generateNetLoadVector(void);
         
         Model(structModel);
         

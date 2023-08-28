@@ -16,6 +16,7 @@ Nondispatchable :: Nondispatchable(
     
     this->struct_nondisp = struct_nondisp;
     
+    this->production_vec_kW.resize(this->struct_nondisp.n_timesteps, 0);
     //...
     
     if (this->struct_nondisp.test_flag) {

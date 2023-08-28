@@ -35,11 +35,14 @@ class Nondispatchable {
         // attributes
         structNondispatchable struct_nondisp;
         
+        std::vector<double> production_vec_kW;
+        
         
         // methods
         Nondispatchable(structNondispatchable);
         
-        //...
+        virtual double getProductionkW(double) {return 0;}
+        virtual double getProductionkW(double, double) {return 0;}
         
         virtual ~Nondispatchable(void);
 };

@@ -13,6 +13,10 @@
 
 struct structWave {
     int resource_key = 0;
+    int power_mode = 0;
+    
+    double design_significant_wave_height_m = 2;
+    double design_energy_period_s = 10;
 };
 
 
@@ -25,7 +29,7 @@ class Wave : public Nondispatchable {
         //  2. methods
         Wave(structNondispatchable, structWave);
         
-        //...
+        double getProductionkW(double, double);
         
         ~Wave(void);
 };

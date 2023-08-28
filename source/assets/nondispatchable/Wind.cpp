@@ -29,6 +29,46 @@ Wind :: Wind(
 }
 
 
+double Wind :: getProductionkW(double wind_resource_ms) {
+    /*
+     *  Method to compute and return production under given wind
+     *  resource.
+     */
+    
+    // first, check if no resource
+    if (wind_resource_ms <= 0) {
+        return 0;
+    }
+    
+    // otherwise, apply selected power curve
+    /*
+     *  ref: docs/wind_tidal_wave.pdf
+     */
+    double production = 0;
+    double turbine_speed = 0;
+    
+    turbine_speed = (wind_resource_ms - this->struct_wind.design_speed_ms) /
+        this->struct_wind.design_speed_ms;
+        
+    if (turbine_speed < -0.76 || turbine_speed > 0.68) {
+        production = 0;
+    }
+    
+    else if (turbine_speed >= -0.76 && turbine_speed <= 0) {
+        production = 1.03273 * exp(-5.97588 * pow(turbine_speed, 2)) -
+            0.03273;
+    }
+    
+    else {
+        production = 0.16154 * exp(-9.30254 * pow(turbine_speed, 2)) +
+            0.83846;
+    }
+    
+    double production_kW = this->struct_nondisp.cap_kW * production;
+    return production_kW;
+}
+
+
 //...
 
 

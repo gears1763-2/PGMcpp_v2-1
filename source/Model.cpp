@@ -8,6 +8,60 @@
 #include "../header/Model.h"
 
 
+// -------- HELPER METHODS -------- //
+
+
+void Model :: _readInLoadData() {
+    /*
+     *  Helper method to read in electrical load time series
+     * 
+     *  ref: https://github.com/ben-strasser/fast-cpp-csv-parser
+     */
+
+    // init CSVReader
+    io::CSVReader<2> in(this->struct_model.path_2_load_data);
+    
+    // define expected .csv structure
+    in.read_header(
+        io::ignore_extra_column,
+        "Time (since start of data) [hr]",
+        "Electrical Load [kW]"
+    );
+    
+    if (this->struct_model.print_flag) {
+        std::cout << "Reading electrical load data ... ";
+    }
+    
+    // populate time_vec_hr and load_vec_kW
+    int periods = 0;
+    double time_hr;
+    double load_kW;
+    while (in.read_row(time_hr, load_kW)) {
+        if (this->struct_model.print_flag) {
+            for (int i = 0; i < periods; i++) {
+                std::cout << ".";
+            }
+        }
+        
+        this->time_vec_hr.push_back(time_hr);
+        this->load_vec_kW.push_back(load_kW);
+        
+        if (this->struct_model.print_flag) {
+            for (int i = 0; i < periods; i++) {
+                std::cout << "\b";
+            }
+            periods = (periods + 1) % 3;
+        }
+    }
+    
+    if (this->struct_model.print_flag) {
+        std::cout << "DONE" << std::endl;
+    }
+    
+    return;
+}
+
+
 void Model :: _populateDeltaVecHr() {
     /*
      *  Helper method to populate dt_vec_hr
@@ -99,6 +153,7 @@ void Model :: _readIn1dRenewableResource(
                 std::cout << error_str << std::endl;
             #endif
             
+            this->clearAssets();
             throw std::runtime_error(error_str);
         }
         
@@ -131,6 +186,7 @@ void Model :: _readIn1dRenewableResource(
             std::cout << error_str << std::endl;
         #endif
         
+        this->clearAssets();
         throw std::runtime_error(error_str);
     }
     
@@ -203,6 +259,7 @@ void Model :: _readIn2dRenewableResource(
                 std::cout << error_str << std::endl;
             #endif
             
+            this->clearAssets();
             throw std::runtime_error(error_str);
         }
         
@@ -236,6 +293,7 @@ void Model :: _readIn2dRenewableResource(
             std::cout << error_str << std::endl;
         #endif
         
+        this->clearAssets();
         throw std::runtime_error(error_str);
     }
     
@@ -243,55 +301,118 @@ void Model :: _readIn2dRenewableResource(
 }
 
 
-void Model :: _readInLoadData() {
+double Model :: _getRenewableProduction(
+    Nondispatchable* nondisp_ptr,
+    int timestep
+) {
     /*
-     *  Helper method to read in electrical load time series
-     * 
-     *  ref: https://github.com/ben-strasser/fast-cpp-csv-parser
+     *  Helper method to compute and return production from renewable 
+     *  asset in given time step
      */
+    
+    double production_kW = 0;
+    
+    switch (nondisp_ptr->struct_nondisp.nondisp_type) {
+        case (SOLAR): {
+            int resource_key =
+                ((Solar*)nondisp_ptr)->struct_solar.resource_key;
+            
+            double solar_resource_kWm2 = this->resource_map_1D[
+                resource_key
+            ][timestep];
+            
+            production_kW = nondisp_ptr->getProductionkW(solar_resource_kWm2);
+            
+            break;
+        }
+        
+        case (TIDAL): {
+            int resource_key =
+                ((Tidal*)nondisp_ptr)->struct_tidal.resource_key;
+            
+            double tidal_resource_ms = this->resource_map_1D[
+                resource_key
+            ][timestep];
+            
+            production_kW = nondisp_ptr->getProductionkW(tidal_resource_ms);
+            
+            break;
+        }
+        
+        case (WAVE): {
+            int resource_key =
+                ((Wave*)nondisp_ptr)->struct_wave.resource_key;
+                
+            std::vector<double> wave_resource = this->resource_map_2D[
+                resource_key
+            ][timestep];
+            
+            double significant_wave_height_m = wave_resource[0];
+            double energy_period_s = wave_resource[1];
+            
+            production_kW = nondisp_ptr->getProductionkW(
+                significant_wave_height_m,
+                energy_period_s
+            );
+            
+            break;
+        }
+        
+        case (WIND): {
+            int resource_key =
+                ((Wind*)nondisp_ptr)->struct_wind.resource_key;
+            
+            double wind_resource_ms = this->resource_map_1D[
+                resource_key
+            ][timestep];
+            
+            production_kW = nondisp_ptr->getProductionkW(wind_resource_ms);
+            
+            break;
+        }
+        
+        default: {
+            // do nothing!
+            
+            break;
+        }
+    }
+    
+    return production_kW;
+}
 
-    // init CSVReader
-    io::CSVReader<2> in(this->struct_model.path_2_load_data);
+
+void Model :: _generateNetLoadVector() {
+    /*
+     *  Helper method to populate net load vector
+     */
     
-    // define expected .csv structure
-    in.read_header(
-        io::ignore_extra_column,
-        "Time (since start of data) [hr]",
-        "Electrical Load [kW]"
-    );
-    
-    if (this->struct_model.print_flag) {
-        std::cout << "Reading electrical load data ... ";
-    }
-    
-    // populate time_vec_hr and load_vec_kW
-    int periods = 0;
-    double time_hr;
-    double load_kW;
-    while (in.read_row(time_hr, load_kW)) {
-        if (this->struct_model.print_flag) {
-            for (int i = 0; i < periods; i++) {
-                std::cout << ".";
-            }
+    for (int i = 0; i < this->struct_model.n_timesteps; i++) {
+        double net_load_kW = this->load_vec_kW[i];
+        
+        for (size_t j = 0; j < this->nondisp_ptr_vec.size(); j++) {
+            // get renewable production
+            Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[j];
+            double production_kW = this->_getRenewableProduction(
+                nondisp_ptr,
+                i
+            );
+            
+            // record renewable production
+            nondisp_ptr->production_vec_kW[i] = production_kW;
+            
+            // update net load
+            net_load_kW -= production_kW;
         }
         
-        this->time_vec_hr.push_back(time_hr);
-        this->load_vec_kW.push_back(load_kW);
-        
-        if (this->struct_model.print_flag) {
-            for (int i = 0; i < periods; i++) {
-                std::cout << "\b";
-            }
-            periods = (periods + 1) % 3;
-        }
-    }
-    
-    if (this->struct_model.print_flag) {
-        std::cout << "DONE" << std::endl;
+        this->net_load_vec_kW[i] = net_load_kW;
     }
     
     return;
 }
+
+
+// -------- INTERFACE METHODS -------- //
 
 
 Model :: Model(structModel struct_model) {
@@ -307,6 +428,9 @@ Model :: Model(structModel struct_model) {
     
     // populate dt_vec_hrs
     this->_populateDeltaVecHr();
+    
+    // size net_load_vec_kW
+    this->net_load_vec_kW.resize(this->struct_model.n_timesteps, 0);
     
     if (this->struct_model.test_flag) {
         std::cout << "Model object constructed at " << this <<
@@ -397,6 +521,8 @@ void Model :: add1dRenewableResource(
         );
     }
     
+    //...
+    
     else {
         std::string error_str = "\nERROR  Model::add1dRenewableResource()";
         error_str += "  resource type ";
@@ -407,6 +533,7 @@ void Model :: add1dRenewableResource(
             std::cout << error_str << std::endl;
         #endif
         
+        this->clearAssets();
         throw std::runtime_error(error_str);
     }
     
@@ -448,6 +575,8 @@ void Model :: add2dRenewableResource(
         );
     }
     
+    //...
+    
     else {
         std::string error_str = "\nERROR  Model::add2dRenewableResource()";
         error_str += "  resource type ";
@@ -458,6 +587,7 @@ void Model :: add2dRenewableResource(
             std::cout << error_str << std::endl;
         #endif
         
+        this->clearAssets();
         throw std::runtime_error(error_str);
     }
     
@@ -564,7 +694,7 @@ void Model :: run() {
     
     try {
         // generate net load vector
-        //...
+        this->_generateNetLoadVector();
     
         // handle dispatch control
         //...
@@ -579,12 +709,13 @@ void Model :: run() {
 
 void Model :: clearAssets() {
     /*
-     *  Method to clear pointer vector attributes
+     *  Method to clear pointer vector attributes (i.e., assets)
      */
     
     for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
         delete this->nondisp_ptr_vec[i];
     }
+    this->nondisp_ptr_vec.clear();
     
     return;
 }

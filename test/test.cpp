@@ -247,6 +247,17 @@ void printRed(std::string input_str) {
 }
 
 
+void printGold(std::string input_str) {
+    /*
+     *  Helper function to stream a red string to std::cout
+     */
+    
+    std::cout << "\x1B[33m" << input_str << "\033[0m";
+    
+    return;
+}
+
+
 int main(int argc, char** argv) {
     
     //  colour streaming
@@ -257,6 +268,10 @@ int main(int argc, char** argv) {
     
     std::cout << "TEST:  Streaming in ";
     printRed("RED");
+    std::cout << std::endl;
+    
+    std::cout << "TEST:  Streaming in ";
+    printGold("GOLD");
     std::cout << std::endl << std::endl;
     
     std::cout << "Running Tests ..." << std::endl;

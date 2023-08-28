@@ -13,6 +13,8 @@
 
 struct structWind {
     int resource_key = 0;
+    
+    double design_speed_ms = 8;
 };
 
 
@@ -25,7 +27,7 @@ class Wind : public Nondispatchable {
         //  2. methods
         Wind(structNondispatchable, structWind);
         
-        //...
+        double getProductionkW(double);
         
         ~Wind(void);
 };
