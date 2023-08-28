@@ -104,7 +104,9 @@ try {
         error_str += "to throw expected runtime error at line ";
         error_str += std::to_string(__LINE__);
         throw std::runtime_error(error_str);
-    } catch (...) {
+    }
+    
+    catch (...) {
         // task failed successfully! =P
     }
     
@@ -119,7 +121,9 @@ try {
         error_str += "to throw expected runtime error at line ";
         error_str += std::to_string(__LINE__);
         throw std::runtime_error(error_str);
-    } catch (...) {
+    }
+    
+    catch (...) {
         // task failed successfully! =P
     }
     
@@ -134,7 +138,9 @@ try {
         error_str += "to throw expected runtime error at line ";
         error_str += std::to_string(__LINE__);
         throw std::runtime_error(error_str);
-    } catch (...) {
+    }
+    
+    catch (...) {
         // task failed successfully! =P
     }
     
@@ -298,7 +304,9 @@ try {
         error_str += "to throw expected runtime error at line ";
         error_str += std::to_string(__LINE__);
         throw std::runtime_error(error_str);
-    } catch (...) {
+    }
+    
+    catch (...) {
         // task failed successfully! =P
     }
     
@@ -313,7 +321,9 @@ try {
         error_str += "to throw expected runtime error at line ";
         error_str += std::to_string(__LINE__);
         throw std::runtime_error(error_str);
-    } catch (...) {
+    }
+    
+    catch (...) {
         // task failed successfully! =P
     }
     
@@ -328,7 +338,9 @@ try {
         error_str += "to throw expected runtime error at line ";
         error_str += std::to_string(__LINE__);
         throw std::runtime_error(error_str);
-    } catch (...) {
+    }
+    
+    catch (...) {
         // task failed successfully! =P
     }
     

@@ -45,7 +45,7 @@ double Tidal :: getProductionkW(double tidal_resource_ms) {
     double turbine_speed = 0;
     
     switch(this->struct_tidal.power_curve) {
-        case (1): {
+        case (CUBIC): {
             /*
              *  ref: B. Buckham, C. Crawford, I. Beya Marshall, and
              *       B. Whitby, "Wei Wai Kum Tidal Prefeasibility
@@ -59,22 +59,25 @@ double Tidal :: getProductionkW(double tidal_resource_ms) {
                 tidal_resource_ms > 1.25 * this->struct_tidal.design_speed_ms
             ){
                 production = 0;
-            } else if (
+            }
+            
+            else if (
                 0.15 * this->struct_tidal.design_speed_ms <= tidal_resource_ms &&
                 tidal_resource_ms <= this->struct_tidal.design_speed_ms
             ) {
                 production = 
                     (1 / pow(this->struct_tidal.design_speed_ms, 3)) *
                     pow(tidal_resource_ms, 3);
-            } else {
+            }
+            
+            else {
                 production = 1;
             }
             
             break;
         }
         
-        
-        default: {
+        case (EXPONENTIAL): {
             /*
              *  ref: docs/wind_tidal_wave.pdf
              */
@@ -85,11 +88,21 @@ double Tidal :: getProductionkW(double tidal_resource_ms) {
                 
             if (turbine_speed < -0.71 || turbine_speed > 0.65) {
                 production = 0;
-            } else if (turbine_speed >= -0.71 && turbine_speed <= 0) {
+            }
+            
+            else if (turbine_speed >= -0.71 && turbine_speed <= 0) {
                 production = 1.69215 * exp(1.25909 * turbine_speed) - 0.69215;
-            } else {
+            }
+            
+            else {
                 production = 1;
             }
+            
+            break;
+        }
+        
+        default: {
+            // do nothing!
             
             break;
         }

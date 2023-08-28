@@ -11,9 +11,17 @@
 #include "Model_includes.h"
 
 
+enum DispatchMode {
+    LOAD_FOLLOWING_IN_ORDER,
+    LOAD_FOLLOWING_SMART_COMBUSTION
+};
+
+
 struct structModel {
     bool print_flag = false;
     bool test_flag = false;
+    
+    DispatchMode dispatch_mode = LOAD_FOLLOWING_IN_ORDER;
     
     int n_timesteps = 0;
     
@@ -54,6 +62,11 @@ class Model {
         
         double _getRenewableProduction(Nondispatchable*, int);
         void _generateNetLoadVector(void);
+        
+        void _dispatchLoadFollowingInOrderCharging(int);
+        void _dispatchLoadFollowingInOrderDischarging(int);
+        void _handleDispatch(void);
+        
         
         Model(structModel);
         

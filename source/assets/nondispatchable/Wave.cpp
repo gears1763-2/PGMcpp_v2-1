@@ -53,7 +53,7 @@ double Wave :: getProductionkW(
     double T_e_nondim = 0;
     
     switch (this->struct_wave.power_mode) {
-        case (-1): {
+        case (NORMALIZED_PERFORMANCE_MATRIX): {
             /*
              *  Interpolate over given normalized performance matrix
              */
@@ -63,8 +63,7 @@ double Wave :: getProductionkW(
             break;
         }
         
-        
-        case (1): {
+        case (GAUSSIAN): {
             /*
              *  ref: docs/wind_tidal_wave.pdf
              */
@@ -92,8 +91,7 @@ double Wave :: getProductionkW(
             break;
         }
         
-        
-        default: {
+        case (PARABOLOID): {
             /*
              *  ref: B. Robertson, H. Bailey, M. Leary, and B. Buckham,
              *       “A methodology for architecture agnostic and
@@ -124,6 +122,12 @@ double Wave :: getProductionkW(
             else if (production > 1) {
                 production = 1;
             }
+            
+            break;
+        }
+        
+        default : {
+            // do nothing!
             
             break;
         }

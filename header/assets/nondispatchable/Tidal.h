@@ -11,9 +11,16 @@
 #include "Nondispatchable.h"
 
 
+enum TidalPowerCurve {
+    CUBIC,
+    EXPONENTIAL
+};
+
+
 struct structTidal {
     int resource_key = 0;
-    int power_curve = 0;
+    
+    TidalPowerCurve power_curve = CUBIC;
     
     double design_speed_ms = 2;
 };

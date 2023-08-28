@@ -40,7 +40,7 @@ double Wind :: getProductionkW(double wind_resource_ms) {
         return 0;
     }
     
-    // otherwise, apply selected power curve
+    // otherwise, apply power curve
     /*
      *  ref: docs/wind_tidal_wave.pdf
      */

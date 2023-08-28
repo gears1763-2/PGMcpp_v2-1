@@ -393,6 +393,7 @@ void Model :: _generateNetLoadVector() {
         for (size_t j = 0; j < this->nondisp_ptr_vec.size(); j++) {
             // get renewable production
             Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[j];
+            
             double production_kW = this->_getRenewableProduction(
                 nondisp_ptr,
                 i
@@ -404,15 +405,74 @@ void Model :: _generateNetLoadVector() {
             // update net load
             net_load_kW -= production_kW;
         }
-        
-        this->net_load_vec_kW[i] = net_load_kW;
     }
     
     return;
 }
 
 
-// -------- INTERFACE METHODS -------- //
+void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
+    /*
+     *  Helper method to handle load following in order dispatch, under
+     *  storage charging, for a single timestep
+     */
+    
+    //...
+    
+    return;
+}
+
+
+void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
+    /*
+     *  Helper method to handle load following in order dispatch, under 
+     *  storage discharging, for a single timestep
+     */
+    
+    //...
+    
+    return;
+}
+
+
+void Model :: _handleDispatch() {
+    /*
+     *  Helper method to handle dispatch under choice of dispatch mode
+     */
+    
+    switch (this->struct_model.dispatch_mode) {
+        case (LOAD_FOLLOWING_IN_ORDER): {
+            for (int i = 0; i < this->struct_model.n_timesteps; i++) {
+                if (this->net_load_vec_kW[i] <= 0) {
+                    this->_dispatchLoadFollowingInOrderCharging(i);
+                }
+                
+                else {
+                    this->_dispatchLoadFollowingInOrderDischarging(i);
+                }
+            }
+            
+            break;
+        }
+        
+        case (LOAD_FOLLOWING_SMART_COMBUSTION): {
+            //...
+            
+            break;
+        }
+        
+        default: {
+            // do nothing!
+            
+            break;
+        }
+    }
+    
+    return;
+}
+
+
+// -------- USER INTERFACE METHODS -------- //
 
 
 Model :: Model(structModel struct_model) {
@@ -697,8 +757,14 @@ void Model :: run() {
         this->_generateNetLoadVector();
     
         // handle dispatch control
+        this->_handleDispatch();
+        
+        // compute economics
         //...
-    } catch (...) {
+        
+    } 
+    
+    catch (...) {
         this->clearAssets();
         throw;
     }
@@ -712,10 +778,20 @@ void Model :: clearAssets() {
      *  Method to clear pointer vector attributes (i.e., assets)
      */
     
+    // clear renewable assets
     for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
         delete this->nondisp_ptr_vec[i];
     }
     this->nondisp_ptr_vec.clear();
+    
+    // clear combustion dispatchable assets
+    //...
+    
+    // clear noncombustion dispatchable assets
+    //...
+    
+    // clear storage assets
+    //..
     
     return;
 }

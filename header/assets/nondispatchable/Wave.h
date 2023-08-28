@@ -11,9 +11,17 @@
 #include "Nondispatchable.h"
 
 
+enum WavePowerMode {
+    GAUSSIAN,
+    NORMALIZED_PERFORMANCE_MATRIX,
+    PARABOLOID
+};
+
+
 struct structWave {
     int resource_key = 0;
-    int power_mode = 0;
+    
+    WavePowerMode power_mode = PARABOLOID;
     
     double design_significant_wave_height_m = 2;
     double design_energy_period_s = 10;
