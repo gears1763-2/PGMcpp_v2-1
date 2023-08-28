@@ -13,5 +13,10 @@
 #include "assets/nondispatchable/Wave.h"
 #include "assets/nondispatchable/Wind.h"
 
+#include "assets/dispatchable/Dispatchable.h"
+#include "assets/dispatchable/Hydro.h"
+#include "assets/dispatchable/combustion/Combustion.h"
+#include "assets/dispatchable/combustion/Diesel.h"
+
 
 #endif  /* MODEL_INCLUDES_H */

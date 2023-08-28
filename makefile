@@ -73,6 +73,46 @@ Wind: $(SRC_WIND)
 	$(CXX) $(CXXFLAGS) -c $(SRC_WIND) -o $(OBJ_WIND)
 
 
+## ------ Dispatchable ------ ##
+
+SRC_DISPATCHABLE = source/assets/dispatchable/Dispatchable.cpp
+OBJ_DISPATCHABLE = object/assets/dispatchable/Dispatchable.o
+
+.PHONY: Dispatchable
+Dispatchable: $(SRC_DISPATCHABLE)
+	$(CXX) $(CXXFLAGS) -c $(SRC_DISPATCHABLE) -o $(OBJ_DISPATCHABLE)
+
+
+## ------ Hydro ------ ##
+
+SRC_HYDRO = source/assets/dispatchable/Hydro.cpp
+OBJ_HYDRO = object/assets/dispatchable/Hydro.o
+
+.PHONY: Hydro
+Hydro: $(SRC_HYDRO)
+	$(CXX) $(CXXFLAGS) -c $(SRC_HYDRO) -o $(OBJ_HYDRO)
+
+
+## ------ Combustion ------ ##
+
+SRC_COMBUSTION = source/assets/dispatchable/combustion/Combustion.cpp
+OBJ_COMBUSTION = object/assets/dispatchable/combustion/Combustion.o
+
+.PHONY: Combustion
+Combustion: $(SRC_COMBUSTION)
+	$(CXX) $(CXXFLAGS) -c $(SRC_COMBUSTION) -o $(OBJ_COMBUSTION)
+
+
+## ------ Diesel ------ ##
+
+SRC_DIESEL = source/assets/dispatchable/combustion/Diesel.cpp
+OBJ_DIESEL = object/assets/dispatchable/combustion/Diesel.o
+
+.PHONY: Diesel
+Diesel: $(SRC_DIESEL)
+	$(CXX) $(CXXFLAGS) -c $(SRC_DIESEL) -o $(OBJ_DIESEL)
+
+
 ## ------ Model ------ ##
 
 SRC_MODEL = source/Model.cpp
@@ -85,19 +125,37 @@ Model: $(SRC_MODEL)
 
 ## ---- ALL ---- ##
 
-OBJ_ALL = $(OBJ_SOLAR)\
-          $(OBJ_TIDAL)\
-          $(OBJ_WAVE)\
-          $(OBJ_WIND)\
-          $(OBJ_NONDISPATCHABLE)\
+OBJ_NONDISP_HIERARCHY = $(OBJ_SOLAR)\
+                        $(OBJ_TIDAL)\
+                        $(OBJ_WAVE)\
+                        $(OBJ_WIND)\
+                        $(OBJ_NONDISPATCHABLE)
+
+MAKE_NONDISP_HIERARCHY = Solar\
+                         Tidal\
+                         Wave\
+                         Wind\
+                         Nondispatchable
+
+
+OBJ_DISP_HIERARCHY = $(OBJ_DIESEL)\
+                     $(OBJ_HYDRO)\
+                     $(OBJ_COMBUSTION)\
+                     $(OBJ_DISPATCHABLE)
+
+MAKE_DISP_HIERARCHY = Diesel\
+                      Hydro\
+                      Combustion\
+                      Dispatchable
+
+
+OBJ_ALL = $(OBJ_NONDISP_HIERARCHY)\
+          $(OBJ_DISP_HIERARCHY)\
           $(OBJ_MODEL)
 
 
-MAKE_ALL = Solar\
-           Tidal\
-           Wave\
-           Wind\
-           Nondispatchable\
+MAKE_ALL = $(MAKE_NONDISP_HIERARCHY)\
+           $(MAKE_DISP_HIERARCHY)\
            Model
 
 
@@ -132,6 +190,8 @@ all:
 	mkdir -pv object
 	mkdir -pv object/assets
 	mkdir -pv object/assets/nondispatchable
+	mkdir -pv object/assets/dispatchable
+	mkdir -pv object/assets/dispatchable/combustion
 	mkdir -pv data/output
 	make $(MAKE_ALL) test
 

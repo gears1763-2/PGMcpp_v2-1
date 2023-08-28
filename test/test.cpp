@@ -281,6 +281,9 @@ int main(int argc, char** argv) {
     #include "assets/nondispatchable/test_Tidal.cpp"
     #include "assets/nondispatchable/test_Wave.cpp"
     #include "assets/nondispatchable/test_Wind.cpp"
+    
+    #include "assets/dispatchable/test_Hydro.cpp"
+    #include "assets/dispatchable/combustion/test_Diesel.cpp"
 
     #include "test_Model.cpp"
     
