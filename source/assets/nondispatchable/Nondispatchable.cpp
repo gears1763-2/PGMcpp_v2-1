@@ -21,6 +21,8 @@ Nondispatchable :: Nondispatchable(
     this->curtailment_vec_kW.resize(this->struct_nondisp.n_timesteps, 0);
     this->storage_vec_kW.resize(this->struct_nondisp.n_timesteps, 0);
     
+    this->is_running_vec.resize(this->struct_nondisp.n_timesteps, false);
+    
     if (this->struct_nondisp.test_flag) {
         std::cout << "\tNondispatchable object constructed at " << this
             << std::endl;
@@ -40,6 +42,11 @@ double Nondispatchable :: getDispatchkW(
     
     // check for zero load
     if (load_kW <= 0) {
+        return 0;
+    }
+    
+    // check for zero production
+    if (production_kW <= 0) {
         return 0;
     }
     

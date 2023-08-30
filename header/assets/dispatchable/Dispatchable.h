@@ -17,6 +17,7 @@ enum DispatchableType {
 
 
 struct structDispatchable {
+    bool is_running = false;
     bool print_flag = false;
     bool test_flag = false;
     
@@ -38,13 +39,18 @@ class Dispatchable {
         std::vector<double> curtailment_vec_kW;
         std::vector<double> storage_vec_kW;
         
+        std::vector<bool> is_running_vec;
+        
         
         // methods
         Dispatchable(structDispatchable);
         
         double getDispatchkW(double, double);
         
-        virtual double requestProduction(double);
+        virtual void commitProduction(double, int) {return;}
+        
+        virtual double requestProduction(double) {return 0;}
+        virtual double getFuelConsumption(double) {return 0;}
         
         virtual ~Dispatchable(void);
 };

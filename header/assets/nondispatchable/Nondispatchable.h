@@ -19,6 +19,7 @@ enum NondispatchableType {
 
 
 struct structNondispatchable {
+    bool is_running = false;
     bool print_flag = false;
     bool test_flag = false;
     
@@ -40,11 +41,15 @@ class Nondispatchable {
         std::vector<double> curtailment_vec_kW;
         std::vector<double> storage_vec_kW;
         
+        std::vector<bool> is_running_vec;
+        
         
         // methods
         Nondispatchable(structNondispatchable);
         
         double getDispatchkW(double, double);
+        
+        virtual void commitProduction(double, int) {return;}
         
         virtual double getProductionkW(double) {return 0;}
         virtual double getProductionkW(double, double) {return 0;}

@@ -20,13 +20,18 @@ struct structDiesel {
 class Diesel : public Combustion {
     public:
         //  1. attributes
-        structDiesel struct_Combustion;
+        structDiesel struct_diesel;
+        
+        std::vector<double> fuel_vec_L;
         
         
         //  2. methods
         Diesel(structDispatchable, structCombustion, structDiesel);
         
+        void commitProduction(double, int);
+        
         double requestProduction(double);
+        double getFuelConsumption(double, double);
         
         ~Diesel(void);
 };

@@ -27,6 +27,8 @@ class Wind : public Nondispatchable {
         //  2. methods
         Wind(structNondispatchable, structWind);
         
+        void commitProduction(double, int);
+        
         double getProductionkW(double);
         
         ~Wind(void);

@@ -8,7 +8,12 @@ std::cout << std::endl;
 
 try {
     //  construction
-    //...
+    structNondispatchable struct_nondisp;
+    struct_nondisp.test_flag = true;
+    
+    structSolar struct_solar;
+    
+    Solar test_solar(struct_nondisp, struct_solar);
     
     
     //...

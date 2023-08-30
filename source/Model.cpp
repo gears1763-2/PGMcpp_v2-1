@@ -393,7 +393,7 @@ void Model :: _generateNetLoadVector() {
         double net_load_kW = this->load_vec_kW[i];
         
         for (size_t j = 0; j < this->nondisp_ptr_vec.size(); j++) {
-            // compute and record production
+            // compute and record renewable production
             Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[j];
             
             double production_kW = this->_getRenewableProduction(
@@ -403,7 +403,7 @@ void Model :: _generateNetLoadVector() {
             
             nondisp_ptr->production_vec_kW[i] = production_kW;
             
-            // compute and record dispatch
+            // compute and record renewable dispatch
             double dispatch_kW = nondisp_ptr->getDispatchkW(
                 load_kW,
                 production_kW
@@ -411,7 +411,7 @@ void Model :: _generateNetLoadVector() {
             
             nondisp_ptr->dispatch_vec_kW[i] = dispatch_kW;
             
-            // compute and record curtailment
+            // compute and record renewable curtailment
             double curtailment_kW = production_kW - dispatch_kW;
             nondisp_ptr->curtailment_vec_kW[i] = curtailment_kW;
             
@@ -419,6 +419,8 @@ void Model :: _generateNetLoadVector() {
             load_kW -= dispatch_kW;
             net_load_kW -= production_kW;
         }
+        
+        this->net_load_vec_kW[i] = net_load_kW;
     }
     
     return;
@@ -431,14 +433,85 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
      *  storage charging, for a single timestep
      */
     
-    // request zero production from all dispatchable assets
-    //...
+    // for all combustion assets, request zero production and commit,
+    // record production, dispatch, and curtailment
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        // request zero production and commit
+        Combustion* combustion_ptr = this->combustion_ptr_vec[i];
+        
+        double production_kW = combustion_ptr->requestProduction(0);
+        
+        combustion_ptr->commitProduction(production_kW, timestep);
+        
+        // record dispatch (remaining load is <= 0, in this case)
+        double dispatch_kW = combustion_ptr->getDispatchkW(
+            0,
+            production_kW
+        );
+        combustion_ptr->dispatch_vec_kW[timestep] = dispatch_kW;
+        
+        // record curtailment
+        double curtailment_kW = production_kW - dispatch_kW;
+        combustion_ptr->curtailment_vec_kW[timestep] = curtailment_kW;
+    }
     
-    // charge from dispatchable curtailment
-    //...
+    // for all noncombustion assets, request zero production and commit,
+    // record production, dispatch, and curtailment
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        // request zero production and commit
+        Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
+        
+        double production_kW = noncombustion_ptr->requestProduction(0);
+        
+        noncombustion_ptr->commitProduction(production_kW, timestep);
+        
+        // record dispatch (net load is <= 0, in this case)
+        double dispatch_kW = noncombustion_ptr->getDispatchkW(
+            0,
+            production_kW
+        );
+        noncombustion_ptr->dispatch_vec_kW[timestep] = dispatch_kW;
+        
+        // record curtailment
+        double curtailment_kW = production_kW - dispatch_kW;
+        noncombustion_ptr->curtailment_vec_kW[timestep] = curtailment_kW;
+    }
     
-    // charge from nondispatchable curtailment
-    //...
+    // for all combustion assets, attempt to charge from curtailment,
+    // update curtailment, and record storage
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        Combustion* combustion_ptr = this->combustion_ptr_vec[i];
+        
+        if (combustion_ptr->curtailment_vec_kW[timestep] <= 0) {
+            continue;
+        }
+        
+        //...
+    }
+    
+    // for all noncombustion assets, attempt to charge from curtailment,
+    // update curtailment, and record storage
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
+        
+        if (noncombustion_ptr->curtailment_vec_kW[timestep] <= 0) {
+            continue;
+        }
+        
+        //...
+    }
+    
+    // for all nondispatchable assets, attempt to charge from curtailment,
+    // update curtailment, and record storage
+    for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
+        Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[i];
+        
+        if (nondisp_ptr->curtailment_vec_kW[timestep] <= 0) {
+            continue;
+        }
+        
+        //...
+    }
     
     return;
 }
@@ -450,14 +523,65 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
      *  storage discharging, for a single timestep
      */
     
-    // discharge
+    double load_kW = this->net_load_vec_kW[timestep];
+    
+    // for all storage assets, discharge
     //...
     
-    // request appropriate production from noncombustion dispatchable
-    //...
+    // for all noncombustion assets, request production and commit,
+    // record production, dispatch, and curtailment, and update load
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        // request production and commit
+        Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
+        
+        double production_kW = noncombustion_ptr->requestProduction(load_kW);
+        
+        noncombustion_ptr->commitProduction(production_kW, timestep);
+        
+        // record dispatch
+        double dispatch_kW = noncombustion_ptr->getDispatchkW(
+            load_kW,
+            production_kW
+        );
+        noncombustion_ptr->dispatch_vec_kW[timestep] = dispatch_kW;
+        
+        // record curtailment
+        double curtailment_kW = production_kW - dispatch_kW;
+        noncombustion_ptr->curtailment_vec_kW[timestep] = curtailment_kW;
+        
+        // update load 
+        load_kW -= dispatch_kW;
+    }
     
-    // request appropriate production from combustion dispatchable
-    //...
+    // for all combustion assets, request production and commit,
+    // record production, dispatch, and curtailment, and update load
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        // request production and commit
+        Combustion* combustion_ptr = this->combustion_ptr_vec[i];
+        
+        double production_kW = combustion_ptr->requestProduction(load_kW);
+        
+        combustion_ptr->commitProduction(production_kW, timestep);
+        
+        // record dispatch
+        double dispatch_kW = combustion_ptr->getDispatchkW(
+            load_kW,
+            production_kW
+        );
+        combustion_ptr->dispatch_vec_kW[timestep] = dispatch_kW;
+        
+        // record curtailment
+        double curtailment_kW = production_kW - dispatch_kW;
+        combustion_ptr->curtailment_vec_kW[timestep] = curtailment_kW;
+        
+        // update load 
+        load_kW -= dispatch_kW;
+    }
+    
+    // if remaining load >= 0, record
+    if (load_kW >= 0) {
+        this->remaining_load_vec_kW[timestep] = load_kW;
+    }
     
     return;
 }
@@ -519,6 +643,7 @@ Model :: Model(structModel struct_model) {
     
     // size net_load_vec_kW
     this->net_load_vec_kW.resize(this->struct_model.n_timesteps, 0);
+    this->remaining_load_vec_kW.resize(this->struct_model.n_timesteps, 0);
     
     if (this->struct_model.test_flag) {
         std::cout << "Model object constructed at " << this <<
@@ -775,6 +900,52 @@ void Model :: addWind(
 }
 
 
+void Model :: addDiesel(
+    structDispatchable struct_disp,
+    structCombustion struct_combustion,
+    structDiesel struct_diesel
+) {
+    /*
+     *  Method to add Diesel asset to the Model
+     */
+    
+    struct_disp.disp_type = DIESEL;
+    struct_disp.n_timesteps = this->struct_model.n_timesteps;
+    
+    Combustion* combustion_ptr = new Diesel(
+        struct_disp,
+        struct_combustion,
+        struct_diesel
+    );
+    
+    this->combustion_ptr_vec.push_back(combustion_ptr);
+    
+    return;
+}
+
+
+void Model :: addHydro(
+    structDispatchable struct_disp,
+    structHydro struct_hydro
+) {
+    /*
+     *  Method to add Hydro asset to the Model
+     */
+    
+    struct_disp.disp_type = HYDRO;
+    struct_disp.n_timesteps = this->struct_model.n_timesteps;
+    
+    Dispatchable* disp_ptr = new Hydro(
+        struct_disp,
+        struct_hydro
+    );
+    
+    this->noncombustion_ptr_vec.push_back(disp_ptr);
+    
+    return;
+}
+
+
 void Model :: run() {
     /*
      *  Method to run the Model
@@ -813,10 +984,16 @@ void Model :: clearAssets() {
     this->nondisp_ptr_vec.clear();
     
     // clear combustion dispatchable assets
-    //...
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        delete this->combustion_ptr_vec[i];
+    }
+    this->combustion_ptr_vec.clear();
     
     // clear noncombustion dispatchable assets
-    //...
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        delete this->noncombustion_ptr_vec[i];
+    }
+    this->noncombustion_ptr_vec.clear();
     
     // clear storage assets
     //..

@@ -8,7 +8,12 @@ std::cout << std::endl;
 
 try {
     //  construction
-    //...
+    structNondispatchable struct_nondisp;
+    struct_nondisp.test_flag = true;
+    
+    structTidal struct_tidal;
+    
+    Tidal test_tidal(struct_nondisp, struct_tidal);
     
     
     //...

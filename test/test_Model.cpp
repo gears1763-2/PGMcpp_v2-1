@@ -13,7 +13,8 @@ try {
     struct_model.print_flag = true;
     struct_model.test_flag = true;
     
-    struct_model.path_2_load_data = "data/input/test/electrical_load_generic_peak-500kW_1yr_dt-1hr.csv";
+    struct_model.path_2_load_data =
+        "data/input/test/electrical_load_generic_peak-500kW_1yr_dt-1hr.csv";
     
     Model test_model(struct_model);
     
@@ -89,6 +90,9 @@ try {
         __FILE__,
         __LINE__
     );
+    
+    
+    // test 
     
     
     // test add1dRenewableResource()
@@ -412,7 +416,6 @@ try {
         std::endl;
         
     structNondispatchable struct_nondisp;
-    
     struct_nondisp.print_flag = true;
     struct_nondisp.test_flag = true;
     
@@ -558,6 +561,87 @@ try {
             test_model.nondisp_ptr_vec.size() - 1
         ]->struct_nondisp.nondisp_type,
         WIND,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    
+    // test addDiesel()
+    std::cout << "\tTesting Model::addDiesel() ..." <<
+        std::endl;
+    
+    structDispatchable struct_disp;
+    struct_disp.print_flag = true;
+    struct_disp.test_flag = true;
+    struct_disp.cap_kW = 600;
+    
+    structCombustion struct_combustion;
+    
+    structDiesel struct_diesel;
+    
+    test_model.addDiesel(struct_disp, struct_combustion, struct_diesel);
+    
+    testFloatEquals(
+        test_model.combustion_ptr_vec.size(),
+        1,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.combustion_ptr_vec[
+            test_model.combustion_ptr_vec.size() - 1
+        ]->struct_disp.n_timesteps,
+        test_model.struct_model.n_timesteps,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.combustion_ptr_vec[
+            test_model.combustion_ptr_vec.size() - 1
+        ]->struct_disp.disp_type,
+        DIESEL,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    
+    // test addHydro()
+    std::cout << "\tTesting Model::addHydro() ..." <<
+        std::endl;
+    
+    structHydro struct_hydro;
+    
+    test_model.addHydro(struct_disp, struct_hydro);
+    
+    testFloatEquals(
+        test_model.noncombustion_ptr_vec.size(),
+        1,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.noncombustion_ptr_vec[
+            test_model.noncombustion_ptr_vec.size() - 1
+        ]->struct_disp.n_timesteps,
+        test_model.struct_model.n_timesteps,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.noncombustion_ptr_vec[
+            test_model.noncombustion_ptr_vec.size() - 1
+        ]->struct_disp.disp_type,
+        HYDRO,
         FLOAT_TOLERANCE,
         __FILE__,
         __LINE__

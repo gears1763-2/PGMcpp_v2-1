@@ -37,12 +37,15 @@ class Model {
         std::vector<double> dt_vec_hr;
         std::vector<double> load_vec_kW;
         std::vector<double> net_load_vec_kW;
+        std::vector<double> remaining_load_vec_kW;
         std::vector<double> time_vec_hr;
         
         std::map<int, std::vector<double>> resource_map_1D;
         std::map<int, std::vector<std::vector<double>>> resource_map_2D;
         
         std::vector<Nondispatchable*> nondisp_ptr_vec;
+        std::vector<Combustion*> combustion_ptr_vec;
+        std::vector<Dispatchable*> noncombustion_ptr_vec;
         
         
         //  methods
@@ -77,6 +80,9 @@ class Model {
         void addTidal(structNondispatchable, structTidal);
         void addWave(structNondispatchable, structWave);
         void addWind(structNondispatchable, structWind);
+        
+        void addDiesel(structDispatchable, structCombustion, structDiesel);
+        void addHydro(structDispatchable, structHydro);
         
         void run(void);
         

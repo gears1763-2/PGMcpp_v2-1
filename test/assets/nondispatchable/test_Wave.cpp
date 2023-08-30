@@ -8,7 +8,12 @@ std::cout << std::endl;
 
 try {
     //  construction
-    //...
+    structNondispatchable struct_nondisp;
+    struct_nondisp.test_flag = true;
+    
+    structWave struct_wave;
+    
+    Wave test_wave(struct_nondisp, struct_wave);
     
     
     //...

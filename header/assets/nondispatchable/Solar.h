@@ -27,6 +27,8 @@ class Solar : public Nondispatchable {
         //  2. methods
         Solar(structNondispatchable, structSolar);
         
+        void commitProduction(double, int);
+        
         double getProductionkW(double);
         
         ~Solar(void);

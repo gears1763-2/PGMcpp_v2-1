@@ -19,7 +19,7 @@ struct structHydro {
 class Hydro : public Dispatchable {
     public:
         //  1. attributes
-        structHydro struct_Hydro;
+        structHydro struct_hydro;
         
         
         //  2. methods

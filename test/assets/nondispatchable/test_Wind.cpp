@@ -8,7 +8,12 @@ std::cout << std::endl;
 
 try {
     //  construction
-    //...
+    structNondispatchable struct_nondisp;
+    struct_nondisp.test_flag = true;
+    
+    structWind struct_wind;
+    
+    Wind test_wind(struct_nondisp, struct_wind);
     
     
     //...
