@@ -17,7 +17,10 @@
 #### ---- COMPILER FLAGS ---- ####
 
 CXX = g++
-CXXFLAGS = -O1 -std=c++17 -Wall
+
+# Remove -g for release! This is for gdb symbols.
+CXXFLAGS = -O1 -std=c++17 -Wall -g
+
 DEPS = -lpthread
 
 
@@ -113,6 +116,46 @@ Diesel: $(SRC_DIESEL)
 	$(CXX) $(CXXFLAGS) -c $(SRC_DIESEL) -o $(OBJ_DIESEL)
 
 
+## ------ Storage ------ ##
+
+SRC_STORAGE = source/assets/storage/Storage.cpp
+OBJ_STORAGE = object/assets/storage/Storage.o
+
+.PHONY: Storage
+Storage: $(SRC_STORAGE)
+	$(CXX) $(CXXFLAGS) -c $(SRC_STORAGE) -o $(OBJ_STORAGE)
+
+
+## ------ HydroStorage ------ ##
+
+SRC_HYDROSTORAGE = source/assets/storage/HydroStorage.cpp
+OBJ_HYDROSTORAGE = object/assets/storage/HydroStorage.o
+
+.PHONY: HydroStorage
+HydroStorage: $(SRC_HYDROSTORAGE)
+	$(CXX) $(CXXFLAGS) -c $(SRC_HYDROSTORAGE) -o $(OBJ_HYDROSTORAGE)
+
+
+## ------ BatteryStorage ------ ##
+
+SRC_BATTERYSTORAGE = source/assets/storage/batterystorage/BatteryStorage.cpp
+OBJ_BATTERYSTORAGE = object/assets/storage/batterystorage/BatteryStorage.o
+
+.PHONY: BatteryStorage
+BatteryStorage: $(SRC_BATTERYSTORAGE)
+	$(CXX) $(CXXFLAGS) -c $(SRC_BATTERYSTORAGE) -o $(OBJ_BATTERYSTORAGE)
+
+
+## ------ LiIon ------ ##
+
+SRC_LIION = source/assets/storage/batterystorage/LiIon.cpp
+OBJ_LIION = object/assets/storage/batterystorage/LiIon.o
+
+.PHONY: LiIon
+LiIon: $(SRC_LIION)
+	$(CXX) $(CXXFLAGS) -c $(SRC_LIION) -o $(OBJ_LIION)
+
+
 ## ------ Model ------ ##
 
 SRC_MODEL = source/Model.cpp
@@ -149,16 +192,26 @@ MAKE_DISP_HIERARCHY = Diesel\
                       Dispatchable
 
 
-# storage hierarchy
+OBJ_STORAGE_HIERARCHY = $(OBJ_LIION)\
+                        $(OBJ_HYDROSTORAGE)\
+                        $(OBJ_BATTERYSTORAGE)\
+                        $(OBJ_STORAGE)
+
+MAKE_STORAGE_HIERARCHY = LiIon\
+                         HydroStorage\
+                         BatteryStorage\
+                         Storage\
 
 
 OBJ_ALL = $(OBJ_NONDISP_HIERARCHY)\
           $(OBJ_DISP_HIERARCHY)\
+          $(OBJ_STORAGE_HIERARCHY)\
           $(OBJ_MODEL)
 
 
 MAKE_ALL = $(MAKE_NONDISP_HIERARCHY)\
            $(MAKE_DISP_HIERARCHY)\
+           $(MAKE_STORAGE_HIERARCHY)\
            Model
 
 
@@ -195,6 +248,8 @@ all:
 	mkdir -pv object/assets/nondispatchable
 	mkdir -pv object/assets/dispatchable
 	mkdir -pv object/assets/dispatchable/combustion
+	mkdir -pv object/assets/storage
+	mkdir -pv object/assets/storage/batterystorage
 	mkdir -pv data/output
 	make $(MAKE_ALL) test
 

@@ -23,7 +23,7 @@ struct structModel {
     
     DispatchMode dispatch_mode = LOAD_FOLLOWING_IN_ORDER;
     
-    int n_timesteps = 0;
+    int n_timesteps = 8760;
     
     std::string path_2_load_data = "";
 };
@@ -46,6 +46,7 @@ class Model {
         std::vector<Nondispatchable*> nondisp_ptr_vec;
         std::vector<Combustion*> combustion_ptr_vec;
         std::vector<Dispatchable*> noncombustion_ptr_vec;
+        std::vector<Storage*> storage_ptr_vec;
         
         
         //  methods
@@ -83,6 +84,9 @@ class Model {
         
         void addDiesel(structDispatchable, structCombustion, structDiesel);
         void addHydro(structDispatchable, structHydro);
+        
+        void addHydroStorage(structStorage, structHydroStorage);
+        void addLiIon(structStorage, structBatteryStorage, structLiIon);
         
         void run(void);
         

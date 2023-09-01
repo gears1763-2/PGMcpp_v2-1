@@ -18,5 +18,10 @@
 #include "assets/dispatchable/combustion/Combustion.h"
 #include "assets/dispatchable/combustion/Diesel.h"
 
+#include "assets/storage/Storage.h"
+#include "assets/storage/HydroStorage.h"
+#include "assets/storage/batterystorage/BatteryStorage.h"
+#include "assets/storage/batterystorage/LiIon.h"
+
 
 #endif  /* MODEL_INCLUDES_H */

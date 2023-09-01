@@ -510,6 +510,11 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
             continue;
         }
         
+        //..
+    }
+    
+    // for all storage assets, attempt to re-direct curtailment
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
         //...
     }
     
@@ -526,7 +531,9 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
     double load_kW = this->net_load_vec_kW[timestep];
     
     // for all storage assets, discharge
-    //...
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        //...
+    }
     
     // for all noncombustion assets, request production and commit,
     // record production, dispatch, and curtailment, and update load
@@ -946,6 +953,30 @@ void Model :: addHydro(
 }
 
 
+void Model :: addLiIon(
+    structStorage struct_storage,
+    structBatteryStorage struct_battery_storage,
+    structLiIon struct_liion
+) {
+    /*
+     *  Method to add LiIon asset to the Model
+     */
+    
+    struct_storage.storage_type = STORAGE_LIION;
+    struct_storage.n_timesteps = this->struct_model.n_timesteps;
+    
+    Storage* storage_ptr = new LiIon(
+        struct_storage,
+        struct_battery_storage,
+        struct_liion
+    );
+    
+    this->storage_ptr_vec.push_back(storage_ptr);
+    
+    return;
+}
+
+
 void Model :: run() {
     /*
      *  Method to run the Model
@@ -996,7 +1027,10 @@ void Model :: clearAssets() {
     this->noncombustion_ptr_vec.clear();
     
     // clear storage assets
-    //..
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        delete this->storage_ptr_vec[i];
+    }
+    this->storage_ptr_vec.clear();
     
     return;
 }

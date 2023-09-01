@@ -21,9 +21,9 @@ struct structDispatchable {
     bool print_flag = false;
     bool test_flag = false;
     
-    DispatchableType disp_type;
+    DispatchableType disp_type = DIESEL;
     
-    int n_timesteps;
+    int n_timesteps = 8760;
     
     double cap_kW = 100;
 };

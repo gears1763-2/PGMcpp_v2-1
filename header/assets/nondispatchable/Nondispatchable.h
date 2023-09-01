@@ -23,9 +23,9 @@ struct structNondispatchable {
     bool print_flag = false;
     bool test_flag = false;
     
-    NondispatchableType nondisp_type;
+    NondispatchableType nondisp_type = SOLAR;
     
-    int n_timesteps;
+    int n_timesteps = 8760;
     
     double cap_kW = 100;
 };

@@ -648,6 +648,11 @@ try {
     );
     
     
+    // test addLiIon()
+    std::cout << "\tTesting Model::addLiIon() ..." <<
+        std::endl;
+    
+    
     //...
     
     
