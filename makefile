@@ -18,8 +18,9 @@
 
 CXX = g++
 
-# Remove -g for release! This is for gdb symbols.
+# -g is for gdb symbols
 CXXFLAGS = -O1 -std=c++17 -Wall -g
+#CXXFLAGS = -std=c++17 -Wall
 
 DEPS = -lpthread
 
@@ -126,16 +127,6 @@ Storage: $(SRC_STORAGE)
 	$(CXX) $(CXXFLAGS) -c $(SRC_STORAGE) -o $(OBJ_STORAGE)
 
 
-## ------ HydroStorage ------ ##
-
-SRC_HYDROSTORAGE = source/assets/storage/HydroStorage.cpp
-OBJ_HYDROSTORAGE = object/assets/storage/HydroStorage.o
-
-.PHONY: HydroStorage
-HydroStorage: $(SRC_HYDROSTORAGE)
-	$(CXX) $(CXXFLAGS) -c $(SRC_HYDROSTORAGE) -o $(OBJ_HYDROSTORAGE)
-
-
 ## ------ BatteryStorage ------ ##
 
 SRC_BATTERYSTORAGE = source/assets/storage/batterystorage/BatteryStorage.cpp
@@ -193,12 +184,10 @@ MAKE_DISP_HIERARCHY = Diesel\
 
 
 OBJ_STORAGE_HIERARCHY = $(OBJ_LIION)\
-                        $(OBJ_HYDROSTORAGE)\
                         $(OBJ_BATTERYSTORAGE)\
                         $(OBJ_STORAGE)
 
 MAKE_STORAGE_HIERARCHY = LiIon\
-                         HydroStorage\
                          BatteryStorage\
                          Storage\
 

@@ -47,10 +47,10 @@ class Dispatchable {
         
         double getDispatchkW(double, double);
         
-        virtual void commitProduction(double, int) {return;}
+        virtual void commitProductionkW(double, int) {return;}
         
-        virtual double requestProduction(double) {return 0;}
-        virtual double getFuelConsumption(double) {return 0;}
+        virtual double requestProductionkW(double) {return 0;}
+        virtual double getFuelConsumptionL(double) {return 0;}
         
         virtual ~Dispatchable(void);
 };

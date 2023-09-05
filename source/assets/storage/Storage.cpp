@@ -16,7 +16,9 @@ Storage :: Storage(
     
     this->struct_storage = struct_storage;
     
-    //...
+    this->charge_vec_kWh.resize(this->struct_storage.n_timesteps, 0);
+    this->charging_vec_kW.resize(this->struct_storage.n_timesteps, 0);
+    this->discharging_vec_kW.resize(this->struct_storage.n_timesteps, 0);
     
     if (this->struct_storage.test_flag) {
         std::cout << "\tStorage object constructed at " << this

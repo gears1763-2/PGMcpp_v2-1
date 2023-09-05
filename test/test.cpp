@@ -285,7 +285,6 @@ int main(int argc, char** argv) {
     #include "assets/dispatchable/test_Hydro.cpp"
     #include "assets/dispatchable/combustion/test_Diesel.cpp"
     
-    #include "assets/storage/test_HydroStorage.cpp"
     #include "assets/storage/batterystorage/test_LiIon.cpp"
 
     #include "test_Model.cpp"

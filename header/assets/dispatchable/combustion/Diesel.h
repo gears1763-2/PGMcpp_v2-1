@@ -28,10 +28,10 @@ class Diesel : public Combustion {
         //  2. methods
         Diesel(structDispatchable, structCombustion, structDiesel);
         
-        void commitProduction(double, int);
+        void commitProductionkW(double, int);
         
-        double requestProduction(double);
-        double getFuelConsumption(double, double);
+        double requestProductionkW(double);
+        double getFuelConsumptionL(double, double);
         
         ~Diesel(void);
 };

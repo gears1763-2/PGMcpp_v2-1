@@ -25,7 +25,7 @@ class Hydro : public Dispatchable {
         //  2. methods
         Hydro(structDispatchable, structHydro);
         
-        double requestProduction(double);
+        double requestProductionkW(double);
         
         ~Hydro(void);
 };

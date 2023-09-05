@@ -30,7 +30,7 @@ Hydro :: Hydro(
 }
 
 
-double Hydro :: requestProduction(double requested_production_kW) {
+double Hydro :: requestProductionkW(double requested_production_kW) {
     /*
      *  Method to handle production requests (subject to active
      *  operating constraints) and return provided production

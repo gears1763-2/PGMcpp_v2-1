@@ -652,6 +652,49 @@ try {
     std::cout << "\tTesting Model::addLiIon() ..." <<
         std::endl;
     
+    structStorage struct_storage;
+    struct_storage.print_flag = true;
+    struct_storage.test_flag = true;
+    
+    
+    structBatteryStorage struct_battery_storage;
+    
+    structLiIon struct_liion;
+    
+    test_model.addLiIon(
+        struct_storage,
+        struct_battery_storage,
+        struct_liion
+    );
+    
+    testFloatEquals(
+        test_model.storage_ptr_vec.size(),
+        1,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.storage_ptr_vec[
+            test_model.storage_ptr_vec.size() - 1
+        ]->struct_storage.n_timesteps,
+        test_model.struct_model.n_timesteps,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.storage_ptr_vec[
+            test_model.storage_ptr_vec.size() - 1
+        ]->struct_storage.storage_type,
+        STORAGE_LIION,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
     
     //...
     

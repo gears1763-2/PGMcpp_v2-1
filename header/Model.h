@@ -64,7 +64,7 @@ class Model {
             int
         );
         
-        double _getRenewableProduction(Nondispatchable*, int);
+        double _getRenewableProductionkW(Nondispatchable*, int);
         void _generateNetLoadVector(void);
         
         void _dispatchLoadFollowingInOrderCharging(int);
@@ -85,7 +85,6 @@ class Model {
         void addDiesel(structDispatchable, structCombustion, structDiesel);
         void addHydro(structDispatchable, structHydro);
         
-        void addHydroStorage(structStorage, structHydroStorage);
         void addLiIon(structStorage, structBatteryStorage, structLiIon);
         
         void run(void);

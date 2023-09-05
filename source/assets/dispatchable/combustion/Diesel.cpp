@@ -34,7 +34,7 @@ Diesel :: Diesel(
 }
 
 
-void Diesel :: commitProduction(double production_kW, int timestep) {
+void Diesel :: commitProductionkW(double production_kW, int timestep) {
     /*
      *  Method to commit to given production
      */
@@ -47,7 +47,7 @@ void Diesel :: commitProduction(double production_kW, int timestep) {
 }
 
 
-double Diesel :: requestProduction(double requested_production_kW) {
+double Diesel :: requestProductionkW(double requested_production_kW) {
     /*
      *  Method to handle production requests (subject to active
      *  operating constraints) and return provided production
@@ -66,7 +66,7 @@ double Diesel :: requestProduction(double requested_production_kW) {
 }
 
 
-double Diesel :: getFuelConsumption(
+double Diesel :: getFuelConsumptionL(
     double production_kW,
     double dt_hrs
 ) {
