@@ -23,6 +23,7 @@ struct structStorage {
     StorageType storage_type = STORAGE_LIION;
     
     int n_timesteps = 8760;
+    int n_replacements = 0;
     
     double cap_kW = 100;
     double cap_kWh = 1000;
@@ -40,6 +41,8 @@ class Storage {
     public:
         // attributes
         structStorage struct_storage;
+        
+        std::vector<bool> replaced_vec;
         
         std::vector<double> charge_vec_kWh;
         std::vector<double> charging_vec_kW;

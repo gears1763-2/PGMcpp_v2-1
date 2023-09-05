@@ -24,8 +24,11 @@ struct structDispatchable {
     DispatchableType disp_type = DIESEL;
     
     int n_timesteps = 8760;
+    int n_replacements = 0;
     
     double cap_kW = 100;
+    double running_hrs = 0;
+    double replace_running_hrs = 30000;
 };
 
 
@@ -34,20 +37,22 @@ class Dispatchable {
         // attributes
         structDispatchable struct_disp;
         
+        std::vector<bool> is_running_vec;
+        std::vector<bool> replaced_vec;
+        
         std::vector<double> production_vec_kW;
         std::vector<double> dispatch_vec_kW;
         std::vector<double> curtailment_vec_kW;
         std::vector<double> storage_vec_kW;
         
-        std::vector<bool> is_running_vec;
-        
         
         // methods
         Dispatchable(structDispatchable);
         
-        double getDispatchkW(double, double);
+        void _handleReplacement(int);
         
-        virtual void commitProductionkW(double, int) {return;}
+        void commitProductionkW(double, double, int);
+        double getDispatchkW(double, double);
         
         virtual double requestProductionkW(double) {return 0;}
         virtual double getFuelConsumptionL(double) {return 0;}

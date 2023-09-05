@@ -29,28 +29,6 @@ Wave :: Wave(
 }
 
 
-void Wave :: commitProduction(double production_kW, int timestep) {
-    /*
-     *  Method to commit to given production
-     */
-    
-    //...
-    
-    if (production_kW > 0) {
-        this->struct_nondisp.is_running = true;
-        this->is_running_vec[timestep] = true;
-    }
-    
-    else {
-        this->struct_nondisp.is_running = false;
-    }
-    
-    this->production_vec_kW[timestep] = production_kW;
-    
-    return;
-}
-
-
 double Wave :: getProductionkW(
     double significant_wave_height_m,
     double energy_period_s

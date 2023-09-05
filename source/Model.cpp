@@ -385,15 +385,16 @@ double Model :: _getRenewableProductionkW(
 void Model :: _generateNetLoadVector() {
     /*
      *  Helper method to populate net load vector, as well as compute
-     *  and record renewable production, dispatch, and curtailment
+     *  and commit renewable production, dispatch, and curtailment
      */
     
     for (int i = 0; i < this->struct_model.n_timesteps; i++) {
+        double dt_hrs = this->dt_vec_hr[i];
         double load_kW = this->load_vec_kW[i];
         double net_load_kW = this->load_vec_kW[i];
         
         for (size_t j = 0; j < this->nondisp_ptr_vec.size(); j++) {
-            // compute and record renewable production
+            // compute and commit renewable production
             Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[j];
             
             double production_kW = this->_getRenewableProductionkW(
@@ -401,7 +402,9 @@ void Model :: _generateNetLoadVector() {
                 i
             );
             
-            nondisp_ptr->production_vec_kW[i] = production_kW;
+            nondisp_ptr->commitProductionkW(
+                production_kW, dt_hrs, i
+            );
             
             // compute and record renewable dispatch
             double dispatch_kW = nondisp_ptr->getDispatchkW(

@@ -37,8 +37,6 @@ class Wave : public Nondispatchable {
         //  2. methods
         Wave(structNondispatchable, structWave);
         
-        void commitProduction(double, int);
-        
         double getProductionkW(double, double);
         
         ~Wave(void);

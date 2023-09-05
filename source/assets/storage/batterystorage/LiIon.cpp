@@ -88,6 +88,36 @@ void LiIon :: _handleDegradation(
         this->struct_storage.charge_kWh = this->struct_storage.cap_kWh;
     }
     
+    // trigger replacement, if necessary
+    if (this->struct_liion.SOH <= this->struct_liion.replace_SOH) {
+        this->_handleReplacement(timestep);
+    }
+    
+    return;
+}
+
+
+void LiIon :: _handleReplacement(int timestep) {
+    /*
+     *  Helper method to handle degradation induced replacement
+     */
+    
+    // reset attributes (replace with fresh LiIon system)
+    this->struct_storage.cap_kWh = this->struct_liion.init_cap_kWh;
+    
+    this->struct_storage.charge_kWh =
+        this->struct_battery_storage.init_SOC *
+        this->struct_storage.cap_kWh;
+        
+    this->struct_liion.SOH = 1;
+    
+    // incur capital cost
+    //..
+    
+    // record replacements
+    this->struct_storage.n_replacements++;
+    this->replaced_vec[timestep] = true;
+    
     return;
 }
 

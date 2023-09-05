@@ -26,8 +26,11 @@ struct structNondispatchable {
     NondispatchableType nondisp_type = SOLAR;
     
     int n_timesteps = 8760;
+    int n_replacements = 0;
     
     double cap_kW = 100;
+    double running_hrs = 0;
+    double replace_running_hrs = 30000;
 };
 
 
@@ -36,20 +39,22 @@ class Nondispatchable {
         // attributes
         structNondispatchable struct_nondisp;
         
+        std::vector<bool> is_running_vec;
+        std::vector<bool> replaced_vec;
+        
         std::vector<double> production_vec_kW;
         std::vector<double> dispatch_vec_kW;
         std::vector<double> curtailment_vec_kW;
         std::vector<double> storage_vec_kW;
         
-        std::vector<bool> is_running_vec;
-        
         
         // methods
         Nondispatchable(structNondispatchable);
         
-        double getDispatchkW(double, double);
+        void _handleReplacement(int);
         
-        virtual void commitProduction(double, int) {return;}
+        void commitProductionkW(double, double, int);
+        double getDispatchkW(double, double);
         
         virtual double getProductionkW(double) {return 0;}
         virtual double getProductionkW(double, double) {return 0;}

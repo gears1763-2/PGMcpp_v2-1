@@ -33,20 +33,6 @@ Diesel :: Diesel(
     return;
 }
 
-
-void Diesel :: commitProductionkW(double production_kW, int timestep) {
-    /*
-     *  Method to commit to given production
-     */
-    
-    //...
-    
-    this->production_vec_kW[timestep] = production_kW;
-    
-    return;
-}
-
-
 double Diesel :: requestProductionkW(double requested_production_kW) {
     /*
      *  Method to handle production requests (subject to active

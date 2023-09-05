@@ -696,14 +696,196 @@ try {
     );
     
     
-    //...
-    
-    
     // test run()
     std::cout << "\tTesting Model::run() ..." <<
         std::endl;
     
     test_model.run();
+    
+    
+    // test post-run attributes
+    std::cout << "\tTesting post Model::run() attributes ..." <<
+        std::endl;
+    
+    for (int i = 0; i < test_model.struct_model.n_timesteps; i++) {
+        double load_remaining_kW = test_model.load_vec_kW[i];
+        
+        for (size_t j = 0; j < test_model.combustion_ptr_vec.size(); j++) {
+            Combustion* combustion_ptr = test_model.combustion_ptr_vec[j];
+            
+            double difference_kW = combustion_ptr->production_vec_kW[i];
+            difference_kW -= combustion_ptr->dispatch_vec_kW[i];
+            difference_kW -= combustion_ptr->curtailment_vec_kW[i];
+            difference_kW -= combustion_ptr->storage_vec_kW[i];
+            
+            load_remaining_kW -= combustion_ptr->dispatch_vec_kW[i];
+            
+            testFloatEquals(
+                difference_kW,
+                0,
+                FLOAT_TOLERANCE,
+                __FILE__,
+                __LINE__
+            );
+        }
+        
+        for (size_t j = 0; j < test_model.noncombustion_ptr_vec.size(); j++) {
+            Dispatchable* noncombustion_ptr = test_model.noncombustion_ptr_vec[j];
+            
+            double difference_kW = noncombustion_ptr->production_vec_kW[i];
+            difference_kW -= noncombustion_ptr->dispatch_vec_kW[i];
+            difference_kW -= noncombustion_ptr->curtailment_vec_kW[i];
+            difference_kW -= noncombustion_ptr->storage_vec_kW[i];
+            
+            load_remaining_kW -= noncombustion_ptr->dispatch_vec_kW[i];
+            
+            testFloatEquals(
+                difference_kW,
+                0,
+                FLOAT_TOLERANCE,
+                __FILE__,
+                __LINE__
+            );
+        }
+        
+        for (size_t j = 0; j < test_model.nondisp_ptr_vec.size(); j++) {
+            Nondispatchable* nondisp_ptr = test_model.nondisp_ptr_vec[j];
+            
+            double difference_kW = nondisp_ptr->production_vec_kW[i];
+            difference_kW -= nondisp_ptr->dispatch_vec_kW[i];
+            difference_kW -= nondisp_ptr->curtailment_vec_kW[i];
+            difference_kW -= nondisp_ptr->storage_vec_kW[i];
+            
+            load_remaining_kW -= nondisp_ptr->dispatch_vec_kW[i];
+            
+            testFloatEquals(
+                difference_kW,
+                0,
+                FLOAT_TOLERANCE,
+                __FILE__,
+                __LINE__
+            );
+        }
+        
+        if (test_model.net_load_vec_kW[i] > 0) {
+            for (size_t j = 0; j < test_model.storage_ptr_vec.size(); j++) {
+                Storage* storage_ptr = test_model.storage_ptr_vec[j];
+                
+                testGreaterThanOrEqualTo(
+                    storage_ptr->discharging_vec_kW[i],
+                    0,
+                    __FILE__,
+                    __LINE__
+                );
+                
+                testFloatEquals(
+                    storage_ptr->charging_vec_kW[i],
+                    0,
+                    FLOAT_TOLERANCE,
+                    __FILE__,
+                    __LINE__
+                );
+                
+                load_remaining_kW -= storage_ptr->discharging_vec_kW[i];
+            }
+            
+            for (size_t j = 0; j < test_model.combustion_ptr_vec.size(); j++) {
+                Combustion* combustion_ptr = test_model.combustion_ptr_vec[j];
+                
+                testFloatEquals(
+                    combustion_ptr->storage_vec_kW[i],
+                    0,
+                    FLOAT_TOLERANCE,
+                    __FILE__,
+                    __LINE__
+                );
+            }
+            
+            for (size_t j = 0; j < test_model.noncombustion_ptr_vec.size(); j++) {
+                Dispatchable* noncombustion_ptr = test_model.noncombustion_ptr_vec[j];
+                
+                testFloatEquals(
+                    noncombustion_ptr->storage_vec_kW[i],
+                    0,
+                    FLOAT_TOLERANCE,
+                    __FILE__,
+                    __LINE__
+                );
+            }
+            
+            for (size_t j = 0; j < test_model.nondisp_ptr_vec.size(); j++) {
+                Nondispatchable* nondisp_ptr = test_model.nondisp_ptr_vec[j];
+                
+                testFloatEquals(
+                    nondisp_ptr->storage_vec_kW[i],
+                    0,
+                    FLOAT_TOLERANCE,
+                    __FILE__,
+                    __LINE__
+                );
+            }
+        }
+        
+        else {
+            double charged_kW = 0;
+            double charging_kW = 0;
+            
+            for (size_t j = 0; j < test_model.storage_ptr_vec.size(); j++) {
+                Storage* storage_ptr = test_model.storage_ptr_vec[j];
+                
+                charged_kW += storage_ptr->charging_vec_kW[i];
+                
+                testGreaterThanOrEqualTo(
+                    storage_ptr->charging_vec_kW[i],
+                    0,
+                    __FILE__,
+                    __LINE__
+                );
+                
+                testFloatEquals(
+                    storage_ptr->discharging_vec_kW[i],
+                    0,
+                    FLOAT_TOLERANCE,
+                    __FILE__,
+                    __LINE__
+                );
+            }
+            
+            for (size_t j = 0; j < test_model.combustion_ptr_vec.size(); j++) {
+                Combustion* combustion_ptr = test_model.combustion_ptr_vec[j];
+                
+                charging_kW += combustion_ptr->storage_vec_kW[i];
+            }
+            
+            for (size_t j = 0; j < test_model.noncombustion_ptr_vec.size(); j++) {
+                Dispatchable* noncombustion_ptr = test_model.noncombustion_ptr_vec[j];
+                
+                charging_kW += noncombustion_ptr->storage_vec_kW[i];
+            }
+            
+            for (size_t j = 0; j < test_model.nondisp_ptr_vec.size(); j++) {
+                Nondispatchable* nondisp_ptr = test_model.nondisp_ptr_vec[j];
+                
+                charging_kW += nondisp_ptr->storage_vec_kW[i];
+            }
+            
+            testFloatEquals(
+                charged_kW,
+                charging_kW,
+                FLOAT_TOLERANCE,
+                __FILE__,
+                __LINE__
+            );
+        }
+        
+        testFloatEquals(
+            load_remaining_kW,
+            0,
+            FLOAT_TOLERANCE,
+            __FILE__,
+            __LINE__
+        );
+    }
     
 } catch (...) {
     printRed("\n\t\t\t\tModel Tests:  FAIL\n");

@@ -15,6 +15,7 @@
 struct structLiIon {
     double init_cap_kWh = 1000;
     double SOH = 1;     // SOH = state of health
+    double replace_SOH = 0.8;
     
     // degradation parameters
     //
@@ -43,6 +44,7 @@ class LiIon : public BatteryStorage {
         
         double _getdSOHdt(double);
         void _handleDegradation(double, double, int);
+        void _handleReplacement(int);
         
         void commitChargekW(double, double, int);
         void commitDischargekW(double, double, int);

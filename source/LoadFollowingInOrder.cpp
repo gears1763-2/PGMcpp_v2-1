@@ -18,7 +18,9 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
         
         double production_kW = combustion_ptr->requestProductionkW(0);
         
-        combustion_ptr->commitProductionkW(production_kW, timestep);
+        ((Dispatchable*)combustion_ptr)->commitProductionkW(
+            production_kW, dt_hrs, timestep
+        );
         
         // record dispatch (remaining load is <= 0, in this case)
         double dispatch_kW = combustion_ptr->getDispatchkW(
@@ -40,7 +42,9 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
         
         double production_kW = noncombustion_ptr->requestProductionkW(0);
         
-        noncombustion_ptr->commitProductionkW(production_kW, timestep);
+        noncombustion_ptr->commitProductionkW(
+            production_kW, dt_hrs, timestep
+        );
         
         // record dispatch (net load is <= 0, in this case)
         double dispatch_kW = noncombustion_ptr->getDispatchkW(
@@ -214,7 +218,9 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
         
         double production_kW = noncombustion_ptr->requestProductionkW(load_kW);
         
-        noncombustion_ptr->commitProductionkW(production_kW, timestep);
+        noncombustion_ptr->commitProductionkW(
+            production_kW, dt_hrs, timestep
+        );
         
         // record dispatch
         double dispatch_kW = noncombustion_ptr->getDispatchkW(
@@ -239,7 +245,9 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
         
         double production_kW = combustion_ptr->requestProductionkW(load_kW);
         
-        combustion_ptr->commitProductionkW(production_kW, timestep);
+        ((Dispatchable*)combustion_ptr)->commitProductionkW(
+            production_kW, dt_hrs, timestep
+        );
         
         // record dispatch
         double dispatch_kW = combustion_ptr->getDispatchkW(

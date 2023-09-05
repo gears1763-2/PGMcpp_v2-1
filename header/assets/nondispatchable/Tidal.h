@@ -35,8 +35,6 @@ class Tidal : public Nondispatchable {
         //  2. methods
         Tidal(structNondispatchable, structTidal);
         
-        void commitProduction(double, int);
-        
         double getProductionkW(double);
         
         ~Tidal(void);
