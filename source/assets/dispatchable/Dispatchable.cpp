@@ -60,22 +60,13 @@ void Dispatchable :: commitProductionkW(
     /*
      *  Method to commit to given production
      */
-    
-    // track and record running state
-    if (production_kW > 0) {
-        this->struct_disp.is_running = true;
-        this->is_running_vec[timestep] = true;
-    }
-    
-    else {
-        this->struct_disp.is_running = false;
-    }
-    
+
     // record production
     this->production_vec_kW[timestep] = production_kW;
     
-    // incremet running hours
+    // increment running hours (if running)
     if (this->struct_disp.is_running) {
+        this->is_running_vec[timestep] = true;
         this->struct_disp.running_hrs += dt_hrs;
     }
     

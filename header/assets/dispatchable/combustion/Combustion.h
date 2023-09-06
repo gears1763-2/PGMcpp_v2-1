@@ -64,6 +64,7 @@ class Combustion : public Dispatchable {
         
         structEmissions getEmissions(double);
         
+        virtual void commitProductionkW(double, double, int) {return;}
         virtual double requestProductionkW(double) {return 0;}
         virtual double getFuelConsumptionL(double) {return 0;}
         

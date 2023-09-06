@@ -18,7 +18,7 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
         
         double production_kW = combustion_ptr->requestProductionkW(0);
         
-        ((Dispatchable*)combustion_ptr)->commitProductionkW(
+        combustion_ptr->commitProductionkW(
             production_kW, dt_hrs, timestep
         );
         
@@ -245,7 +245,7 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
         
         double production_kW = combustion_ptr->requestProductionkW(load_kW);
         
-        ((Dispatchable*)combustion_ptr)->commitProductionkW(
+        combustion_ptr->commitProductionkW(
             production_kW, dt_hrs, timestep
         );
         

@@ -74,7 +74,7 @@ void Nondispatchable :: commitProductionkW(
     // record production
     this->production_vec_kW[timestep] = production_kW;
     
-    // incremet running hours
+    // increment running hours
     if (this->struct_nondisp.is_running) {
         this->struct_nondisp.running_hrs += dt_hrs;
     }

@@ -50,8 +50,7 @@ class Dispatchable {
         Dispatchable(structDispatchable);
         
         void _handleReplacement(int);
-        
-        void commitProductionkW(double, double, int);
+        virtual void commitProductionkW(double, double, int);
         double getDispatchkW(double, double);
         
         virtual double requestProductionkW(double) {return 0;}

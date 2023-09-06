@@ -88,6 +88,7 @@ class Model {
         void addLiIon(structStorage, structBatteryStorage, structLiIon);
         
         void run(void);
+        void writeResults(std::string);
         
         void clearAssets(void);
         virtual ~Model(void);

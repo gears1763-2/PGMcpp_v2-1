@@ -864,6 +864,30 @@ void Model :: run() {
 }
 
 
+void Model :: writeResults(std::string write_path) {
+    /*
+     *  Method to write modelling results to given path
+     */
+    
+    // write Model-level results
+    //...
+    
+    // write Combustion-level results
+    //...
+    
+    // write non-Combustion-level results
+    //...
+    
+    // write Nondispatchable-level results
+    //...
+    
+    // write Storage-level results
+    //...
+    
+    return;
+}
+
+
 void Model :: clearAssets() {
     /*
      *  Method to clear pointer vector attributes (i.e., assets)
