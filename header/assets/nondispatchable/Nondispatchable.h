@@ -31,6 +31,8 @@ struct structNondispatchable {
     double cap_kW = 100;
     double running_hrs = 0;
     double replace_running_hrs = 30000;
+    
+    std::string nondisp_type_str = "";
 };
 
 

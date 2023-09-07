@@ -16,6 +16,8 @@ Tidal :: Tidal(
      *  Tidal class constructor
      */
     
+    this->struct_nondisp.nondisp_type = TIDAL;
+    this->struct_nondisp.nondisp_type_str = "TIDAL";
     this->struct_tidal = struct_tidal;
     
     //...

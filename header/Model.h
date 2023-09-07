@@ -71,6 +71,9 @@ class Model {
         void _dispatchLoadFollowingInOrderDischarging(int);
         void _handleDispatch(void);
         
+        void _writeDispatchResults(std::string);
+        void _writeLoadResults(std::string);
+        
         
         Model(structModel);
         

@@ -17,6 +17,7 @@ Hydro :: Hydro(
      */
     
     this->struct_disp.disp_type = HYDRO;
+    this->struct_disp.disp_type_str = "HYDRO";
     this->struct_hydro = struct_hydro;
     
     //...

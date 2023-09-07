@@ -675,10 +675,12 @@ try {
         __LINE__
     );
     
+    LiIon* liion_ptr = (LiIon*)(test_model.storage_ptr_vec[
+        test_model.storage_ptr_vec.size() - 1
+    ]);
+    
     testFloatEquals(
-        test_model.storage_ptr_vec[
-            test_model.storage_ptr_vec.size() - 1
-        ]->struct_storage.n_timesteps,
+        liion_ptr->struct_storage.n_timesteps,
         test_model.struct_model.n_timesteps,
         FLOAT_TOLERANCE,
         __FILE__,
@@ -686,10 +688,8 @@ try {
     );
     
     testFloatEquals(
-        test_model.storage_ptr_vec[
-            test_model.storage_ptr_vec.size() - 1
-        ]->struct_storage.storage_type,
-        STORAGE_LIION,
+        liion_ptr->struct_storage.storage_type,
+        LIION,
         FLOAT_TOLERANCE,
         __FILE__,
         __LINE__
@@ -886,6 +886,13 @@ try {
             __LINE__
         );
     }
+    
+    
+    // test writeResults()
+    std::cout << "\tTesting Model::writeResults() ..." <<
+        std::endl;
+    
+    test_model.writeResults("test");
     
 } catch (...) {
     printRed("\n\t\t\t\tModel Tests:  FAIL\n");

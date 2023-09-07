@@ -18,7 +18,8 @@ LiIon :: LiIon(
      *  LiIon class constructor
      */
     
-    this->struct_storage.storage_type = STORAGE_LIION;
+    this->struct_storage.storage_type = LIION;
+    this->struct_storage.storage_type_str = "LIION";
     this->struct_liion = struct_liion;
     
     this->struct_liion.init_cap_kWh = this->struct_storage.cap_kWh;

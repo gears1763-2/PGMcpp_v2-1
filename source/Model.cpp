@@ -492,6 +492,167 @@ void Model :: _handleDispatch() {
 }
 
 
+void Model :: _writeDispatchResults(std::string _write_path) {
+    /*
+     *  Helper method to write Model-level dispatch results
+     */
+    
+    // init output file stream
+    std::ofstream ofs;
+    ofs.open(_write_path + "Model/Model_dispatch_results.csv");
+    
+    // write file header
+    ofs << "Time [hrs]," <<
+        "Load (at beginning of time step a.k.a. demand) [kW],";
+    
+    for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
+        Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[i];
+        
+        std::string type_str =
+            nondisp_ptr->struct_nondisp.nondisp_type_str;
+            
+        double cap_kW = nondisp_ptr->struct_nondisp.cap_kW;
+        
+        ofs << cap_kW << " kW " << type_str
+            << " Dispatch (over time step) [kW],";
+    }
+    
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        Storage* storage_ptr = this->storage_ptr_vec[i];
+        
+        std::string type_str =
+            storage_ptr->struct_storage.storage_type_str;
+            
+        double cap_kW = storage_ptr->struct_storage.cap_kW;
+        double cap_kWh = 0;
+        
+        switch (storage_ptr->struct_storage.storage_type) {
+            case (LIION): {
+                cap_kWh =
+                    ((LiIon*)storage_ptr)->struct_liion.init_cap_kWh;
+                    
+                break;
+            }
+            
+            default: {
+                cap_kWh = storage_ptr->struct_storage.cap_kWh;
+                
+                break;
+            }
+        }
+        
+        ofs << "(" << cap_kW << " kW " << cap_kWh << " kWh) " <<
+            type_str << " Discharge (over time step) [kW],";
+    }
+    
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
+        
+        std::string type_str =
+            noncombustion_ptr->struct_disp.disp_type_str;
+            
+        double cap_kW = noncombustion_ptr->struct_disp.cap_kW;
+        
+        ofs << cap_kW << " kW " << type_str
+            << " Dispatch (over time step) [kW],";
+    }
+    
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        Combustion* combustion_ptr = this->combustion_ptr_vec[i];
+        
+        std::string type_str =
+            combustion_ptr->struct_disp.disp_type_str;
+            
+        double cap_kW = combustion_ptr->struct_disp.cap_kW;
+        
+        ofs << cap_kW << " kW " << type_str
+            << " Dispatch (over time step) [kW],";
+    }
+    
+    ofs << "\n";
+    
+    // write file body
+    for (int i = 0; i < this->struct_model.n_timesteps; i++) {
+        ofs << std::to_string(this->time_vec_hr[i]) << ","
+            << std::to_string(this->load_vec_kW[i]) << ",";
+        
+        for (size_t j = 0; j < this->nondisp_ptr_vec.size(); j++) {
+            Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[j];
+            
+            double dispatch_kW = nondisp_ptr->dispatch_vec_kW[i];
+            
+            ofs << std::to_string(dispatch_kW) << ",";
+        }
+        
+        for (size_t j = 0; j < this->storage_ptr_vec.size(); j++) {
+            Storage* storage_ptr = this->storage_ptr_vec[j];
+            
+            double discharging_kW = storage_ptr->discharging_vec_kW[i];
+            
+            ofs << std::to_string(discharging_kW) << ",";
+        }
+        
+        for (size_t j = 0; j < this->noncombustion_ptr_vec.size(); j++) {
+            Dispatchable* noncombustion_ptr =
+                this->noncombustion_ptr_vec[j];
+            
+            double dispatch_kW = noncombustion_ptr->dispatch_vec_kW[i];
+            
+            ofs << std::to_string(dispatch_kW) << ",";
+        }
+        
+        for (size_t j = 0; j < this->combustion_ptr_vec.size(); j++) {
+            Combustion* combustion_ptr =
+                this->combustion_ptr_vec[j];
+            
+            double dispatch_kW = combustion_ptr->dispatch_vec_kW[i];
+            
+            ofs << std::to_string(dispatch_kW) << ",";
+        }
+        
+        ofs << "\n";
+    }
+    
+    ofs.close();
+    
+    return;
+}
+
+
+void Model :: _writeLoadResults(std::string _write_path) {
+    /*
+     *  Helper method to write Model-level load results
+     */
+    
+    // init output file stream
+    std::ofstream ofs;
+    ofs.open(_write_path + "Model/Model_load_results.csv");
+    
+    // write file header
+    ofs << "Time [hrs]," <<
+        "Load (at beginning of time step a.k.a. demand) [kW]," <<
+        "Net Load (load minus all renewable production over time step) [kW]," <<
+        "Load Remaining (at end of time step after all dispatch) [kW]\n";
+    
+    // write file body
+    for (int i = 0; i < this->struct_model.n_timesteps; i++) {
+        double time_hrs = this->time_vec_hr[i];
+        double load_kW = this->load_vec_kW[i];
+        double net_load_kW = this->net_load_vec_kW[i];
+        double remaining_load_kW = this->remaining_load_vec_kW[i];
+        
+        ofs << std::to_string(time_hrs) << ","
+            << std::to_string(load_kW) << ","
+            << std::to_string(net_load_kW) << ","
+            << std::to_string(remaining_load_kW) << "\n";
+    }
+    
+    ofs.close();
+    
+    return;
+}
+
+
 // -------- USER INTERFACE METHODS -------- //
 
 
@@ -688,7 +849,6 @@ void Model :: addSolar(
      *  Method to add Solar asset to the Model
      */
     
-    struct_nondisp.nondisp_type = SOLAR;
     struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
     
     Nondispatchable* nondisp_ptr = new Solar(
@@ -710,7 +870,6 @@ void Model :: addTidal(
      *  Method to add Tidal asset to the Model
      */
     
-    struct_nondisp.nondisp_type = TIDAL;
     struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
     
     Nondispatchable* nondisp_ptr = new Tidal(
@@ -732,7 +891,6 @@ void Model :: addWave(
      *  Method to add Wave asset to the Model
      */
     
-    struct_nondisp.nondisp_type = WAVE;
     struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
     
     Nondispatchable* nondisp_ptr = new Wave(
@@ -754,7 +912,6 @@ void Model :: addWind(
      *  Method to add Wind asset to the Model
      */
     
-    struct_nondisp.nondisp_type = WIND;
     struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
     
     Nondispatchable* nondisp_ptr = new Wind(
@@ -777,7 +934,6 @@ void Model :: addDiesel(
      *  Method to add Diesel asset to the Model
      */
     
-    struct_disp.disp_type = DIESEL;
     struct_disp.n_timesteps = this->struct_model.n_timesteps;
     
     Combustion* combustion_ptr = new Diesel(
@@ -800,7 +956,6 @@ void Model :: addHydro(
      *  Method to add Hydro asset to the Model
      */
     
-    struct_disp.disp_type = HYDRO;
     struct_disp.n_timesteps = this->struct_model.n_timesteps;
     
     Dispatchable* disp_ptr = new Hydro(
@@ -823,7 +978,6 @@ void Model :: addLiIon(
      *  Method to add LiIon asset to the Model
      */
     
-    struct_storage.storage_type = STORAGE_LIION;
     struct_storage.n_timesteps = this->struct_model.n_timesteps;
     
     Storage* storage_ptr = new LiIon(
@@ -869,20 +1023,60 @@ void Model :: writeResults(std::string write_path) {
      *  Method to write modelling results to given path
      */
     
+    // expand write_path 
+    std::string _write_path = "data/output/";
+    _write_path += write_path;
+    _write_path += "/";
+    
+    
+    // create directories (overwrite if already exists)
+    if (std::filesystem::is_directory(_write_path)) {
+        std::string warning_str = "WARNING:  Model::writeResults():  ";
+        warning_str += _write_path;
+        warning_str += " already exists, contents will be overwritten!";
+        
+        std::cout << warning_str << std::endl;
+        
+        std::filesystem::remove_all(_write_path);
+    }
+    
+    std::filesystem::create_directory(_write_path);
+    
+    
     // write Model-level results
-    //...
+    std::filesystem::create_directory(_write_path + "Model/");
+    
+    this->_writeDispatchResults(_write_path);
+    this->_writeLoadResults(_write_path);
+    
     
     // write Combustion-level results
-    //...
+    if (not this->combustion_ptr_vec.empty()) {
+        std::filesystem::create_directory(_write_path + "Combustion/");
+        //...
+    }
+    
     
     // write non-Combustion-level results
-    //...
+    if (not this->noncombustion_ptr_vec.empty()) {
+        std::filesystem::create_directory(_write_path + "non-Combustion/");
+        //...
+    }
+    
     
     // write Nondispatchable-level results
-    //...
+    if (not this->nondisp_ptr_vec.empty()) {
+        std::filesystem::create_directory(_write_path + "Nondispatchable/");
+        //...
+    }
+    
     
     // write Storage-level results
-    //...
+    if (not this->storage_ptr_vec.empty()) {
+        std::filesystem::create_directory(_write_path + "Storage/");
+        //...
+    }
+    
     
     return;
 }

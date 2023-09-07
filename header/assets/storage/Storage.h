@@ -11,8 +11,7 @@
 
 
 enum StorageType {
-    STORAGE_HYDRO,
-    STORAGE_LIION
+    LIION
 };
 
 
@@ -20,7 +19,7 @@ struct structStorage {
     bool print_flag = false;
     bool test_flag = false;
     
-    StorageType storage_type = STORAGE_LIION;
+    StorageType storage_type = LIION;
     
     int n_timesteps = 8760;
     int n_replacements = 0;
@@ -34,6 +33,8 @@ struct structStorage {
     
     double acceptable_kW = 0;
     double charging_kW = 0;
+    
+    std::string storage_type_str = "";
 };
 
 

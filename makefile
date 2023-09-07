@@ -226,6 +226,7 @@ clean:
 	rm -frv core;
 	rm -frv object;
 	rm -frv data/output/example;
+	rm -frv data/output/test;
 
 
 .PHONY: all

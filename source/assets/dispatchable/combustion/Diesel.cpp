@@ -19,6 +19,7 @@ Diesel :: Diesel(
      */
     
     this->struct_disp.disp_type = DIESEL;
+    this->struct_disp.disp_type_str = "DIESEL";
     this->struct_diesel = struct_diesel;
     
     this->struct_combustion.fuel_type = FUEL_DIESEL;
