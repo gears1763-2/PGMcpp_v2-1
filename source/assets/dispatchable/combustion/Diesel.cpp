@@ -24,7 +24,7 @@ Diesel :: Diesel(
     
     this->struct_combustion.fuel_type = FUEL_DIESEL;
     
-    // init linear fuel consumption parameters if sentinel value
+    // init linear fuel consumption parameters if sentinel value detected
     if (this->struct_combustion.linear_fuel_intercept_LkWh < 0) {
         this->struct_combustion.linear_fuel_intercept_LkWh =
             0.0940 * pow(this->struct_disp.cap_kW, -0.2735);
@@ -34,6 +34,9 @@ Diesel :: Diesel(
         this->struct_combustion.linear_fuel_slope_LkWh =
             0.3062 * pow(this->struct_disp.cap_kW, -0.0370);
     }
+    
+    // read in fuel consumption LOOKUP data
+    //...
     
     // if fuel mode is LOOKUP and no lookup data provided, default to 
     // LINEAR

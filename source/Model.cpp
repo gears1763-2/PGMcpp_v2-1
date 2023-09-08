@@ -753,7 +753,7 @@ void Model :: add1dRenewableResource(
      *  Method to register 1d renewable resource with the Model
      */
     
-    std::string _type_str = to_upper(type_str);
+    std::string _type_str = stringToUpper(type_str);
     
     // handle by renewable type
     if (_type_str.compare("HYDRO") == 0) {
@@ -857,7 +857,7 @@ void Model :: add2dRenewableResource(
      *  Method to register 2d renewable resource with the Model
      */
     
-    std::string _type_str = to_upper(type_str);
+    std::string _type_str = stringToUpper(type_str);
     
     // handle by renewable type
     if (_type_str.compare("WAVE") == 0) {

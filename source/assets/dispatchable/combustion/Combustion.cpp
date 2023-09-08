@@ -67,13 +67,11 @@ double Combustion :: getFuelConsumptionL(
              *  ref: https://www.homerenergy.com/products/pro/docs/latest/generator_fuel_curve_slope.html
              */
             
-            fuel_consumption_L  = 
-                this->struct_combustion.linear_fuel_intercept_LkWh *
+            fuel_consumption_L =
+                (this->struct_combustion.linear_fuel_intercept_LkWh *
                 this->struct_disp.cap_kW +
                 this->struct_combustion.linear_fuel_slope_LkWh *
-                production_kW;
-            
-            fuel_consumption_L *= dt_hrs;
+                production_kW) * dt_hrs;
             
             break;
         }

@@ -2,12 +2,8 @@
  *  Testing for PGMcpp
  */
 
-
-#include <cstdlib>
-#include <iostream>
-#include <string>
-#include <vector>
-
+#include "../header/includes.h"
+#include "../header/Model_includes.h"
 #include "../header/Model.h"
 
 
@@ -276,6 +272,7 @@ int main(int argc, char** argv) {
     
     std::cout << "Running Tests ..." << std::endl;
     
+    #include "test_utilities.cpp"
 
     #include "assets/nondispatchable/test_Solar.cpp"
     #include "assets/nondispatchable/test_Tidal.cpp"

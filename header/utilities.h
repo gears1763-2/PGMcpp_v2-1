@@ -7,9 +7,9 @@
 #define UTILITIES_H
 
 
-inline std::string to_upper(std::string input_str) {
+inline std::string stringToUpper(std::string input_str) {
     /*
-     *  Helper function to convert string to upper case
+     *  Utility function to convert string to upper case
      */
     
     std::string return_str = "";
@@ -19,6 +19,97 @@ inline std::string to_upper(std::string input_str) {
     }
     
     return return_str;
+}
+
+
+inline double linearInterpolate1d(
+    double x,
+    double x_0,
+    double x_1,
+    double y_0, 
+    double y_1
+) {
+    /*
+     *  Utility function to perform a 1d linear interpolation
+     *
+     *  For 1d data of the form y = f(x):
+     *  
+     *      (x_0, y_0)
+     *      (x_1, y_1)
+     */
+    
+    // check for degenerate inputs
+    if (x_0 == x_1) {
+        return y_0;
+    }
+    
+    // check for coincidence
+    if (x == x_0) {
+        return y_0;
+    }
+    
+    else if (x == x_1) {
+        return y_1;
+    }
+    
+    // interpolate
+    double m = (y_1 - y_0) / (x_1 - x_0);
+    double y = m * (x - x_0) + y_0;
+    
+    return y;
+}
+
+
+inline double linearInterpolation2d(
+    double x,
+    double y,
+    double x_0,
+    double x_1,
+    double y_0,
+    double y_1,
+    double z_00,
+    double z_10,
+    double z_01,
+    double z_11
+) {
+    /*
+     *  Utility function to perform a 2d linear interpolation
+     *
+     *  For 2d data of the form z = f(x, y):
+     *
+     *              x_0     x_1
+     *      y_0     z_00    z_10
+     *      y_1     z_01    z_11
+     */
+    
+    // perform first horizontal 1d interpolation
+    double z_horizontal_0 = linearInterpolate1d(
+        x,
+        x_0,
+        x_1,
+        z_00,
+        z_10
+    );
+    
+    // perform second horizontal 1d interpolation
+    double z_horizontal_1 = linearInterpolate1d(
+        x,
+        x_0,
+        x_1,
+        z_01,
+        z_11
+    );
+    
+    // perform vertical 1d interpolation over horizontal interpolations
+    double z = linearInterpolate1d(
+        y,
+        y_0,
+        y_1,
+        z_horizontal_0,
+        z_horizontal_1
+    );
+    
+    return z;
 }
 
 
