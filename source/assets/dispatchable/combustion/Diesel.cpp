@@ -59,11 +59,39 @@ void Diesel :: _writeTimeSeriesResults(
     ofs.open(_write_path + filename);
     
     // write file header
-    //...
+    ofs << "Time [hrs],"
+        << "Production (over time step) [kW],"
+        << "Dispatch (over time step) [kW],"
+        << "Curtailment (over time step) [kW],"
+        << "Storage (over time step) [kW],"
+        << "Is Running [T/F],"
+        << "Fuel Consumption (over time step) [L],"
+        << "CO2 Emissions (over time step) [kg],"
+        << "CO Emissions (over time step) [kg],"
+        << "NOx Emissions (over time step) [kg],"
+        << "SOx Emissions (over time step) [kg],"
+        << "CH4 Emissions (over time step) [kg],"
+        << "PM Emissions (over time step) [kg],"
+        //<< ","
+        << "\n";
     
     // write file body
     for (int i = 0; i < this->struct_disp.n_timesteps; i++) {
-        //...
+        ofs << std::to_string(ptr_2_time_vec_hr->at(i)) << ","
+            << std::to_string(this->production_vec_kW[i]) << ","
+            << std::to_string(this->dispatch_vec_kW[i]) << ","
+            << std::to_string(this->curtailment_vec_kW[i]) << ","
+            << std::to_string(this->storage_vec_kW[i]) << ","
+            << std::to_string(this->is_running_vec[i]) << ","
+            << std::to_string(this->fuel_vec_L[i]) << ","
+            << std::to_string(this->CO2_vec_kg[i]) << ","
+            << std::to_string(this->CO_vec_kg[i]) << ","
+            << std::to_string(this->NOx_vec_kg[i]) << ","
+            << std::to_string(this->SOx_vec_kg[i]) << ","
+            << std::to_string(this->CH4_vec_kg[i]) << ","
+            << std::to_string(this->PM_vec_kg[i]) << ","
+            //<< [...] << ","
+            << "\n";
     }
     
     ofs.close();
@@ -92,10 +120,25 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs.open(_write_path + filename);
     
     // write attributes
-    //...
+    ofs << this->struct_disp.cap_kW << "kW Diesel Summary\n\n";
+    ofs << "Attributes:\n\n";
+    
+    ofs << "\treplacement running hours: " << this->struct_disp.replace_running_hrs
+        << " hrs\n";
+    ofs << "\tminimum load ratio: " << this->struct_diesel.minimum_load_ratio
+        << "\n";
+    ofs << "\tminimum runtime: " << this->struct_diesel.minimum_runtime_hrs
+        << " hrs\n";
     
     // write results
-    //...
+    ofs << "\nResults:\n\n";
+    
+    ofs << "\trunning hours: " << this->struct_disp.running_hrs
+        << " hrs\n";
+    ofs << "\tnumber of starts: " << this->struct_disp.n_starts
+        << "\n";
+    ofs << "\tnumber of replacements: " << this->struct_disp.n_replacements
+        << "\n";
     
     ofs.close();
     
@@ -130,13 +173,27 @@ void Diesel :: commitProductionkW(
         production_kW > 0
     ) {
         this->struct_disp.is_running = true;
+        this->struct_disp.n_starts++;
     }
     
     if (this->struct_disp.is_running) {
         this->struct_diesel.time_since_last_start_hrs += dt_hrs;
     }
     
+    // callback
     Dispatchable::commitProductionkW(production_kW, dt_hrs, timestep);
+    
+    // handle fuel consumption
+    double fuel_consumption_L =
+        this->getFuelConsumptionL(production_kW, dt_hrs);
+        
+    this->fuel_vec_L[timestep] = fuel_consumption_L;
+    
+    // handle emissions
+    structEmissions struct_emissions =
+        Combustion::getEmissions(fuel_consumption_L);
+    
+    Combustion::recordEmissions(struct_emissions, timestep);
     
     return;
 }
@@ -180,9 +237,14 @@ double Diesel :: getFuelConsumptionL(
      *  production and time step
      */
     
+    // check running state
+    if (not this->struct_disp.is_running) {
+        return 0;
+    }
+    
     //...
     
-    return 0;
+    return 10;  // <-- CHANGE THIS!!!
 }
 
 

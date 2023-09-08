@@ -82,6 +82,25 @@ structEmissions Combustion :: getEmissions(double fuel_consumption_L) {
 }
 
 
+void Combustion :: recordEmissions(
+    structEmissions struct_emissions,
+    int timestep
+) {
+    /*
+     *  Method to record emissions over time step
+     */
+    
+    this->CO2_vec_kg[timestep] = struct_emissions.CO2_kg;
+    this->CO_vec_kg[timestep] = struct_emissions.CO_kg;
+    this->NOx_vec_kg[timestep] = struct_emissions.NOx_kg;
+    this->SOx_vec_kg[timestep] = struct_emissions.SOx_kg;
+    this->CH4_vec_kg[timestep] = struct_emissions.CH4_kg;
+    this->PM_vec_kg[timestep] = struct_emissions.PM_kg;
+    
+    return;
+}
+
+
 Combustion :: ~Combustion() {
     /*
      *  Combustion class destructor

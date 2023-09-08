@@ -71,6 +71,8 @@ class Model {
         void _dispatchLoadFollowingInOrderDischarging(int);
         void _handleDispatch(void);
         
+        void _computeEconomics(void);
+        
         void _writeDispatchResults(std::string);
         void _writeLoadResults(std::string);
         void _writeSummary(std::string);
@@ -91,10 +93,11 @@ class Model {
         
         void addLiIon(structStorage, structBatteryStorage, structLiIon);
         
-        void run(void);
+        void run(bool = true);
         void writeResults(std::string);
         
         void clearAssets(void);
+        void reset(void);
         virtual ~Model(void);
 };
 

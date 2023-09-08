@@ -11,6 +11,13 @@
 #include "../Dispatchable.h"
 
 
+enum FuelMode {
+    LINEAR,
+    LOOKUP,
+    QUADRATIC
+};
+
+
 enum FuelType {
     FUEL_DIESEL,
     FUEL_GAS
@@ -18,6 +25,7 @@ enum FuelType {
 
 
 struct structCombustion {
+    FuelMode fuel_mode = LINEAR;
     FuelType fuel_type = FUEL_DIESEL;
     
     /*
@@ -63,6 +71,7 @@ class Combustion : public Dispatchable {
         Combustion(structDispatchable, structCombustion);
         
         structEmissions getEmissions(double);
+        void recordEmissions(structEmissions, int);
         
         virtual void commitProductionkW(double, double, int) {return;}
         virtual double requestProductionkW(double) {return 0;}

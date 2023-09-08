@@ -492,6 +492,17 @@ void Model :: _handleDispatch() {
 }
 
 
+void Model :: _computeEconomics(void) {
+    /*
+     *  Helper method to compute economics of Model run
+     */
+    
+    //...
+    
+    return;
+}
+
+
 void Model :: _writeDispatchResults(std::string _write_path) {
     /*
      *  Helper method to write Model-level dispatch results
@@ -720,7 +731,7 @@ Model :: Model(structModel struct_model) {
     // populate dt_vec_hrs
     this->_populateDeltaVecHr();
     
-    // size net_load_vec_kW
+    // size net and remaining load vectors
     this->net_load_vec_kW.resize(this->struct_model.n_timesteps, 0);
     this->remaining_load_vec_kW.resize(this->struct_model.n_timesteps, 0);
     
@@ -1042,7 +1053,7 @@ void Model :: addLiIon(
 }
 
 
-void Model :: run() {
+void Model :: run(bool compute_economics) {
     /*
      *  Method to run the Model
      */
@@ -1055,7 +1066,9 @@ void Model :: run() {
         this->_handleDispatch();
         
         // compute economics
-        //...
+        if (compute_economics) {
+            this->_computeEconomics();
+        }
         
     } 
     
@@ -1235,6 +1248,25 @@ void Model :: clearAssets() {
         delete this->storage_ptr_vec[i];
     }
     this->storage_ptr_vec.clear();
+    
+    return;
+}
+
+
+void Model :: reset() {
+    /*
+     *  Method to reset Model, to be used to change the modelling 
+     *  parameters prior to calling run() again
+     */
+    
+    this->clearAssets();
+    
+    // clear and size net and remaining load vectors
+    this->net_load_vec_kW.clear();
+    this->remaining_load_vec_kW.clear();
+    
+    this->net_load_vec_kW.resize(this->struct_model.n_timesteps, 0);
+    this->remaining_load_vec_kW.resize(this->struct_model.n_timesteps, 0);
     
     return;
 }

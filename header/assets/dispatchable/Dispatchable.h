@@ -25,6 +25,7 @@ struct structDispatchable {
     
     int n_timesteps = 8760;
     int n_replacements = 0;
+    int n_starts = 0;
     
     double cap_kW = 100;
     double running_hrs = 0;
