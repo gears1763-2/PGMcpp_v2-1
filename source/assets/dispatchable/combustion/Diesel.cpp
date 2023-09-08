@@ -24,6 +24,21 @@ Diesel :: Diesel(
     
     this->struct_combustion.fuel_type = FUEL_DIESEL;
     
+    // init linear fuel consumption parameters if sentinel value
+    if (this->struct_combustion.linear_fuel_intercept_LkWh < 0) {
+        this->struct_combustion.linear_fuel_intercept_LkWh =
+            0.0940 * pow(this->struct_disp.cap_kW, -0.2735);
+    }
+    
+    if (this->struct_combustion.linear_fuel_slope_LkWh < 0) {
+        this->struct_combustion.linear_fuel_slope_LkWh =
+            0.3062 * pow(this->struct_disp.cap_kW, -0.0370);
+    }
+    
+    // if fuel mode is LOOKUP and no lookup data provided, default to 
+    // LINEAR
+    //...
+    
     this->fuel_vec_L.resize(this->struct_disp.n_timesteps, 0);
     
     if (this->struct_disp.test_flag) {
@@ -129,6 +144,27 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
         << "\n";
     ofs << "\tminimum runtime: " << this->struct_diesel.minimum_runtime_hrs
         << " hrs\n";
+    ofs << "\tfuel mode: " << this->struct_combustion.fuel_mode;
+    
+    switch (this->struct_combustion.fuel_mode) {
+        case (LINEAR): {
+            ofs << " (LINEAR)\n";
+            
+            break;
+        }
+        
+        case (LOOKUP): {
+            ofs << " (LOOKUP)\n";
+            
+            break;
+        }
+        
+        default: {
+            // do nothing!
+            
+            break;
+        }
+    }
     
     // write results
     ofs << "\nResults:\n\n";
@@ -185,7 +221,7 @@ void Diesel :: commitProductionkW(
     
     // handle fuel consumption
     double fuel_consumption_L =
-        this->getFuelConsumptionL(production_kW, dt_hrs);
+        Combustion::getFuelConsumptionL(production_kW, dt_hrs);
         
     this->fuel_vec_L[timestep] = fuel_consumption_L;
     
@@ -225,26 +261,6 @@ double Diesel :: requestProductionkW(double requested_production_kW) {
     //...
     
     return production_kW;
-}
-
-
-double Diesel :: getFuelConsumptionL(
-    double production_kW,
-    double dt_hrs
-) {
-    /*
-     *  Method to compute and return fuel consumption under given
-     *  production and time step
-     */
-    
-    // check running state
-    if (not this->struct_disp.is_running) {
-        return 0;
-    }
-    
-    //...
-    
-    return 10;  // <-- CHANGE THIS!!!
 }
 
 

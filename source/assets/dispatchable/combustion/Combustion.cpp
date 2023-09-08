@@ -34,6 +34,55 @@ Combustion :: Combustion(
 }
 
 
+double Combustion :: getFuelConsumptionL(
+    double production_kW,
+    double dt_hrs
+) {
+    /*
+     *  Method to compute and return fuel consumption under given
+     *  production and time step
+     */
+    
+    // check running state
+    if (not this->struct_disp.is_running) {
+        return 0;
+    }
+    
+    double fuel_consumption_L = 0;
+    
+    switch (this->struct_combustion.fuel_mode) {
+        case (LOOKUP): {
+            //...
+            
+            break;
+        }
+        
+        default: {  // default to LINEAR
+            /*
+             *  Fuel consumption over time step based on linearized fuel
+             *  consumption curve (i.e. HOMER-like consumption model)
+             *
+             *  ref: https://www.homerenergy.com/products/pro/docs/latest/fuel_curve.html
+             *  ref: https://www.homerenergy.com/products/pro/docs/latest/generator_fuel_curve_intercept_coefficient.html
+             *  ref: https://www.homerenergy.com/products/pro/docs/latest/generator_fuel_curve_slope.html
+             */
+            
+            fuel_consumption_L  = 
+                this->struct_combustion.linear_fuel_intercept_LkWh *
+                this->struct_disp.cap_kW +
+                this->struct_combustion.linear_fuel_slope_LkWh *
+                production_kW;
+            
+            fuel_consumption_L *= dt_hrs;
+            
+            break;
+        }
+    }
+    
+    return fuel_consumption_L;
+}
+
+
 structEmissions Combustion :: getEmissions(double fuel_consumption_L) {
     /*
      *  Method to compute and return emissions under given fuel

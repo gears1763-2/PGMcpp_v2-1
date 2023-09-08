@@ -36,7 +36,6 @@ class Diesel : public Combustion {
         
         void commitProductionkW(double, double, int);
         double requestProductionkW(double);
-        double getFuelConsumptionL(double, double);
         
         void writeResults(std::string, std::vector<double>*, int);
         

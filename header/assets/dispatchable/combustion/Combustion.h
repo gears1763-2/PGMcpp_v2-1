@@ -13,8 +13,7 @@
 
 enum FuelMode {
     LINEAR,
-    LOOKUP,
-    QUADRATIC
+    LOOKUP
 };
 
 
@@ -29,7 +28,18 @@ struct structCombustion {
     FuelType fuel_type = FUEL_DIESEL;
     
     /*
-     *  Diesel emissions coefficients
+     *  LINEAR fuel consumption parameters
+     */
+    double linear_fuel_intercept_LkWh = -1; // sentinel
+    double linear_fuel_slope_LkWh = -1;     // sentinel
+    
+    /*
+     *  QUADRATIC fuel consumption parameters
+     */
+    //...
+    
+    /*
+     *  Diesel emissions parameters
      *  ref: docs/diesel_emissions_ref_1.pdf
      *  ref: docs/diesel_emissions_ref_2.pdf
      */
@@ -39,8 +49,6 @@ struct structCombustion {
     double diesel_SOx_kgL = 0.0042;
     double diesel_CH4_kgL = 0.0007;
     double diesel_PM_kgL = 0.0001;
-    
-    //...
 };
 
 
@@ -70,12 +78,12 @@ class Combustion : public Dispatchable {
         //  2. methods
         Combustion(structDispatchable, structCombustion);
         
+        double getFuelConsumptionL(double, double);
         structEmissions getEmissions(double);
         void recordEmissions(structEmissions, int);
         
         virtual void commitProductionkW(double, double, int) {return;}
         virtual double requestProductionkW(double) {return 0;}
-        virtual double getFuelConsumptionL(double) {return 0;}
         
         virtual void writeResults(
             std::string,

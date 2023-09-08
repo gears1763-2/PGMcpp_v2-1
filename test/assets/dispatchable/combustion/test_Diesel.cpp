@@ -18,6 +18,35 @@ try {
     Diesel test_diesel(struct_disp, struct_combustion, struct_diesel);
     
     
+    //  test post-construction attributes
+    std::cout << "\tTesting post-construction attributes ..." <<
+        std::endl;
+    
+    testFloatEquals(
+        test_diesel.struct_combustion.fuel_mode,
+        LINEAR,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_diesel.struct_combustion.linear_fuel_intercept_LkWh,
+        0.0940 * pow(struct_disp.cap_kW, -0.2735),
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_diesel.struct_combustion.linear_fuel_slope_LkWh,
+        0.3062 * pow(struct_disp.cap_kW, -0.0370),
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    
     //  test requestProductionkW()
     std::cout << "\tTesting Diesel::requestProductionkW() ..." <<
         std::endl;
