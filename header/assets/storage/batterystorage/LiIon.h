@@ -42,12 +42,17 @@ class LiIon : public BatteryStorage {
         //  2. methods
         LiIon(structStorage, structBatteryStorage, structLiIon);
         
+        void _writeTimeSeriesResults(std::string, std::vector<double>*, int);
+        void _writeSummary(std::string, int);
+        
         double _getdSOHdt(double);
         void _handleDegradation(double, double, int);
         void _handleReplacement(int);
         
         void commitChargekW(double, double, int);
         void commitDischargekW(double, double, int);
+        
+        void writeResults(std::string, std::vector<double>*, int);
         
         ~LiIon(void);
 };

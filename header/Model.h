@@ -73,6 +73,7 @@ class Model {
         
         void _writeDispatchResults(std::string);
         void _writeLoadResults(std::string);
+        void _writeSummary(std::string);
         
         
         Model(structModel);

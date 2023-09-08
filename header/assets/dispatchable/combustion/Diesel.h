@@ -31,9 +31,14 @@ class Diesel : public Combustion {
         //  2. methods
         Diesel(structDispatchable, structCombustion, structDiesel);
         
+        void _writeTimeSeriesResults(std::string, std::vector<double>*, int);
+        void _writeSummary(std::string, int);
+        
         void commitProductionkW(double, double, int);
         double requestProductionkW(double);
         double getFuelConsumptionL(double, double);
+        
+        void writeResults(std::string, std::vector<double>*, int);
         
         ~Diesel(void);
 };

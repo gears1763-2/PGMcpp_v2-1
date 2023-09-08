@@ -35,7 +35,12 @@ class Tidal : public Nondispatchable {
         //  2. methods
         Tidal(structNondispatchable, structTidal);
         
+        void _writeTimeSeriesResults(std::string, std::vector<double>*, int);
+        void _writeSummary(std::string, int);
+        
         double getProductionkW(double);
+        
+        void writeResults(std::string, std::vector<double>*, int);
         
         ~Tidal(void);
 };

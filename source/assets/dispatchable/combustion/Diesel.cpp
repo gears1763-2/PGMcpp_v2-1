@@ -35,6 +35,74 @@ Diesel :: Diesel(
 }
 
 
+void Diesel :: _writeTimeSeriesResults(
+    std::string _write_path,
+    std::vector<double>* ptr_2_time_vec_hr,
+    int asset_idx
+) {
+    /*
+     *  Helper method to write Diesel-level time series results
+     */
+    
+    // construct filename 
+    std::string filename = "Combustion/" +
+        std::to_string(int(this->struct_disp.cap_kW)) +
+        "kW_" + this->struct_disp.disp_type_str +
+        "_" + std::to_string(asset_idx) + "/" +
+        std::to_string(int(this->struct_disp.cap_kW)) +
+        "kW_" + this->struct_disp.disp_type_str +
+        "_" + std::to_string(asset_idx) +
+        "_results.csv";
+    
+    // init output file stream
+    std::ofstream ofs;
+    ofs.open(_write_path + filename);
+    
+    // write file header
+    //...
+    
+    // write file body
+    for (int i = 0; i < this->struct_disp.n_timesteps; i++) {
+        //...
+    }
+    
+    ofs.close();
+    
+    return;
+}
+
+
+void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
+    /*
+     *  Helper method to write Diesel-level summary
+     */
+    
+    // construct filename 
+    std::string filename = "Combustion/" +
+        std::to_string(int(this->struct_disp.cap_kW)) +
+        "kW_" + this->struct_disp.disp_type_str +
+        "_" + std::to_string(asset_idx) + "/" +
+        std::to_string(int(this->struct_disp.cap_kW)) +
+        "kW_" + this->struct_disp.disp_type_str +
+        "_" + std::to_string(asset_idx) +
+        "_summary.txt";
+    
+    // init output file stream
+    std::ofstream ofs;
+    ofs.open(_write_path + filename);
+    
+    // write attributes
+    //...
+    
+    // write results
+    //...
+    
+    ofs.close();
+    
+    return;
+}
+
+
 void Diesel :: commitProductionkW(
     double production_kW,
     double dt_hrs,
@@ -115,6 +183,24 @@ double Diesel :: getFuelConsumptionL(
     //...
     
     return 0;
+}
+
+
+void Diesel :: writeResults(
+    std::string _write_path,
+    std::vector<double>* ptr_2_time_vec_hr,
+    int asset_idx
+) {
+    /*
+     *  Method to write Diesel-level results
+     */
+    
+    this->_writeTimeSeriesResults(
+        _write_path, ptr_2_time_vec_hr, asset_idx
+    );
+    this->_writeSummary(_write_path, asset_idx);
+    
+    return;
 }
 
 

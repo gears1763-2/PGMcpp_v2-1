@@ -58,6 +58,12 @@ class Dispatchable {
         virtual double requestProductionkW(double) {return 0;}
         virtual double getFuelConsumptionL(double) {return 0;}
         
+        virtual void writeResults(
+            std::string,
+            std::vector<double>*,
+            int
+        ) {return;}
+        
         virtual ~Dispatchable(void);
 };
 

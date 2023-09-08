@@ -27,7 +27,12 @@ class Solar : public Nondispatchable {
         //  2. methods
         Solar(structNondispatchable, structSolar);
         
+        void _writeTimeSeriesResults(std::string, std::vector<double>*, int);
+        void _writeSummary(std::string, int);
+        
         double getProductionkW(double);
+        
+        void writeResults(std::string, std::vector<double>*, int);
         
         ~Solar(void);
 };

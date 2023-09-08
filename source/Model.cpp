@@ -653,6 +653,56 @@ void Model :: _writeLoadResults(std::string _write_path) {
 }
 
 
+void Model :: _writeSummary(std::string _write_path) {
+    /*
+     *  Helper method to write Model-level summary
+     */
+    
+    // init output file stream
+    std::ofstream ofs;
+    ofs.open(_write_path + "Model/Model_summary.txt");
+    
+    // write attributes
+    ofs << "Model Summary\n\n";
+    ofs << "Attributes:\n\n";
+    
+    ofs << "\ttimesteps: " << this->struct_model.n_timesteps << "\n";
+    ofs << "\tdispatch mode: " << this->struct_model.dispatch_mode;
+    
+    switch (this->struct_model.dispatch_mode) {
+        case (LOAD_FOLLOWING_IN_ORDER): {
+            ofs << " (LOAD_FOLLOWING_IN_ORDER)";
+            
+            break;
+        }
+        
+        case (LOAD_FOLLOWING_SMART_COMBUSTION): {
+            ofs << " (LOAD_FOLLOWING_SMART_COMBUSTION)";
+            
+            break;
+        }
+        
+        default: {
+            // do nothing!
+            
+            break;
+        }
+    }
+    ofs << "\n";
+    
+    //...
+    
+    // write results
+    ofs << "\nResults:\n\n";
+    
+    //...
+    
+    ofs.close();
+    
+    return;
+}
+
+
 // -------- USER INTERFACE METHODS -------- //
 
 
@@ -1048,35 +1098,110 @@ void Model :: writeResults(std::string write_path) {
     
     this->_writeDispatchResults(_write_path);
     this->_writeLoadResults(_write_path);
+    this->_writeSummary(_write_path);
     
     
     // write Combustion-level results
     if (not this->combustion_ptr_vec.empty()) {
         std::filesystem::create_directory(_write_path + "Combustion/");
-        //...
+        
+        for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+            Combustion* combustion_ptr = this->combustion_ptr_vec[i];
+            
+            std::filesystem::create_directory(
+                _write_path + "Combustion/" +
+                std::to_string(int(combustion_ptr->struct_disp.cap_kW)) +
+                "kW_" + combustion_ptr->struct_disp.disp_type_str +
+                "_" + std::to_string(i) + "/"
+            );
+            
+            combustion_ptr->writeResults(_write_path, &(this->time_vec_hr), i);
+        }
+        
     }
     
     
     // write non-Combustion-level results
     if (not this->noncombustion_ptr_vec.empty()) {
         std::filesystem::create_directory(_write_path + "non-Combustion/");
-        //...
+        
+        for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+            Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
+            
+            std::filesystem::create_directory(
+                _write_path + "non-Combustion/" +
+                std::to_string(int(noncombustion_ptr->struct_disp.cap_kW)) +
+                "kW_" + noncombustion_ptr->struct_disp.disp_type_str +
+                "_" + std::to_string(i) + "/"
+            );
+            
+            noncombustion_ptr->writeResults(_write_path, &(this->time_vec_hr), i);
+        }
     }
     
     
     // write Nondispatchable-level results
     if (not this->nondisp_ptr_vec.empty()) {
         std::filesystem::create_directory(_write_path + "Nondispatchable/");
-        //...
+        
+        for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
+            Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[i];
+            
+            std::filesystem::create_directory(
+                _write_path + "Nondispatchable/" +
+                std::to_string(int(nondisp_ptr->struct_nondisp.cap_kW)) +
+                "kW_" + nondisp_ptr->struct_nondisp.nondisp_type_str +
+                "_" + std::to_string(i) + "/"
+            );
+            
+            nondisp_ptr->writeResults(_write_path, &(this->time_vec_hr), i);
+        }
     }
     
     
     // write Storage-level results
     if (not this->storage_ptr_vec.empty()) {
         std::filesystem::create_directory(_write_path + "Storage/");
-        //...
+        
+        for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+            Storage* storage_ptr = this->storage_ptr_vec[i];
+            
+            std::string file_path = _write_path + "Storage/" +
+                std::to_string(int(storage_ptr->struct_storage.cap_kW)) +
+                "kW_";
+            
+            switch (storage_ptr->struct_storage.storage_type) {
+                case (LIION): {
+                    file_path +=
+                        std::to_string(
+                            int(
+                                ((LiIon*)storage_ptr)->struct_liion.init_cap_kWh
+                            )
+                        ) +
+                        "kWh_";
+                    
+                    break;
+                }
+                
+                default: {
+                    file_path +=
+                        std::to_string(
+                            int(storage_ptr->struct_storage.cap_kWh)
+                        ) +
+                        "kWh_";
+                    
+                    break;
+                }
+            }
+            
+            file_path += storage_ptr->struct_storage.storage_type_str +
+                "_" + std::to_string(i) + "/";
+            
+            std::filesystem::create_directory(file_path);
+            
+            storage_ptr->writeResults(_write_path, &(this->time_vec_hr), i);
+        }
     }
-    
     
     return;
 }

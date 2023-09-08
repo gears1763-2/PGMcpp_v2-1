@@ -33,6 +33,84 @@ LiIon :: LiIon(
 }
 
 
+void LiIon :: _writeTimeSeriesResults(
+    std::string _write_path,
+    std::vector<double>* ptr_2_time_vec_hr,
+    int asset_idx
+) {
+    /*
+     *  Helper method to write LiIon-level time series results
+     */
+    
+    // construct filename 
+    std::string filename = "Storage/" +
+        std::to_string(int(this->struct_storage.cap_kW)) +
+        "kW_" +
+        std::to_string(int(this->struct_liion.init_cap_kWh)) +
+        "kWh_" +
+        this->struct_storage.storage_type_str +
+        "_" + std::to_string(asset_idx) + "/" +
+        std::to_string(int(this->struct_storage.cap_kW)) +
+        "kW_" +
+        std::to_string(int(this->struct_liion.init_cap_kWh)) +
+        "kWh_" + this->struct_storage.storage_type_str +
+        "_" + std::to_string(asset_idx) +
+        "_results.csv";
+    
+    // init output file stream
+    std::ofstream ofs;
+    ofs.open(_write_path + filename);
+    
+    // write file header
+    //...
+    
+    // write file body
+    for (int i = 0; i < this->struct_storage.n_timesteps; i++) {
+        //...
+    }
+    
+    ofs.close();
+    
+    return;
+}
+
+
+void LiIon :: _writeSummary(std::string _write_path, int asset_idx) {
+    /*
+     *  Helper method to write LiIon-level summary
+     */
+    
+    // construct filename 
+    std::string filename = "Storage/" +
+        std::to_string(int(this->struct_storage.cap_kW)) +
+        "kW_" +
+        std::to_string(int(this->struct_liion.init_cap_kWh)) +
+        "kWh_" +
+        this->struct_storage.storage_type_str +
+        "_" + std::to_string(asset_idx) + "/" +
+        std::to_string(int(this->struct_storage.cap_kW)) +
+        "kW_" +
+        std::to_string(int(this->struct_liion.init_cap_kWh)) +
+        "kWh_" + this->struct_storage.storage_type_str +
+        "_" + std::to_string(asset_idx) +
+        "_summary.txt";
+    
+    // init output file stream
+    std::ofstream ofs;
+    ofs.open(_write_path + filename);
+    
+    // write attributes
+    //...
+    
+    // write results
+    //...
+    
+    ofs.close();
+    
+    return;
+}
+
+
 double LiIon :: _getdSOHdt(double power_kW) {
     /*
      *  Helper method to compute and return dSOH_dt
@@ -156,6 +234,24 @@ void LiIon :: commitDischargekW(
     
     // handle degradation
     this->_handleDegradation(discharging_kW, dt_hrs, timestep);
+    
+    return;
+}
+
+
+void LiIon :: writeResults(
+    std::string _write_path,
+    std::vector<double>* ptr_2_time_vec_hr,
+    int asset_idx
+) {
+    /*
+     *  Method to write LiIon-level results
+     */
+    
+    this->_writeTimeSeriesResults(
+        _write_path, ptr_2_time_vec_hr, asset_idx
+    );
+    this->_writeSummary(_write_path, asset_idx);
     
     return;
 }

@@ -59,6 +59,12 @@ class Storage {
         virtual void commitChargekW(double, double, int) {return;}
         virtual void commitDischargekW(double, double, int) {return;}
         
+        virtual void writeResults(
+            std::string,
+            std::vector<double>*,
+            int
+        ) {return;}
+        
         virtual ~Storage(void);
 };
 

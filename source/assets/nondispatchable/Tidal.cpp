@@ -31,6 +31,74 @@ Tidal :: Tidal(
 }
 
 
+void Tidal :: _writeTimeSeriesResults(
+    std::string _write_path,
+    std::vector<double>* ptr_2_time_vec_hr,
+    int asset_idx
+) {
+    /*
+     *  Helper method to write Tidal-level time series results
+     */
+    
+    // construct filename 
+    std::string filename = "Nondispatchable/" +
+        std::to_string(int(this->struct_nondisp.cap_kW)) +
+        "kW_" + this->struct_nondisp.nondisp_type_str +
+        "_" + std::to_string(asset_idx) + "/" +
+        std::to_string(int(this->struct_nondisp.cap_kW)) +
+        "kW_" + this->struct_nondisp.nondisp_type_str +
+        "_" + std::to_string(asset_idx) +
+        "_results.csv";
+    
+    // init output file stream
+    std::ofstream ofs;
+    ofs.open(_write_path + filename);
+    
+    // write file header
+    //...
+    
+    // write file body
+    for (int i = 0; i < this->struct_nondisp.n_timesteps; i++) {
+        //...
+    }
+    
+    ofs.close();
+    
+    return;
+}
+
+
+void Tidal :: _writeSummary(std::string _write_path, int asset_idx) {
+    /*
+     *  Helper method to write Tidal-level summary
+     */
+    
+    // construct filename 
+    std::string filename = "Nondispatchable/" +
+        std::to_string(int(this->struct_nondisp.cap_kW)) +
+        "kW_" + this->struct_nondisp.nondisp_type_str +
+        "_" + std::to_string(asset_idx) + "/" +
+        std::to_string(int(this->struct_nondisp.cap_kW)) +
+        "kW_" + this->struct_nondisp.nondisp_type_str +
+        "_" + std::to_string(asset_idx) +
+        "_summary.txt";
+    
+    // init output file stream
+    std::ofstream ofs;
+    ofs.open(_write_path + filename);
+    
+    // write attributes
+    //...
+    
+    // write results
+    //...
+    
+    ofs.close();
+    
+    return;
+}
+
+
 double Tidal :: getProductionkW(double tidal_resource_ms) {
     /*
      *  Method to compute and return production under given tidal
@@ -115,7 +183,22 @@ double Tidal :: getProductionkW(double tidal_resource_ms) {
 }
 
 
-//...
+void Tidal :: writeResults(
+    std::string _write_path,
+    std::vector<double>* ptr_2_time_vec_hr,
+    int asset_idx
+) {
+    /*
+     *  Method to write Tidal-level results
+     */
+    
+    this->_writeTimeSeriesResults(
+        _write_path, ptr_2_time_vec_hr, asset_idx
+    );
+    this->_writeSummary(_write_path, asset_idx);
+    
+    return;
+}
 
 
 Tidal :: ~Tidal() {

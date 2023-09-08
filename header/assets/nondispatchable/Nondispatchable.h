@@ -61,6 +61,12 @@ class Nondispatchable {
         virtual double getProductionkW(double) {return 0;}
         virtual double getProductionkW(double, double) {return 0;}
         
+        virtual void writeResults(
+            std::string,
+            std::vector<double>*,
+            int
+        ) {return;}
+        
         virtual ~Nondispatchable(void);
 };
 

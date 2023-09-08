@@ -37,7 +37,12 @@ class Wave : public Nondispatchable {
         //  2. methods
         Wave(structNondispatchable, structWave);
         
+        void _writeTimeSeriesResults(std::string, std::vector<double>*, int);
+        void _writeSummary(std::string, int);
+        
         double getProductionkW(double, double);
+        
+        void writeResults(std::string, std::vector<double>*, int);
         
         ~Wave(void);
 };

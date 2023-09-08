@@ -27,7 +27,12 @@ class Wind : public Nondispatchable {
         //  2. methods
         Wind(structNondispatchable, structWind);
         
+        void _writeTimeSeriesResults(std::string, std::vector<double>*, int);
+        void _writeSummary(std::string, int);
+        
         double getProductionkW(double);
+        
+        void writeResults(std::string, std::vector<double>*, int);
         
         ~Wind(void);
 };
