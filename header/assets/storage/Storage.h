@@ -34,6 +34,8 @@ struct structStorage {
     double acceptable_kW = 0;
     double charging_kW = 0;
     
+    double real_discount_rate_annual = -1;
+    
     std::string storage_type_str = "";
 };
 

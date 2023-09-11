@@ -20,49 +20,34 @@ Solar :: Solar(
     this->struct_nondisp.nondisp_type_str = "SOLAR";
     this->struct_solar = struct_solar;
     
-    //...
+    /*
+     *  Init economic attributes
+     */
+    if (this->struct_nondisp.capital_cost < 0) {
+        this->struct_nondisp.capital_cost =
+            this->struct_solar.capital_cost_per_kW * 
+            this->struct_nondisp.cap_kW;
+    }
+    
+    else {
+        this->struct_solar.capital_cost_per_kW = 
+            this->struct_nondisp.capital_cost / 
+            this->struct_nondisp.cap_kW;
+    }
+    
+    if (this->struct_nondisp.op_maint_cost_per_kWh < 0) {
+        this->struct_nondisp.op_maint_cost_per_kWh = 0.01;
+    }
+    
+    if (not this->struct_nondisp.is_sunk) {
+        this->real_capital_cost_vec[0] =
+            this->struct_nondisp.capital_cost;
+    }
     
     if (this->struct_nondisp.test_flag) {
         std::cout << "\tSolar object constructed at " << this
             << std::endl;
     }
-    
-    return;
-}
-
-
-void Solar :: _writeTimeSeriesResults(
-    std::string _write_path,
-    std::vector<double>* ptr_2_time_vec_hr,
-    int asset_idx
-) {
-    /*
-     *  Helper method to write Solar-level time series results
-     */
-    
-    // construct filename 
-    std::string filename = "Nondispatchable/" +
-        std::to_string(int(this->struct_nondisp.cap_kW)) +
-        "kW_" + this->struct_nondisp.nondisp_type_str +
-        "_" + std::to_string(asset_idx) + "/" +
-        std::to_string(int(this->struct_nondisp.cap_kW)) +
-        "kW_" + this->struct_nondisp.nondisp_type_str +
-        "_" + std::to_string(asset_idx) +
-        "_results.csv";
-    
-    // init output file stream
-    std::ofstream ofs;
-    ofs.open(_write_path + filename);
-    
-    // write file header
-    //...
-    
-    // write file body
-    for (int i = 0; i < this->struct_nondisp.n_timesteps; i++) {
-        //...
-    }
-    
-    ofs.close();
     
     return;
 }
@@ -88,10 +73,28 @@ void Solar :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs.open(_write_path + filename);
     
     // write attributes
-    //...
+    ofs << this->struct_nondisp.cap_kW << "kW Solar Summary\n\n";
+    ofs << "Attributes:\n\n";
+    
+    ofs << "\t1D resource key: " << this->struct_solar.resource_key
+        << "\n";
+    ofs << "\treplacement running hours: " << this->struct_nondisp.replace_running_hrs
+        << " hrs\n";
+    ofs << "\tderating: " << this->struct_solar.derating << "\n";
+    ofs << "\tcapital cost: " << this->struct_nondisp.capital_cost <<
+        "\n";
+    ofs << "\toperation and maintenance cost (per kWh produced): " <<
+        this->struct_nondisp.op_maint_cost_per_kWh << "\n";
+    ofs << "\treal discount rate (annual): " <<
+        this->struct_nondisp.real_discount_rate_annual << "\n";
     
     // write results
-    //...
+    ofs << "\nResults:\n\n";
+    
+    ofs << "\trunning hours: " << this->struct_nondisp.running_hrs
+        << " hrs\n";
+    ofs << "\tnumber of replacements: " << this->struct_nondisp.n_replacements
+        << "\n";
     
     ofs.close();
     
@@ -128,7 +131,7 @@ void Solar :: writeResults(
      *  Method to write Solar-level results
      */
     
-    this->_writeTimeSeriesResults(
+    Nondispatchable::_writeTimeSeriesResults(
         _write_path, ptr_2_time_vec_hr, asset_idx
     );
     this->_writeSummary(_write_path, asset_idx);

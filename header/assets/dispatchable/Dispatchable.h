@@ -31,6 +31,8 @@ struct structDispatchable {
     double running_hrs = 0;
     double replace_running_hrs = 30000;
     
+    double real_discount_rate_annual = -1;
+    
     std::string disp_type_str = "";
 };
 

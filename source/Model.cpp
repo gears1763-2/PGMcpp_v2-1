@@ -190,6 +190,11 @@ void Model :: _readIn1dRenewableResource(
         throw std::runtime_error(error_str);
     }
     
+    // register path
+    this->resource_path_map_1D.insert(
+        std::pair<int, std::string> (map_key, path_2_resource_data)
+    );
+    
     return;
 }
 
@@ -297,6 +302,11 @@ void Model :: _readIn2dRenewableResource(
         throw std::runtime_error(error_str);
     }
     
+    // register path
+    this->resource_path_map_2D.insert(
+        std::pair<int, std::string> (map_key, path_2_resource_data)
+    );
+    
     return;
 }
 
@@ -390,6 +400,7 @@ void Model :: _generateNetLoadVector() {
     
     for (int i = 0; i < this->struct_model.n_timesteps; i++) {
         double dt_hrs = this->dt_vec_hr[i];
+        double t_hrs = this->time_vec_hr[i];
         double load_kW = this->load_vec_kW[i];
         double net_load_kW = this->load_vec_kW[i];
         
@@ -403,7 +414,7 @@ void Model :: _generateNetLoadVector() {
             );
             
             nondisp_ptr->commitProductionkW(
-                production_kW, dt_hrs, i
+                production_kW, dt_hrs, t_hrs, i
             );
             
             // compute and record renewable dispatch
@@ -449,12 +460,10 @@ void Model :: _handleDispatch() {
                     this->_dispatchLoadFollowingInOrderDischarging(i);
                 }
                 
-                //***
+                /*
                 for (size_t j = 0; j < this->storage_ptr_vec.size(); j++) {
                     Storage* storage_ptr = this->storage_ptr_vec[j];
-                    
-                    continue;
-                    
+
                     if (
                         storage_ptr->struct_storage.charge_kWh > 
                         storage_ptr->struct_storage.min_charge_kWh
@@ -469,7 +478,7 @@ void Model :: _handleDispatch() {
                     std::cout << ((LiIon*)storage_ptr)->struct_liion.SOH
                         << std::endl;
                 }
-                //***
+                */
             }
             
             break;
@@ -677,18 +686,25 @@ void Model :: _writeSummary(std::string _write_path) {
     ofs << "Model Summary\n\n";
     ofs << "Attributes:\n\n";
     
+    ofs << "\tpath to load data: " <<
+        this->struct_model.path_2_load_data << "\n";
     ofs << "\ttimesteps: " << this->struct_model.n_timesteps << "\n";
-    ofs << "\tdispatch mode: " << this->struct_model.dispatch_mode;
+    ofs << "\tproject life: " << this->struct_model.project_life_yrs
+        << " yrs\n";
+    ofs << "\treal discount rate (annual): " <<
+        this->struct_model.real_discount_rate_annual << "\n";
+    ofs << "\tdispatch mode: " << this->struct_model.dispatch_mode
+        << " ";
     
     switch (this->struct_model.dispatch_mode) {
         case (LOAD_FOLLOWING_IN_ORDER): {
-            ofs << " (LOAD_FOLLOWING_IN_ORDER)";
+            ofs << "(LOAD_FOLLOWING_IN_ORDER)\n";
             
             break;
         }
         
         case (LOAD_FOLLOWING_SMART_COMBUSTION): {
-            ofs << " (LOAD_FOLLOWING_SMART_COMBUSTION)";
+            ofs << "(LOAD_FOLLOWING_SMART_COMBUSTION)\n";
             
             break;
         }
@@ -699,9 +715,37 @@ void Model :: _writeSummary(std::string _write_path) {
             break;
         }
     }
-    ofs << "\n";
     
-    //...
+    // write resource map
+    ofs << "\nResource Mapping:\n\n";
+    
+    ofs << "1D Resources:\n\n";
+    if (not this->resource_path_map_1D.empty()) {
+        std::map<int, std::string>::iterator itr;
+        
+        for (
+            itr = this->resource_path_map_1D.begin();
+            itr != this->resource_path_map_1D.end();
+            itr++
+        ) {
+            ofs << "\tresource key: " << itr->first << "  path: "
+                << itr->second << std::endl;
+        }
+    }
+    
+    ofs << "\n2D Resources:\n\n";
+    if (not this->resource_path_map_2D.empty()) {
+        std::map<int, std::string>::iterator itr;
+        
+        for (
+            itr = this->resource_path_map_2D.begin();
+            itr != this->resource_path_map_2D.end();
+            itr++
+        ) {
+            ofs << "\tresource key: " << itr->first << "  path: "
+                << itr->second << std::endl;
+        }
+    }
     
     // write results
     ofs << "\nResults:\n\n";
@@ -724,9 +768,12 @@ Model :: Model(structModel struct_model) {
     
     this->struct_model = struct_model;
     
-    // read in load data, set n_timesteps attribute
+    // read in load data, set n_timesteps attribute, compute and set
+    // project_life_yrs
     this->_readInLoadData();
     this->struct_model.n_timesteps = this->time_vec_hr.size();
+    this->struct_model.project_life_yrs =
+        this->time_vec_hr[this->time_vec_hr.size() - 1] / 8760;
     
     // populate dt_vec_hrs
     this->_populateDeltaVecHr();
@@ -739,6 +786,18 @@ Model :: Model(structModel struct_model) {
         std::cout << "Model object constructed at " << this <<
             std::endl;
     }
+    
+    /*  compute real discount rate
+     *
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.11/real_discount_rate.html
+     */
+    this->struct_model.real_discount_rate_annual =
+        (
+            this->struct_model.nominal_discount_rate_annual - 
+            this->struct_model.nominal_inflation_rate_annual
+        ) / 
+        (1 + this->struct_model.nominal_inflation_rate_annual);
+
     
     return;
 }
@@ -912,6 +971,11 @@ void Model :: addSolar(
     
     struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
     
+    if (struct_nondisp.real_discount_rate_annual < 0) {
+        struct_nondisp.real_discount_rate_annual = 
+            this->struct_model.real_discount_rate_annual;
+    }
+    
     Nondispatchable* nondisp_ptr = new Solar(
         struct_nondisp,
         struct_solar
@@ -932,6 +996,11 @@ void Model :: addTidal(
      */
     
     struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
+    
+    if (struct_nondisp.real_discount_rate_annual < 0) {
+        struct_nondisp.real_discount_rate_annual = 
+            this->struct_model.real_discount_rate_annual;
+    }
     
     Nondispatchable* nondisp_ptr = new Tidal(
         struct_nondisp,
@@ -954,6 +1023,11 @@ void Model :: addWave(
     
     struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
     
+    if (struct_nondisp.real_discount_rate_annual < 0) {
+        struct_nondisp.real_discount_rate_annual = 
+            this->struct_model.real_discount_rate_annual;
+    }
+    
     Nondispatchable* nondisp_ptr = new Wave(
         struct_nondisp,
         struct_wave
@@ -974,6 +1048,11 @@ void Model :: addWind(
      */
     
     struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
+    
+    if (struct_nondisp.real_discount_rate_annual < 0) {
+        struct_nondisp.real_discount_rate_annual = 
+            this->struct_model.real_discount_rate_annual;
+    }
     
     Nondispatchable* nondisp_ptr = new Wind(
         struct_nondisp,
@@ -997,6 +1076,11 @@ void Model :: addDiesel(
     
     struct_disp.n_timesteps = this->struct_model.n_timesteps;
     
+    if (struct_disp.real_discount_rate_annual < 0) {
+        struct_disp.real_discount_rate_annual = 
+            this->struct_model.real_discount_rate_annual;
+    }
+    
     Combustion* combustion_ptr = new Diesel(
         struct_disp,
         struct_combustion,
@@ -1019,6 +1103,11 @@ void Model :: addHydro(
     
     struct_disp.n_timesteps = this->struct_model.n_timesteps;
     
+    if (struct_disp.real_discount_rate_annual < 0) {
+        struct_disp.real_discount_rate_annual = 
+            this->struct_model.real_discount_rate_annual;
+    }
+    
     Dispatchable* disp_ptr = new Hydro(
         struct_disp,
         struct_hydro
@@ -1040,6 +1129,11 @@ void Model :: addLiIon(
      */
     
     struct_storage.n_timesteps = this->struct_model.n_timesteps;
+    
+    if (struct_storage.real_discount_rate_annual < 0) {
+        struct_storage.real_discount_rate_annual = 
+            this->struct_model.real_discount_rate_annual;
+    }
     
     Storage* storage_ptr = new LiIon(
         struct_storage,

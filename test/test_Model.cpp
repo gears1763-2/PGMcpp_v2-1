@@ -68,6 +68,14 @@ try {
         );
     }
     
+    testFloatEquals(
+        test_model.struct_model.project_life_yrs,
+        8759.0 / 8760,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
     
     // test _populateDeltaVecHr()
     std::cout << "\tTesting Model::_populateDeltaVecHr() ..." <<
@@ -92,7 +100,14 @@ try {
     );
     
     
-    // test 
+    // test post-construction economic parameters
+    testFloatEquals(
+        test_model.struct_model.real_discount_rate_annual,
+        (0.04 - 0.02) / (1 + 0.02),
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
     
     
     // test add1dRenewableResource()

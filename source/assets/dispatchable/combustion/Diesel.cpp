@@ -145,12 +145,21 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
     switch (this->struct_combustion.fuel_mode) {
         case (LINEAR): {
             ofs << " (LINEAR)\n";
+            ofs << "\tfuel intercept: " <<
+                this->struct_combustion.linear_fuel_intercept_LkWh
+                << " L/kWh\n";
+            ofs << "\tfuel slope: " <<
+                this->struct_combustion.linear_fuel_slope_LkWh
+                << "L/kWh\n";
             
             break;
         }
         
         case (LOOKUP): {
             ofs << " (LOOKUP)\n";
+            ofs << "\tpath to fuel consumption data: " <<
+                this->struct_combustion.path_2_fuel_consumption_data
+                << "\n";
             
             break;
         }

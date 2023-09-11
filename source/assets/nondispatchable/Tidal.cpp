@@ -31,43 +31,6 @@ Tidal :: Tidal(
 }
 
 
-void Tidal :: _writeTimeSeriesResults(
-    std::string _write_path,
-    std::vector<double>* ptr_2_time_vec_hr,
-    int asset_idx
-) {
-    /*
-     *  Helper method to write Tidal-level time series results
-     */
-    
-    // construct filename 
-    std::string filename = "Nondispatchable/" +
-        std::to_string(int(this->struct_nondisp.cap_kW)) +
-        "kW_" + this->struct_nondisp.nondisp_type_str +
-        "_" + std::to_string(asset_idx) + "/" +
-        std::to_string(int(this->struct_nondisp.cap_kW)) +
-        "kW_" + this->struct_nondisp.nondisp_type_str +
-        "_" + std::to_string(asset_idx) +
-        "_results.csv";
-    
-    // init output file stream
-    std::ofstream ofs;
-    ofs.open(_write_path + filename);
-    
-    // write file header
-    //...
-    
-    // write file body
-    for (int i = 0; i < this->struct_nondisp.n_timesteps; i++) {
-        //...
-    }
-    
-    ofs.close();
-    
-    return;
-}
-
-
 void Tidal :: _writeSummary(std::string _write_path, int asset_idx) {
     /*
      *  Helper method to write Tidal-level summary
@@ -88,10 +51,52 @@ void Tidal :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs.open(_write_path + filename);
     
     // write attributes
-    //...
+    ofs << this->struct_nondisp.cap_kW << "kW Tidal Summary\n\n";
+    ofs << "Attributes:\n\n";
+    
+    ofs << "\t1D resource key: " << this->struct_tidal.resource_key
+        << "\n";
+    ofs << "\treplacement running hours: " << this->struct_nondisp.replace_running_hrs
+        << " hrs\n";
+    
+    ofs << "\tpower curve: " << this->struct_tidal.power_curve << " ";
+    
+    switch (this->struct_tidal.power_curve) {
+        case (CUBIC): {
+            ofs << "(CUBIC)\n";
+            
+            break;
+        }
+        
+        case (EXPONENTIAL): {
+            ofs << "(EXPONENTIAL)\n";
+            
+            break;
+        }
+        
+        default: {
+            // do nothing!
+            
+            break;
+        }
+    }
+    
+    ofs << "\tdesign speed: " << this->struct_tidal.design_speed_ms
+        << " m/s\n";
+    ofs << "\tcapital cost: " << this->struct_nondisp.capital_cost <<
+        "\n";
+    ofs << "\toperation and maintenance cost (per kWh produced): " <<
+        this->struct_nondisp.op_maint_cost_per_kWh << "\n";
+    ofs << "\treal discount rate (annual): " <<
+        this->struct_nondisp.real_discount_rate_annual << "\n";
     
     // write results
-    //...
+    ofs << "\nResults:\n\n";
+    
+    ofs << "\trunning hours: " << this->struct_nondisp.running_hrs
+        << " hrs\n";
+    ofs << "\tnumber of replacements: " << this->struct_nondisp.n_replacements
+        << "\n";
     
     ofs.close();
     
@@ -192,7 +197,7 @@ void Tidal :: writeResults(
      *  Method to write Tidal-level results
      */
     
-    this->_writeTimeSeriesResults(
+    Nondispatchable::_writeTimeSeriesResults(
         _write_path, ptr_2_time_vec_hr, asset_idx
     );
     this->_writeSummary(_write_path, asset_idx);

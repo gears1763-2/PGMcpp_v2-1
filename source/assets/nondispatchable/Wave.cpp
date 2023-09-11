@@ -101,43 +101,6 @@ void Wave :: _readInNormalizedPerformanceMatrix() {
 }
 
 
-void Wave :: _writeTimeSeriesResults(
-    std::string _write_path,
-    std::vector<double>* ptr_2_time_vec_hr,
-    int asset_idx
-) {
-    /*
-     *  Helper method to write Wave-level time series results
-     */
-    
-    // construct filename 
-    std::string filename = "Nondispatchable/" +
-        std::to_string(int(this->struct_nondisp.cap_kW)) +
-        "kW_" + this->struct_nondisp.nondisp_type_str +
-        "_" + std::to_string(asset_idx) + "/" +
-        std::to_string(int(this->struct_nondisp.cap_kW)) +
-        "kW_" + this->struct_nondisp.nondisp_type_str +
-        "_" + std::to_string(asset_idx) +
-        "_results.csv";
-    
-    // init output file stream
-    std::ofstream ofs;
-    ofs.open(_write_path + filename);
-    
-    // write file header
-    //...
-    
-    // write file body
-    for (int i = 0; i < this->struct_nondisp.n_timesteps; i++) {
-        //...
-    }
-    
-    ofs.close();
-    
-    return;
-}
-
-
 void Wave :: _writeSummary(std::string _write_path, int asset_idx) {
     /*
      *  Helper method to write Wave-level summary
@@ -158,10 +121,63 @@ void Wave :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs.open(_write_path + filename);
     
     // write attributes
-    //...
+    ofs << this->struct_nondisp.cap_kW << "kW Wave Summary\n\n";
+    ofs << "Attributes:\n\n";
+    
+    ofs << "\t2D resource key: " << this->struct_wave.resource_key
+        << "\n";
+    ofs << "\treplacement running hours: " << this->struct_nondisp.replace_running_hrs
+        << " hrs\n";
+    
+    ofs << "\tpower mode: " << this->struct_wave.power_mode << " ";
+    
+    switch (this->struct_wave.power_mode) {
+        case (GAUSSIAN): {
+            ofs << "(GAUSSIAN)\n";
+            ofs << "\tdesign significant wave height: " <<
+                this->struct_wave.design_significant_wave_height_m <<
+                " m\n";
+            ofs << "\tdesign energy period: " << 
+                this->struct_wave.design_energy_period_s << " s\n";
+            
+            break;
+        }
+        
+        case (NORMALIZED_PERFORMANCE_MATRIX): {
+            ofs << "(NORMALIZED_PERFORMANCE_MATRIX)\n";
+            ofs << "\tpath to normalized performance matrix: " <<
+                this->struct_wave.path_2_normalized_performance_matrix
+                << "\n";
+            
+            break;
+        }
+        
+        case (PARABOLOID): {
+            ofs << "(PARABOLOID)\n";
+            
+            break;
+        }
+        
+        default: {
+            // do nothing!
+            
+            break;
+        }
+    }
+    ofs << "\tcapital cost: " << this->struct_nondisp.capital_cost <<
+        "\n";
+    ofs << "\toperation and maintenance cost (per kWh produced): " <<
+        this->struct_nondisp.op_maint_cost_per_kWh << "\n";
+    ofs << "\treal discount rate (annual): " <<
+        this->struct_nondisp.real_discount_rate_annual << "\n";
     
     // write results
-    //...
+    ofs << "\nResults:\n\n";
+    
+    ofs << "\trunning hours: " << this->struct_nondisp.running_hrs
+        << " hrs\n";
+    ofs << "\tnumber of replacements: " << this->struct_nondisp.n_replacements
+        << "\n";
     
     ofs.close();
     
@@ -373,7 +389,7 @@ void Wave :: writeResults(
      *  Method to write Wave-level results
      */
     
-    this->_writeTimeSeriesResults(
+    Nondispatchable::_writeTimeSeriesResults(
         _write_path, ptr_2_time_vec_hr, asset_idx
     );
     this->_writeSummary(_write_path, asset_idx);

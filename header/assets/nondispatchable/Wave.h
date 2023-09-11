@@ -49,7 +49,6 @@ class Wave : public Nondispatchable {
         Wave(structNondispatchable, structWave);
         
         void _readInNormalizedPerformanceMatrix(void);
-        void _writeTimeSeriesResults(std::string, std::vector<double>*, int);
         void _writeSummary(std::string, int);
         double _productionLookupkW(double, double);
         

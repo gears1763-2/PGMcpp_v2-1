@@ -16,7 +16,14 @@ try {
     Solar test_solar(struct_nondisp, struct_solar);
     
     
-    //...
+    //  test post-construction attributes
+    testFloatEquals(
+        test_solar.struct_nondisp.capital_cost,
+        300000,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
     
 } catch (...) {
     printRed("\n\t\t\t\tNondispatchable <-- Solar Tests:  FAIL\n");

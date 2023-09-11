@@ -25,6 +25,11 @@ struct structModel {
     
     int n_timesteps = 8760;
     
+    double project_life_yrs = 0;
+    double nominal_inflation_rate_annual = 0.02;
+    double nominal_discount_rate_annual = 0.04;
+    double real_discount_rate_annual = 0;
+    
     std::string path_2_load_data = "";
 };
 
@@ -41,7 +46,10 @@ class Model {
         std::vector<double> time_vec_hr;
         
         std::map<int, std::vector<double>> resource_map_1D;
+        std::map<int, std::string> resource_path_map_1D;
+        
         std::map<int, std::vector<std::vector<double>>> resource_map_2D;
+        std::map<int, std::string> resource_path_map_2D;
         
         std::vector<Nondispatchable*> nondisp_ptr_vec;
         std::vector<Combustion*> combustion_ptr_vec;
