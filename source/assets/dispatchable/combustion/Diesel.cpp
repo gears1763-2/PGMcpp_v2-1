@@ -35,13 +35,6 @@ Diesel :: Diesel(
             0.3062 * pow(this->struct_disp.cap_kW, -0.0370);
     }
     
-    // read in fuel consumption LOOKUP data
-    //...
-    
-    // if fuel mode is LOOKUP and no lookup data provided, default to 
-    // LINEAR
-    //...
-    
     this->fuel_vec_L.resize(this->struct_disp.n_timesteps, 0);
     
     if (this->struct_disp.test_flag) {

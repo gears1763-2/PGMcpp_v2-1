@@ -1,4 +1,4 @@
-Datetime [  ],Time (since start of data) [hr],Sig Wave Height [m],Energy Period [s],,Be sure to leave the last two column headers as is!,Notes
+Datetime [  ],Time (since start of data) [hr],Sig Wave Height [m],Energy Period [s],,Be sure to leave the last three column headers as is!,Notes (no commas in notes!)
 2010-01-01 00:00,0,4.26175222125028,10.4456008226821,,,blah blah blah ...
 2010-01-01 01:00,1,4.25020976167872,10.4614151137651,,,
 2010-01-01 02:00,2,4.25656524330349,10.4462827795433,,,

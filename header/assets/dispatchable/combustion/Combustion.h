@@ -34,9 +34,9 @@ struct structCombustion {
     double linear_fuel_slope_LkWh = -1;     // sentinel
     
     /*
-     *  QUADRATIC fuel consumption parameters
+     *  LOOKUP fuel consumption parameters
      */
-    //...
+    std::string path_2_fuel_consumption_data = "";
     
     /*
      *  Diesel emissions parameters
@@ -67,6 +67,9 @@ class Combustion : public Dispatchable {
         //  1. attributes
         structCombustion struct_combustion;
         
+        std::vector<double> fuel_interp_load_ratio_vec;
+        std::vector<double> fuel_interp_consumption_vec_Lhr;
+        
         std::vector<double> CO2_vec_kg;
         std::vector<double> CO_vec_kg;
         std::vector<double> NOx_vec_kg;
@@ -77,6 +80,9 @@ class Combustion : public Dispatchable {
         
         //  2. methods
         Combustion(structDispatchable, structCombustion);
+        
+        void _readInFuelConsumptionData(void);
+        double _fuelConsumptionLookupL(double, double);
         
         double getFuelConsumptionL(double, double);
         structEmissions getEmissions(double);

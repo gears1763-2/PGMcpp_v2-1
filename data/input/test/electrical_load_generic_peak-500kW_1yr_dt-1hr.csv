@@ -1,4 +1,4 @@
-Datetime [  ],Time (since start of data) [hr],Electrical Load [kW],,Be sure to leave the last two column headers as is!,Notes
+Datetime [  ],Time (since start of data) [hr],Electrical Load [kW],,Be sure to leave the last two column headers as is!,Notes (no commas in notes!)
 2010-01-01 00:00,0,360.253836463674,,,blah blah blah ...
 2010-01-01 01:00,1,355.171277826775,,,
 2010-01-01 02:00,2,353.776453532298,,,

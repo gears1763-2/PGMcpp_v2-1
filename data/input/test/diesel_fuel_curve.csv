@@ -1,5 +1,6 @@
-Load Ratio [ ],Fuel Consumption [L/hr],,Be sure to leave the first two column headers as is!,Notes
-0.3,11.1278522361839,,,blah blah blah ...
+Load Ratio [ ],Fuel Consumption [L/hr],,Be sure to leave the first two column headers as is!,Notes (no commas in notes!)
+0,4.68079520372916,,,Make sure to give fuel consumption rate data spanning the entire load ratio interval [0  1].
+0.3,11.1278522361839,,,
 0.35,12.4787834830748,,,
 0.4,13.7808847600209,,,
 0.45,15.0417468303382,,,

@@ -1,4 +1,4 @@
-Datetime [  ],Time (since start of data) [hr],Solar GHI [kW/m2],,Be sure to leave the last column header as is!,Notes
+Datetime [  ],Time (since start of data) [hr],Solar GHI [kW/m2],,Be sure to leave the last column header as is!,Notes (no commas in notes!)
 2010-01-01 00:00,0,0,,,blah blah blah ...
 2010-01-01 01:00,1,0,,,
 2010-01-01 02:00,2,0,,,

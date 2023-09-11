@@ -1,4 +1,4 @@
-Datetime [  ],Time (since start of data) [hr],Tidal Speed (hub depth) [m/s],,Be sure to leave the last column header as is!,Notes
+Datetime [  ],Time (since start of data) [hr],Tidal Speed (hub depth) [m/s],,Be sure to leave the last column header as is!,Notes (no commas in notes!)
 2010-01-01 00:00,0,0.347439913040533,,,blah blah blah ...
 2010-01-01 01:00,1,0.770545522195602,,,
 2010-01-01 02:00,2,0.731352084836198,,,

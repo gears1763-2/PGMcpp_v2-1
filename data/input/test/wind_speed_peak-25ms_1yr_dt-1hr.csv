@@ -1,4 +1,4 @@
-Datetime [  ],Time (since start of data) [hr],Wind Speed (hub height) [m/s],,Be sure to leave the last column header as is!,Notes
+Datetime [  ],Time (since start of data) [hr],Wind Speed (hub height) [m/s],,Be sure to leave the last column header as is!,Notes (no commas in notes!)
 2010-01-01 00:00,0,6.88566688469997,,,blah blah blah ...
 2010-01-01 01:00,1,5.02177105466549,,,
 2010-01-01 02:00,2,3.74211715899568,,,

@@ -25,12 +25,113 @@ Combustion :: Combustion(
     this->CH4_vec_kg.resize(this->struct_disp.n_timesteps, 0);
     this->PM_vec_kg.resize(this->struct_disp.n_timesteps, 0);
     
+    if (this->struct_combustion.fuel_mode == LOOKUP) {
+        if (this->struct_combustion.path_2_fuel_consumption_data.empty()) {
+            std::string warning_str = "WARNING:  Combustion()  path to ";
+            warning_str += "fuel consumption data is empty, defaulting to ";
+            warning_str += "linear fuel consumption model.";
+            std::cout << warning_str << std::endl;
+            
+            this->struct_combustion.fuel_mode = LINEAR;
+        }
+        
+        else {
+            this->_readInFuelConsumptionData();
+        }
+    }
+    
     if (this->struct_disp.test_flag) {
         std::cout << "\tCombustion object constructed at " << this
             << std::endl;
     }
     
     return;
+}
+
+
+void Combustion :: _readInFuelConsumptionData() {
+    /*
+     *  Helper method to read in fuel consumption data for use as
+     *  a lookup table
+     */
+    
+    // init CSVReader
+    io::CSVReader<2> in(
+        this->struct_combustion.path_2_fuel_consumption_data
+    );
+    
+    // define expected .csv structure
+    in.read_header(
+        io::ignore_extra_column,
+        "Load Ratio [ ]",
+        "Fuel Consumption [L/hr]"
+    );
+    
+    // read in data
+    double load_ratio;
+    double fuel_consumption_rate_Lhr;
+    while (
+        in.read_row(
+            load_ratio,
+            fuel_consumption_rate_Lhr
+        )
+    ) {
+        this->fuel_interp_load_ratio_vec.push_back(load_ratio);
+        this->fuel_interp_consumption_vec_Lhr.push_back(
+            fuel_consumption_rate_Lhr
+        );
+    }
+    
+    return;
+}
+
+
+double Combustion :: _fuelConsumptionLookupL(
+    double production_kW,
+    double dt_hrs
+) {
+    /*
+     *  Helper method to get fuel consumption from given fuel
+     *  consumption data (1d linear interpolation)
+     */
+    
+    double load_ratio = production_kW / this->struct_disp.cap_kW;
+    
+    double fuel_consumption_L = 0;
+    
+    if (load_ratio <= 0) {
+        return this->fuel_interp_consumption_vec_Lhr[0] * dt_hrs;
+    }
+    
+    else if (load_ratio >= 1) {
+        return this->fuel_interp_consumption_vec_Lhr[
+            this->fuel_interp_consumption_vec_Lhr.size() - 1
+        ] * dt_hrs;
+    }
+    
+    int interp_idx = 0;
+    int max_idx = int(this->fuel_interp_load_ratio_vec.size() - 1);
+    
+    while (
+        this->fuel_interp_load_ratio_vec[interp_idx + 1] < load_ratio
+    ) {
+        interp_idx++;
+        
+        if (interp_idx >= max_idx - 1) {
+            interp_idx = max_idx - 1;
+            break;
+        }
+    }
+    
+    fuel_consumption_L = linearInterpolate1d(
+        load_ratio,
+        this->fuel_interp_load_ratio_vec[interp_idx],
+        this->fuel_interp_load_ratio_vec[interp_idx + 1],
+        this->fuel_interp_consumption_vec_Lhr[interp_idx], 
+        this->fuel_interp_consumption_vec_Lhr[interp_idx + 1]
+    ) * dt_hrs;
+    
+    return fuel_consumption_L;
 }
 
 
@@ -52,7 +153,10 @@ double Combustion :: getFuelConsumptionL(
     
     switch (this->struct_combustion.fuel_mode) {
         case (LOOKUP): {
-            //...
+            fuel_consumption_L = this->_fuelConsumptionLookupL(
+                production_kW,
+                dt_hrs
+            );
             
             break;
         }

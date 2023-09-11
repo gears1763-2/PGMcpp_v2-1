@@ -1,4 +1,4 @@
-Datetime [  ],Time (since start of data) [hr],Hydro Flow (into reservoir) [m3/hr],,Be sure to leave the last column header as is!,Notes
+Datetime [  ],Time (since start of data) [hr],Hydro Flow (into reservoir) [m3/hr],,Be sure to leave the last column header as is!,Notes (no commas in notes!)
 2010-01-01 00:00,0.95511530343591,1779,,,blah blah blah ...
 2010-01-01 01:00,0.399794319000395,1748,,,
 2010-01-01 02:00,0.048068356974692,1720,,,
