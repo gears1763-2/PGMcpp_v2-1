@@ -92,12 +92,10 @@ double Combustion :: _fuelConsumptionLookupL(
 ) {
     /*
      *  Helper method to get fuel consumption from given fuel
-     *  consumption data (1d linear interpolation)
+     *  consumption data (1d linear interpolation) and return
      */
     
     double load_ratio = production_kW / this->struct_disp.cap_kW;
-    
-    double fuel_consumption_L = 0;
     
     if (load_ratio <= 0) {
         return this->fuel_interp_consumption_vec_Lhr[0] * dt_hrs;
@@ -111,6 +109,7 @@ double Combustion :: _fuelConsumptionLookupL(
     
     int interp_idx = 0;
     int max_idx = int(this->fuel_interp_load_ratio_vec.size() - 1);
+    double fuel_consumption_L = 0;
     
     while (
         this->fuel_interp_load_ratio_vec[interp_idx + 1] < load_ratio
@@ -153,6 +152,10 @@ double Combustion :: getFuelConsumptionL(
     
     switch (this->struct_combustion.fuel_mode) {
         case (LOOKUP): {
+            /*
+             *  Interpolated over given fuel consumption data
+             */
+            
             fuel_consumption_L = this->_fuelConsumptionLookupL(
                 production_kW,
                 dt_hrs

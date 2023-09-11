@@ -113,4 +113,37 @@ inline double linearInterpolation2d(
 }
 
 
+inline std::vector<std::string> splitString(
+    std::string input_string,
+    char delimiter
+) {
+    /*
+     *  Utility function to split string with respect to given delimiter
+     */
+    
+    std::vector<std::string> string_split_vec = {};
+    
+    std::string temp_string = "";
+    for (size_t i = 0; i < input_string.size(); i++) {
+        if (char(input_string[i]) != delimiter) {
+            if (char(input_string[i]) != '\n') {
+                temp_string += input_string[i];
+            }
+            
+            continue;
+        }
+        
+        string_split_vec.push_back(temp_string);
+        temp_string = "";
+    }
+    
+    while (temp_string[temp_string.length() - 1] == '\n') {
+        temp_string.pop_back();
+    }
+    string_split_vec.push_back(temp_string);
+    
+    return string_split_vec;
+}
+
+
 #endif  /* UTILITIES_H */

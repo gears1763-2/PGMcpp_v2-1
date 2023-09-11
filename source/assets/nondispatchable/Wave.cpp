@@ -20,12 +20,82 @@ Wave :: Wave(
     this->struct_nondisp.nondisp_type_str = "WAVE";
     this->struct_wave = struct_wave;
     
-    //...
+    if (
+        not this->struct_wave.path_2_normalized_performance_matrix.empty()
+    ) {
+        this->struct_wave.power_mode = NORMALIZED_PERFORMANCE_MATRIX;
+        this->_readInNormalizedPerformanceMatrix();
+    }
     
     if (this->struct_nondisp.test_flag) {
         std::cout << "\tWave object constructed at " << this
             << std::endl;
     }
+    
+    return;
+}
+
+
+void Wave :: _readInNormalizedPerformanceMatrix() {
+    /*
+     *  Helper method to read in normalized performance matrix data
+     */
+    
+    std::ifstream ifs;
+    ifs.open(this->struct_wave.path_2_normalized_performance_matrix);
+    
+    int line_idx = 0;
+    std::string file_line;
+    while (std::getline(ifs, file_line)) {
+        std::vector<std::string> file_line_split_vec = 
+            splitString(file_line, ',');
+        
+        if (line_idx <= 0) {
+            for (size_t i = 1; i < file_line_split_vec.size(); i++) {
+                this->interp_sig_wave_height_vec_m.push_back(
+                    std::stod(file_line_split_vec[i])
+                );
+            }
+            
+            this->min_interp_sig_wave_height_m = 
+                this->interp_sig_wave_height_vec_m[0];
+            
+            this->max_interp_sig_wave_height_m = 
+                this->interp_sig_wave_height_vec_m[
+                    this->interp_sig_wave_height_vec_m.size() - 1
+                ];
+        }
+        
+        else {
+            this->interp_energy_period_vec_s.push_back(
+                std::stod(file_line_split_vec[0])
+            );
+            
+            std::vector<double> normalized_performance_matrix_row = {};
+            
+            for (size_t i = 1; i < file_line_split_vec.size(); i++) {
+                normalized_performance_matrix_row.push_back(
+                    std::stod(file_line_split_vec[i])
+                );
+            }
+            
+            this->interp_normalized_performance_matrix.push_back(
+                normalized_performance_matrix_row
+            );
+        }
+        
+        line_idx++;
+    }
+    
+    this->min_interp_energy_period_s = 
+        this->interp_energy_period_vec_s[0];
+    
+    this->max_interp_energy_period_s = 
+        this->interp_energy_period_vec_s[
+            this->interp_energy_period_vec_s.size() - 1
+        ];
+    
+    ifs.close();
     
     return;
 }
@@ -96,6 +166,92 @@ void Wave :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs.close();
     
     return;
+}
+
+
+double Wave :: _productionLookupkW(
+    double significant_wave_height_m,
+    double energy_period_s
+) {
+    /*
+     *  Helper method to lookup and return wave energy converter
+     *  production
+     */
+    
+    if (
+        significant_wave_height_m <= this->min_interp_sig_wave_height_m ||
+        significant_wave_height_m >= this->max_interp_sig_wave_height_m
+    ) {
+        return 0;
+    }
+    
+    else if (
+        energy_period_s <= this->min_interp_energy_period_s ||
+        energy_period_s >= this->max_interp_energy_period_s
+    ) {
+        return 0;
+    }
+    
+    int idx_horizontal = 0;
+    int idx_vertical = 0;
+    int max_idx_horizontal = this->interp_sig_wave_height_vec_m.size() - 1;
+    int max_idx_vertical = this->interp_energy_period_vec_s.size() - 1;
+    double normalized_production = 0;
+    
+    while (
+        this->interp_sig_wave_height_vec_m[idx_horizontal + 1] <
+        significant_wave_height_m
+    ) {
+        idx_horizontal++;
+        
+        if (idx_horizontal >= max_idx_horizontal - 1) {
+            idx_horizontal = max_idx_horizontal - 1;
+            break;
+        }
+    }
+    
+    while (
+        this->interp_energy_period_vec_s[idx_vertical + 1] <
+        energy_period_s
+    ) {
+        idx_vertical++;
+        
+        if (idx_vertical >= max_idx_vertical - 1) {
+            idx_vertical = max_idx_vertical - 1;
+            break;
+        }
+    }
+    
+    normalized_production = linearInterpolation2d(
+        significant_wave_height_m,                              // x
+        energy_period_s,                                        // y
+        this->interp_sig_wave_height_vec_m[idx_horizontal],     // x_0
+        this->interp_sig_wave_height_vec_m[idx_horizontal + 1], // x_1
+        this->interp_energy_period_vec_s[idx_vertical],         // y_0
+        this->interp_energy_period_vec_s[idx_vertical + 1],     // y_1
+        this->interp_normalized_performance_matrix[
+            idx_vertical
+        ][
+            idx_horizontal
+        ],                                                      // z_00
+        this->interp_normalized_performance_matrix[
+            idx_vertical
+        ][
+            idx_horizontal + 1
+        ],                                                      // z_10
+        this->interp_normalized_performance_matrix[
+            idx_vertical + 1
+        ][
+            idx_horizontal
+        ],                                                      // z_01
+        this->interp_normalized_performance_matrix[
+            idx_vertical + 1
+        ][
+            idx_horizontal + 1
+        ]                                                       // z_11
+    );
+    
+    return normalized_production * this->struct_nondisp.cap_kW;
 }
 
 

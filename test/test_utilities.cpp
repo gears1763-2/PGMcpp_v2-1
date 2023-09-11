@@ -141,6 +141,34 @@ try {
     );
     
     
+    //  test splitString()
+    std::cout << "\tTesting splitString() ..." <<
+        std::endl;
+    
+    std::string test_string =
+        "\nLOL,I'm\n,a\n\n,comma,\nseparated\n,test,string!\n\n\n\n";
+    std::vector<std::string> exp_string_split_vec = {
+        "LOL",
+        "I'm",
+        "a",
+        "comma",
+        "separated",
+        "test",
+        "string!"
+    };
+    
+    std::vector<std::string> string_split_vec =
+        splitString(test_string, ',');
+    
+    for (int i = 0; i < exp_string_split_vec.size(); i++) {
+        testTruth(
+            string_split_vec[i].compare(exp_string_split_vec[i]) == 0,
+            __FILE__,
+            __LINE__
+        );
+    }
+    
+    
 } catch (...) {
     printRed("\n\t\t\t\t Utility Function Tests:  FAIL\n");
     std::cout << std::endl;

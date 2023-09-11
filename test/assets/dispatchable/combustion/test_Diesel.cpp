@@ -186,7 +186,7 @@ try {
     }
     
     
-    // test _fuelConsumptionLookupL(
+    // test _fuelConsumptionLookupL()
     std::cout << "\tTesting Combustion::_fuelConsumptionLookupL() ..." <<
         std::endl;
     
