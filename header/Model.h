@@ -30,6 +30,11 @@ struct structModel {
     double nominal_discount_rate_annual = 0.04;
     double real_discount_rate_annual = 0;
     
+    double net_present_cost = 0;
+    
+    double total_dispatch_kWh = 0;
+    double levellized_cost_of_energy_per_kWh = 0;
+    
     std::string path_2_load_data = "";
 };
 
@@ -79,6 +84,7 @@ class Model {
         void _dispatchLoadFollowingInOrderDischarging(int);
         void _handleDispatch(void);
         
+        void _computeFuelEmissions(void);
         void _computeEconomics(void);
         
         void _writeDispatchResults(std::string);
@@ -101,7 +107,7 @@ class Model {
         
         void addLiIon(structStorage, structBatteryStorage, structLiIon);
         
-        void run(bool = true);
+        void run();
         void writeResults(std::string);
         
         void clearAssets(void);

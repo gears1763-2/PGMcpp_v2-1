@@ -501,12 +501,121 @@ void Model :: _handleDispatch() {
 }
 
 
+void Model :: _computeFuelEmissions(void) {
+    /*
+     *  Helper method to compute fuel consumption and emissions totals
+     *  of Model run
+     */
+    
+    //...
+    
+    return;
+}
+
+
 void Model :: _computeEconomics(void) {
     /*
      *  Helper method to compute economics of Model run
      */
     
-    //...
+    // compute net present cost
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        Combustion* combustion_ptr = this->combustion_ptr_vec[i];
+        
+        this->struct_model.net_present_cost +=
+            combustion_ptr->struct_disp.net_present_cost;
+    }
+    
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
+        
+        this->struct_model.net_present_cost +=
+            noncombustion_ptr->struct_disp.net_present_cost;
+    }
+    
+    for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
+        Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[i];
+        
+        this->struct_model.net_present_cost +=
+            nondisp_ptr->struct_nondisp.net_present_cost;
+    }
+    
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        Storage* storage_ptr = this->storage_ptr_vec[i];
+        
+        this->struct_model.net_present_cost +=
+            storage_ptr->struct_storage.net_present_cost;
+    }
+    
+    
+    // compute levellized cost of energy (for each component)
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        Combustion* combustion_ptr = this->combustion_ptr_vec[i];
+        
+        combustion_ptr->computeLevellizedCostOfEnergy(
+            this->struct_model.project_life_yrs,
+            &(this->dt_vec_hr)
+        );
+    }
+    
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
+        
+        noncombustion_ptr->computeLevellizedCostOfEnergy(
+            this->struct_model.project_life_yrs,
+            &(this->dt_vec_hr)
+        );
+    }
+    
+    for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
+        Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[i];
+        
+        nondisp_ptr->computeLevellizedCostOfEnergy(
+            this->struct_model.project_life_yrs,
+            &(this->dt_vec_hr)
+        );
+    }
+    
+    // compute levellized cost of energy (for entire system)
+    /*
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.12/levelized_cost_of_energy.html
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.12/total_annualized_cost.html
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.12/capital_recovery_factor.html
+     */
+    double total_load_served_kWh = 0;
+    
+    for (size_t i = 0; i < this->load_vec_kW.size(); i++) {
+        total_load_served_kWh += (
+            this->load_vec_kW[i] - 
+            this->remaining_load_vec_kW[i]
+        ) * this->dt_vec_hr[i];
+    }
+    
+    if (total_load_served_kWh <= 0) {
+        return;
+    }
+    
+    double capital_recovery_factor = 
+        (
+            this->struct_model.real_discount_rate_annual *
+            pow(
+                1 + this->struct_model.real_discount_rate_annual,
+                this->struct_model.project_life_yrs
+            )
+        ) / 
+        (
+            pow(
+                1 + this->struct_model.real_discount_rate_annual,
+                this->struct_model.project_life_yrs
+            ) -
+            1
+        );
+        
+    double total_annualized_cost = capital_recovery_factor *
+        this->struct_model.net_present_cost;
+    
+    this->struct_model.levellized_cost_of_energy_per_kWh =
+        total_annualized_cost / total_load_served_kWh;
     
     return;
 }
@@ -750,7 +859,10 @@ void Model :: _writeSummary(std::string _write_path) {
     // write results
     ofs << "\nResults:\n\n";
     
-    //...
+    ofs << "\tnet present cost: " <<
+        this->struct_model.net_present_cost << "\n";
+    ofs << "\tlevellized cost of energy (per kWh served): " <<
+        this->struct_model.levellized_cost_of_energy_per_kWh << "\n";
     
     ofs.close();
     
@@ -1081,6 +1193,16 @@ void Model :: addDiesel(
             this->struct_model.real_discount_rate_annual;
     }
     
+    if (struct_combustion.real_fuel_discount_rate_annual < 0) {
+        /*
+         *
+         *  ref: https://www.homerenergy.com/products/pro/docs/3.11/real_discount_rate.html
+         */
+        struct_combustion.real_fuel_discount_rate_annual =
+            (this->struct_model.nominal_discount_rate_annual - 0.05) / 
+            1.05;
+    }
+    
     Combustion* combustion_ptr = new Diesel(
         struct_disp,
         struct_combustion,
@@ -1147,7 +1269,7 @@ void Model :: addLiIon(
 }
 
 
-void Model :: run(bool compute_economics) {
+void Model :: run() {
     /*
      *  Method to run the Model
      */
@@ -1159,10 +1281,11 @@ void Model :: run(bool compute_economics) {
         // handle dispatch control
         this->_handleDispatch();
         
+        // compute fuel and emissions
+        this->_computeFuelEmissions();
+        
         // compute economics
-        if (compute_economics) {
-            this->_computeEconomics();
-        }
+        this->_computeEconomics();
         
     } 
     

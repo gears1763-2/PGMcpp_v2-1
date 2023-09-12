@@ -143,8 +143,8 @@ void LiIon :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs.open(_write_path + filename);
     
     // write attributes
-    ofs << this->struct_storage.cap_kW << "kW, " << 
-        this->struct_liion.init_cap_kWh << "kWh LiIon Summary\n\n";
+    ofs << this->struct_storage.cap_kW << " kW, " << 
+        this->struct_liion.init_cap_kWh << " kWh LiIon Summary\n\n";
     ofs << "Attributes:\n\n";
     
     ofs << "\tcapital cost: " << this->struct_storage.capital_cost <<

@@ -63,6 +63,9 @@ Diesel :: Diesel(
     if (not this->struct_disp.is_sunk) {
         this->real_capital_cost_vec[0] =
             this->struct_disp.capital_cost;
+        
+        this->struct_disp.net_present_cost +=
+            this->struct_disp.capital_cost;
     }
     
     if (this->struct_disp.test_flag) {
@@ -94,7 +97,7 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs.open(_write_path + filename);
     
     // write attributes
-    ofs << this->struct_disp.cap_kW << "kW Diesel Summary\n\n";
+    ofs << this->struct_disp.cap_kW << " kW Diesel Summary\n\n";
     ofs << "Attributes:\n\n";
     
     ofs << "\treplacement running hours: " << this->struct_disp.replace_running_hrs
@@ -113,7 +116,7 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
                 << " L/kWh\n";
             ofs << "\tfuel slope: " <<
                 this->struct_combustion.linear_fuel_slope_LkWh
-                << "L/kWh\n";
+                << " L/kWh\n";
             
             break;
         }
@@ -134,6 +137,17 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
         }
     }
     
+    ofs << "\tcapital cost: " << this->struct_disp.capital_cost <<
+        "\n";
+    ofs << "\toperation and maintenance cost (per kWh produced): " <<
+        this->struct_disp.op_maint_cost_per_kWh << "\n";
+    ofs << "\tfuel cost (per L): " <<
+        this->struct_combustion.fuel_cost_L << "\n";
+    ofs << "\treal discount rate (annual): " <<
+        this->struct_disp.real_discount_rate_annual << "\n";
+    ofs << "\treal fuel discount rate (annual): " <<
+        this->struct_combustion.real_fuel_discount_rate_annual << "\n";
+    
     // write results
     ofs << "\nResults:\n\n";
     
@@ -143,6 +157,12 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
         << "\n";
     ofs << "\tnumber of replacements: " << this->struct_disp.n_replacements
         << "\n";
+    ofs << "\ttotal dispatch (over project life): " << 
+        this->total_dispatch_kWh << " kWh\n";
+    ofs << "\tnet present cost: " <<
+        this->struct_disp.net_present_cost << "\n";
+    ofs << "\tlevellized cost of energy (per kWh dispatched): " <<
+        this->struct_disp.levellized_cost_of_energy_per_kWh << "\n";
     
     ofs.close();
     
@@ -188,17 +208,39 @@ void Diesel :: commitProductionkW(
     // callback
     Dispatchable::commitProductionkW(production_kW, dt_hrs, t_hrs, timestep);
     
-    // handle fuel consumption
-    double fuel_consumption_L =
-        Combustion::getFuelConsumptionL(production_kW, dt_hrs);
+    
+    if (this->struct_disp.is_running) {
+        // handle fuel consumption
+        double fuel_consumption_L =
+            Combustion::getFuelConsumptionL(production_kW, dt_hrs);
+            
+        this->fuel_vec_L[timestep] = fuel_consumption_L;
         
-    this->fuel_vec_L[timestep] = fuel_consumption_L;
-    
-    // handle emissions
-    structEmissions struct_emissions =
-        Combustion::getEmissions(fuel_consumption_L);
-    
-    Combustion::recordEmissions(struct_emissions, timestep);
+        // incur fuel cost
+        /*
+         *  ref: https://www.homerenergy.com/products/pro/docs/latest/real_discount_rate.html
+         *  ref: https://www.homerenergy.com/products/pro/docs/latest/present_value.html
+         */
+        double real_discount_scalar = 1.0 / pow(
+            1 + this->struct_combustion.real_fuel_discount_rate_annual,
+            t_hrs / 8760
+        );
+
+        double fuel_cost = real_discount_scalar * 
+            this->struct_combustion.fuel_cost_L * 
+            fuel_consumption_L;
+
+        this->real_fuel_cost_vec[timestep] = fuel_cost;
+
+        this->struct_disp.net_present_cost +=
+            this->real_fuel_cost_vec[timestep];
+        
+        // handle emissions
+        structEmissions struct_emissions =
+            Combustion::getEmissions(fuel_consumption_L);
+        
+        Combustion::recordEmissions(struct_emissions, timestep);
+    }
     
     return;
 }

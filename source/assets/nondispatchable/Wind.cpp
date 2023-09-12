@@ -44,6 +44,9 @@ Wind :: Wind(
     if (not this->struct_nondisp.is_sunk) {
         this->real_capital_cost_vec[0] =
             this->struct_nondisp.capital_cost;
+            
+        this->struct_nondisp.net_present_cost +=
+            this->struct_nondisp.capital_cost;
     }
     
     if (this->struct_nondisp.test_flag) {
@@ -75,7 +78,7 @@ void Wind :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs.open(_write_path + filename);
     
     // write attributes
-    ofs << this->struct_nondisp.cap_kW << "kW Wind Summary\n\n";
+    ofs << this->struct_nondisp.cap_kW << " kW Wind Summary\n\n";
     ofs << "Attributes:\n\n";
     
     ofs << "\t1D resource key: " << this->struct_wind.resource_key
@@ -98,6 +101,12 @@ void Wind :: _writeSummary(std::string _write_path, int asset_idx) {
         << " hrs\n";
     ofs << "\tnumber of replacements: " << this->struct_nondisp.n_replacements
         << "\n";
+    ofs << "\ttotal dispatch (over project life): " <<
+        this->total_dispatch_kWh << " kWh\n";
+    ofs << "\tnet present cost: " <<
+        this->struct_nondisp.net_present_cost << "\n";
+    ofs << "\tlevellized cost of energy (per kWh dispatched): " <<
+        this->struct_nondisp.levellized_cost_of_energy_per_kWh << "\n";
     
     ofs.close();
     

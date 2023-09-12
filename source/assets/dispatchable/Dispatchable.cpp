@@ -57,6 +57,9 @@ void Dispatchable :: _handleReplacement(int timestep, double t_hrs) {
     this->real_capital_cost_vec[timestep] = real_discount_scalar *
         this->struct_disp.capital_cost;
     
+    this->struct_disp.net_present_cost +=
+        this->real_capital_cost_vec[timestep];
+    
     // record replacements
     this->struct_disp.n_replacements++;
     this->replaced_vec[timestep] = true;
@@ -157,6 +160,9 @@ void Dispatchable :: commitProductionkW(
             production_kW * dt_hrs;
         
         this->real_op_maint_cost_vec[timestep] = op_maint_cost;
+        
+        this->struct_disp.net_present_cost +=
+            this->real_op_maint_cost_vec[timestep];
     }
     
     // trigger replacement, if necessary
@@ -198,6 +204,56 @@ double Dispatchable :: getDispatchkW(
     }
     
     return dispatch_kW;
+}
+
+
+void Dispatchable :: computeLevellizedCostOfEnergy(
+    double project_life_yrs,
+    std::vector<double>* ptr_2_dt_vec_hr
+) {
+    /*
+     *  Method to compute levellized cost of energy
+     * 
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.12/levelized_cost_of_energy.html
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.12/total_annualized_cost.html
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.12/capital_recovery_factor.html
+     */
+    
+    double total_dispatch_kWh = 0;
+    
+    for (size_t i = 0; i < this->dispatch_vec_kW.size(); i++) {
+        total_dispatch_kWh += this->dispatch_vec_kW[i] *
+            ptr_2_dt_vec_hr->at(i);
+    }
+    
+    if (total_dispatch_kWh <= 0) {
+        return;
+    }
+    this->total_dispatch_kWh = total_dispatch_kWh;
+    
+    double capital_recovery_factor = 
+        (
+            this->struct_disp.real_discount_rate_annual *
+            pow(
+                1 + this->struct_disp.real_discount_rate_annual,
+                project_life_yrs
+            )
+        ) / 
+        (
+            pow(
+                1 + this->struct_disp.real_discount_rate_annual,
+                project_life_yrs
+            ) -
+            1
+        );
+        
+    double total_annualized_cost = capital_recovery_factor *
+        this->struct_disp.net_present_cost;
+    
+    this->struct_disp.levellized_cost_of_energy_per_kWh =
+        total_annualized_cost / total_dispatch_kWh;
+    
+    return;
 }
 
 

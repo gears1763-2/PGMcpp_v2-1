@@ -40,6 +40,8 @@ struct structStorage {
     
     double real_discount_rate_annual = -1;
     
+    double net_present_cost = 0;
+    
     std::string storage_type_str = "";
 };
 

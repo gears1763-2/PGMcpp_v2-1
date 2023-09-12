@@ -27,6 +27,9 @@ struct structCombustion {
     FuelMode fuel_mode = LINEAR;
     FuelType fuel_type = FUEL_DIESEL;
     
+    double fuel_cost_L = 1.50;
+    double real_fuel_discount_rate_annual = -1;
+    
     /*
      *  LINEAR fuel consumption parameters
      */
@@ -71,6 +74,7 @@ class Combustion : public Dispatchable {
         std::vector<double> fuel_interp_consumption_vec_Lhr;
         
         std::vector<double> fuel_vec_L;
+        std::vector<double> real_fuel_cost_vec;
         
         std::vector<double> CO2_vec_kg;
         std::vector<double> CO_vec_kg;
@@ -95,6 +99,8 @@ class Combustion : public Dispatchable {
         
         virtual void commitProductionkW(double, double, double, int) {return;}
         virtual double requestProductionkW(double) {return 0;}
+        
+        void computeLevellizedCostOfEnergy(double, std::vector<double>*);
         
         virtual void writeResults(
             std::string,

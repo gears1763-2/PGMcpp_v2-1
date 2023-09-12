@@ -19,6 +19,7 @@ Combustion :: Combustion(
     this->struct_combustion = struct_combustion;
     
     this->fuel_vec_L.resize(this->struct_disp.n_timesteps, 0);
+    this->real_fuel_cost_vec.resize(this->struct_disp.n_timesteps, 0);
     
     this->CO2_vec_kg.resize(this->struct_disp.n_timesteps, 0);
     this->CO_vec_kg.resize(this->struct_disp.n_timesteps, 0);
@@ -168,6 +169,7 @@ void Combustion :: _writeTimeSeriesResults(
         << "Is Running [T/F],"
         << "Real Op & Maint Cost (over time step),"
         << "Fuel Consumption (over time step) [L],"
+        << "Real Fuel Cost (over time step),"
         << "CO2 Emissions (over time step) [kg],"
         << "CO Emissions (over time step) [kg],"
         << "NOx Emissions (over time step) [kg],"
@@ -189,6 +191,7 @@ void Combustion :: _writeTimeSeriesResults(
             << std::to_string(this->is_running_vec[i]) << ","
             << std::to_string(this->real_op_maint_cost_vec[i]) << ","
             << std::to_string(this->fuel_vec_L[i]) << ","
+            << std::to_string(this->real_fuel_cost_vec[i]) << ","
             << std::to_string(this->CO2_vec_kg[i]) << ","
             << std::to_string(this->CO_vec_kg[i]) << ","
             << std::to_string(this->NOx_vec_kg[i]) << ","
@@ -323,6 +326,26 @@ void Combustion :: recordEmissions(
     this->SOx_vec_kg[timestep] = struct_emissions.SOx_kg;
     this->CH4_vec_kg[timestep] = struct_emissions.CH4_kg;
     this->PM_vec_kg[timestep] = struct_emissions.PM_kg;
+    
+    return;
+}
+
+
+void Combustion :: computeLevellizedCostOfEnergy(
+    double project_life_yrs,
+    std::vector<double>* ptr_2_dt_vec_hr
+) {
+    /*
+     *  Method to compute levellized cost of energy
+     * 
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.12/levelized_cost_of_energy.html
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.12/total_annualized_cost.html
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.12/capital_recovery_factor.html
+     */
+    
+    Dispatchable::computeLevellizedCostOfEnergy(
+        project_life_yrs, ptr_2_dt_vec_hr
+    );
     
     return;
 }

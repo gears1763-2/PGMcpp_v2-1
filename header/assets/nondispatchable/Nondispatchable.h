@@ -38,6 +38,9 @@ struct structNondispatchable {
     
     double real_discount_rate_annual = -1;
     
+    double net_present_cost = 0;
+    double levellized_cost_of_energy_per_kWh = 0;
+    
     std::string nondisp_type_str = "";
 };
 
@@ -46,6 +49,8 @@ class Nondispatchable {
     public:
         // attributes
         structNondispatchable struct_nondisp;
+        
+        double total_dispatch_kWh = 0;
         
         std::vector<bool> is_running_vec;
         std::vector<bool> replaced_vec;
@@ -72,6 +77,8 @@ class Nondispatchable {
         
         virtual double getProductionkW(double) {return 0;}
         virtual double getProductionkW(double, double) {return 0;}
+        
+        void computeLevellizedCostOfEnergy(double, std::vector<double>*);
         
         virtual void writeResults(
             std::string,
