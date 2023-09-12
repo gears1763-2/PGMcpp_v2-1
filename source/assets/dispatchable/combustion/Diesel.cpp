@@ -35,77 +35,40 @@ Diesel :: Diesel(
             0.3062 * pow(this->struct_disp.cap_kW, -0.0370);
     }
     
-    this->fuel_vec_L.resize(this->struct_disp.n_timesteps, 0);
+    //  init ecomonomic attributes
+    /*
+     *  These capital and operational cost formulae are derived from a survey
+     *  of data for commercially available diesel generators
+     *  [Canadian dollars]
+     */
+    if (this->struct_disp.capital_cost < 0) {
+        // Canadian dollars
+        this->struct_disp.capital_cost =
+            this->struct_disp.cap_kW * (
+            150 * exp(
+                0.0002 * log(0.14666666) *
+                this->struct_disp.cap_kW
+            ) + 400
+        );
+    }
+    
+    if (this->struct_disp.op_maint_cost_per_kWh < 0) {
+        // Canadian dollars
+        this->struct_disp.op_maint_cost_per_kWh = 0.03 * exp(
+            0.0002 * log(0.03333333) *
+            this->struct_disp.cap_kW
+        ) + 0.01;
+    }
+    
+    if (not this->struct_disp.is_sunk) {
+        this->real_capital_cost_vec[0] =
+            this->struct_disp.capital_cost;
+    }
     
     if (this->struct_disp.test_flag) {
         std::cout << "\tDiesel object constructed at " << this
             << std::endl;
     }
-    
-    return;
-}
-
-
-void Diesel :: _writeTimeSeriesResults(
-    std::string _write_path,
-    std::vector<double>* ptr_2_time_vec_hr,
-    int asset_idx
-) {
-    /*
-     *  Helper method to write Diesel-level time series results
-     */
-    
-    // construct filename 
-    std::string filename = "Combustion/" +
-        std::to_string(int(this->struct_disp.cap_kW)) +
-        "kW_" + this->struct_disp.disp_type_str +
-        "_" + std::to_string(asset_idx) + "/" +
-        std::to_string(int(this->struct_disp.cap_kW)) +
-        "kW_" + this->struct_disp.disp_type_str +
-        "_" + std::to_string(asset_idx) +
-        "_results.csv";
-    
-    // init output file stream
-    std::ofstream ofs;
-    ofs.open(_write_path + filename);
-    
-    // write file header
-    ofs << "Time [hrs],"
-        << "Production (over time step) [kW],"
-        << "Dispatch (over time step) [kW],"
-        << "Curtailment (over time step) [kW],"
-        << "Storage (over time step) [kW],"
-        << "Is Running [T/F],"
-        << "Fuel Consumption (over time step) [L],"
-        << "CO2 Emissions (over time step) [kg],"
-        << "CO Emissions (over time step) [kg],"
-        << "NOx Emissions (over time step) [kg],"
-        << "SOx Emissions (over time step) [kg],"
-        << "CH4 Emissions (over time step) [kg],"
-        << "PM Emissions (over time step) [kg],"
-        //<< ","
-        << "\n";
-    
-    // write file body
-    for (int i = 0; i < this->struct_disp.n_timesteps; i++) {
-        ofs << std::to_string(ptr_2_time_vec_hr->at(i)) << ","
-            << std::to_string(this->production_vec_kW[i]) << ","
-            << std::to_string(this->dispatch_vec_kW[i]) << ","
-            << std::to_string(this->curtailment_vec_kW[i]) << ","
-            << std::to_string(this->storage_vec_kW[i]) << ","
-            << std::to_string(this->is_running_vec[i]) << ","
-            << std::to_string(this->fuel_vec_L[i]) << ","
-            << std::to_string(this->CO2_vec_kg[i]) << ","
-            << std::to_string(this->CO_vec_kg[i]) << ","
-            << std::to_string(this->NOx_vec_kg[i]) << ","
-            << std::to_string(this->SOx_vec_kg[i]) << ","
-            << std::to_string(this->CH4_vec_kg[i]) << ","
-            << std::to_string(this->PM_vec_kg[i]) << ","
-            //<< [...] << ","
-            << "\n";
-    }
-    
-    ofs.close();
     
     return;
 }
@@ -190,6 +153,7 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
 void Diesel :: commitProductionkW(
     double production_kW,
     double dt_hrs,
+    double t_hrs,
     int timestep
 ) {
     /*
@@ -222,7 +186,7 @@ void Diesel :: commitProductionkW(
     }
     
     // callback
-    Dispatchable::commitProductionkW(production_kW, dt_hrs, timestep);
+    Dispatchable::commitProductionkW(production_kW, dt_hrs, t_hrs, timestep);
     
     // handle fuel consumption
     double fuel_consumption_L =
@@ -278,7 +242,7 @@ void Diesel :: writeResults(
      *  Method to write Diesel-level results
      */
     
-    this->_writeTimeSeriesResults(
+    Combustion::_writeTimeSeriesResults(
         _write_path, ptr_2_time_vec_hr, asset_idx
     );
     this->_writeSummary(_write_path, asset_idx);

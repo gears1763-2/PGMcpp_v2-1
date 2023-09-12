@@ -9,6 +9,7 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
      */
     
     double dt_hrs = this->dt_vec_hr[timestep];
+    double t_hrs = this->time_vec_hr[timestep];
     
     // for all combustion assets, request zero production and commit,
     // record production, dispatch, and curtailment
@@ -19,7 +20,7 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
         double production_kW = combustion_ptr->requestProductionkW(0);
         
         combustion_ptr->commitProductionkW(
-            production_kW, dt_hrs, timestep
+            production_kW, dt_hrs, t_hrs, timestep
         );
         
         // record dispatch (remaining load is <= 0, in this case)
@@ -43,7 +44,7 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
         double production_kW = noncombustion_ptr->requestProductionkW(0);
         
         noncombustion_ptr->commitProductionkW(
-            production_kW, dt_hrs, timestep
+            production_kW, dt_hrs, t_hrs, timestep
         );
         
         // record dispatch (net load is <= 0, in this case)
@@ -171,7 +172,7 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
         
         double charging_kW = storage_ptr->struct_storage.charging_kW;
         
-        storage_ptr->commitChargekW(charging_kW, dt_hrs, timestep);
+        storage_ptr->commitChargekW(charging_kW, dt_hrs, t_hrs, timestep);
     }
     
     return;
@@ -185,6 +186,7 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
      */
     
     double dt_hrs = this->dt_vec_hr[timestep];
+    double t_hrs = this->time_vec_hr[timestep];
     double load_kW = this->net_load_vec_kW[timestep];
     
     // for all storage assets, get available, discharge up to load, 
@@ -204,7 +206,9 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
         }
         
         // commit
-        storage_ptr->commitDischargekW(discharging_kW, dt_hrs, timestep);
+        storage_ptr->commitDischargekW(
+            discharging_kW, dt_hrs, t_hrs, timestep
+        );
         
         // update load
         load_kW -= discharging_kW;
@@ -219,7 +223,7 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
         double production_kW = noncombustion_ptr->requestProductionkW(load_kW);
         
         noncombustion_ptr->commitProductionkW(
-            production_kW, dt_hrs, timestep
+            production_kW, dt_hrs, t_hrs, timestep
         );
         
         // record dispatch
@@ -246,7 +250,7 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
         double production_kW = combustion_ptr->requestProductionkW(load_kW);
         
         combustion_ptr->commitProductionkW(
-            production_kW, dt_hrs, timestep
+            production_kW, dt_hrs, t_hrs, timestep
         );
         
         // record dispatch

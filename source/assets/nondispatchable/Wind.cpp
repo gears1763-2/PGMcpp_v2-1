@@ -20,7 +20,31 @@ Wind :: Wind(
     this->struct_nondisp.nondisp_type_str = "WIND";
     this->struct_wind = struct_wind;
     
-    //...
+    //  init ecomonomic attributes
+    /*
+     *  These capital and operational cost formulae are derived from a
+     *  survey of data for commercially available wind turbine
+     *  technologies [Canadian dollars]
+     */
+    if (this->struct_nondisp.capital_cost < 0) {
+        this->struct_nondisp.capital_cost =
+            this->struct_nondisp.cap_kW * (
+            4525 * exp(
+                0.333333333 * log(0.8839779) *
+                this->struct_nondisp.cap_kW
+            ) + 2000
+        );
+    }
+    
+    if (this->struct_nondisp.op_maint_cost_per_kWh < 0) {
+        // Canadian dollars
+        this->struct_nondisp.op_maint_cost_per_kWh = 0.05;
+    }
+    
+    if (not this->struct_nondisp.is_sunk) {
+        this->real_capital_cost_vec[0] =
+            this->struct_nondisp.capital_cost;
+    }
     
     if (this->struct_nondisp.test_flag) {
         std::cout << "\tWind object constructed at " << this

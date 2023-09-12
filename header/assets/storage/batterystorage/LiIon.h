@@ -38,6 +38,7 @@ class LiIon : public BatteryStorage {
         //  1. attributes
         structLiIon struct_liion;
         
+        std::vector<double> SOH_vec;
         
         //  2. methods
         LiIon(structStorage, structBatteryStorage, structLiIon);
@@ -46,11 +47,11 @@ class LiIon : public BatteryStorage {
         void _writeSummary(std::string, int);
         
         double _getdSOHdt(double);
-        void _handleDegradation(double, double, int);
-        void _handleReplacement(int);
+        void _handleDegradation(double, double, double, int);
+        void _handleReplacement(int, double);
         
-        void commitChargekW(double, double, int);
-        void commitDischargekW(double, double, int);
+        void commitChargekW(double, double, double, int);
+        void commitDischargekW(double, double, double, int);
         
         void writeResults(std::string, std::vector<double>*, int);
         

@@ -20,11 +20,40 @@ Wave :: Wave(
     this->struct_nondisp.nondisp_type_str = "WAVE";
     this->struct_wave = struct_wave;
     
+    // read in normalized performance matrix
     if (
         not this->struct_wave.path_2_normalized_performance_matrix.empty()
     ) {
         this->struct_wave.power_mode = NORMALIZED_PERFORMANCE_MATRIX;
         this->_readInNormalizedPerformanceMatrix();
+    }
+    
+    //  init ecomonomic attributes
+    /*
+     *  ref:    Dr. S.L. MacDougall, Commercial Potential of Marine
+     *              Renewables in British Columbia, technical report
+     *              submitted to Natural Resources Canada, 
+     *              S.L. MacDougall Research & Consulting, 2019
+     */
+    if (this->struct_nondisp.capital_cost < 0) {
+        // Canadian dollars
+        this->struct_nondisp.capital_cost =
+            this->struct_nondisp.cap_kW * (
+            10298 * exp(
+                0.000142857 * log(0.941347834) *
+                this->struct_nondisp.cap_kW
+            ) + 200
+        );
+    }
+    
+    if (this->struct_nondisp.op_maint_cost_per_kWh < 0) {
+        // Canadian dollars
+        this->struct_nondisp.op_maint_cost_per_kWh = 0.05;
+    }
+    
+    if (not this->struct_nondisp.is_sunk) {
+        this->real_capital_cost_vec[0] =
+            this->struct_nondisp.capital_cost;
     }
     
     if (this->struct_nondisp.test_flag) {

@@ -1222,7 +1222,9 @@ void Model :: writeResults(std::string write_path) {
                 "_" + std::to_string(i) + "/"
             );
             
-            combustion_ptr->writeResults(_write_path, &(this->time_vec_hr), i);
+            combustion_ptr->writeResults(
+                _write_path, &(this->time_vec_hr), i
+            );
         }
         
     }
@@ -1242,7 +1244,9 @@ void Model :: writeResults(std::string write_path) {
                 "_" + std::to_string(i) + "/"
             );
             
-            noncombustion_ptr->writeResults(_write_path, &(this->time_vec_hr), i);
+            noncombustion_ptr->writeResults(
+                _write_path, &(this->time_vec_hr), i
+            );
         }
     }
     
@@ -1261,7 +1265,9 @@ void Model :: writeResults(std::string write_path) {
                 "_" + std::to_string(i) + "/"
             );
             
-            nondisp_ptr->writeResults(_write_path, &(this->time_vec_hr), i);
+            nondisp_ptr->writeResults(
+                _write_path, &(this->time_vec_hr), i
+            );
         }
     }
     
@@ -1306,7 +1312,9 @@ void Model :: writeResults(std::string write_path) {
             
             std::filesystem::create_directory(file_path);
             
-            storage_ptr->writeResults(_write_path, &(this->time_vec_hr), i);
+            storage_ptr->writeResults(
+                _write_path, &(this->time_vec_hr), i
+            );
         }
     }
     

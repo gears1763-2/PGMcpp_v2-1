@@ -22,6 +22,9 @@ Storage :: Storage(
     this->charging_vec_kW.resize(this->struct_storage.n_timesteps, 0);
     this->discharging_vec_kW.resize(this->struct_storage.n_timesteps, 0);
     
+    real_capital_cost_vec.resize(this->struct_storage.n_timesteps, 0);
+    real_op_maint_cost_vec.resize(this->struct_storage.n_timesteps, 0);
+    
     if (this->struct_storage.test_flag) {
         std::cout << "\tStorage object constructed at " << this
             << std::endl;

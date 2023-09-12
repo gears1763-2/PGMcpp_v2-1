@@ -70,6 +70,8 @@ class Combustion : public Dispatchable {
         std::vector<double> fuel_interp_load_ratio_vec;
         std::vector<double> fuel_interp_consumption_vec_Lhr;
         
+        std::vector<double> fuel_vec_L;
+        
         std::vector<double> CO2_vec_kg;
         std::vector<double> CO_vec_kg;
         std::vector<double> NOx_vec_kg;
@@ -83,12 +85,15 @@ class Combustion : public Dispatchable {
         
         void _readInFuelConsumptionData(void);
         double _fuelConsumptionLookupL(double, double);
+        void _writeTimeSeriesResults(
+            std::string, std::vector<double>* ptr_2_time_vec_hr, int
+        );
         
         double getFuelConsumptionL(double, double);
         structEmissions getEmissions(double);
         void recordEmissions(structEmissions, int);
         
-        virtual void commitProductionkW(double, double, int) {return;}
+        virtual void commitProductionkW(double, double, double, int) {return;}
         virtual double requestProductionkW(double) {return 0;}
         
         virtual void writeResults(

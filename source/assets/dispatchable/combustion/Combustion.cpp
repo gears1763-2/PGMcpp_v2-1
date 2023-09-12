@@ -18,6 +18,8 @@ Combustion :: Combustion(
     
     this->struct_combustion = struct_combustion;
     
+    this->fuel_vec_L.resize(this->struct_disp.n_timesteps, 0);
+    
     this->CO2_vec_kg.resize(this->struct_disp.n_timesteps, 0);
     this->CO_vec_kg.resize(this->struct_disp.n_timesteps, 0);
     this->NOx_vec_kg.resize(this->struct_disp.n_timesteps, 0);
@@ -131,6 +133,77 @@ double Combustion :: _fuelConsumptionLookupL(
     ) * dt_hrs;
     
     return fuel_consumption_L;
+}
+
+
+void Combustion :: _writeTimeSeriesResults(
+    std::string _write_path,
+    std::vector<double>* ptr_2_time_vec_hr,
+    int asset_idx
+) {
+    /*
+     *  Helper method to write Combustion-level time series results
+     */
+    
+    // construct filename 
+    std::string filename = "Combustion/" +
+        std::to_string(int(this->struct_disp.cap_kW)) +
+        "kW_" + this->struct_disp.disp_type_str +
+        "_" + std::to_string(asset_idx) + "/" +
+        std::to_string(int(this->struct_disp.cap_kW)) +
+        "kW_" + this->struct_disp.disp_type_str +
+        "_" + std::to_string(asset_idx) +
+        "_results.csv";
+    
+    // init output file stream
+    std::ofstream ofs;
+    ofs.open(_write_path + filename);
+    
+    // write file header
+    ofs << "Time [hrs],"
+        << "Production (over time step) [kW],"
+        << "Dispatch (over time step) [kW],"
+        << "Curtailment (over time step) [kW],"
+        << "Storage (over time step) [kW],"
+        << "Is Running [T/F],"
+        << "Real Op & Maint Cost (over time step),"
+        << "Fuel Consumption (over time step) [L],"
+        << "CO2 Emissions (over time step) [kg],"
+        << "CO Emissions (over time step) [kg],"
+        << "NOx Emissions (over time step) [kg],"
+        << "SOx Emissions (over time step) [kg],"
+        << "CH4 Emissions (over time step) [kg],"
+        << "PM Emissions (over time step) [kg],"
+        << "Is Replaced [T/F],"
+        << "Real Capital Cost (incurred during time step),"
+        //<< ","
+        << "\n";
+    
+    // write file body
+    for (int i = 0; i < this->struct_disp.n_timesteps; i++) {
+        ofs << std::to_string(ptr_2_time_vec_hr->at(i)) << ","
+            << std::to_string(this->production_vec_kW[i]) << ","
+            << std::to_string(this->dispatch_vec_kW[i]) << ","
+            << std::to_string(this->curtailment_vec_kW[i]) << ","
+            << std::to_string(this->storage_vec_kW[i]) << ","
+            << std::to_string(this->is_running_vec[i]) << ","
+            << std::to_string(this->real_op_maint_cost_vec[i]) << ","
+            << std::to_string(this->fuel_vec_L[i]) << ","
+            << std::to_string(this->CO2_vec_kg[i]) << ","
+            << std::to_string(this->CO_vec_kg[i]) << ","
+            << std::to_string(this->NOx_vec_kg[i]) << ","
+            << std::to_string(this->SOx_vec_kg[i]) << ","
+            << std::to_string(this->CH4_vec_kg[i]) << ","
+            << std::to_string(this->PM_vec_kg[i]) << ","
+            << std::to_string(this->replaced_vec[i]) << ","
+            << std::to_string(this->real_capital_cost_vec[i]) << ","
+            //<< [...] << ","
+            << "\n";
+    }
+    
+    ofs.close();
+    
+    return;
 }
 
 

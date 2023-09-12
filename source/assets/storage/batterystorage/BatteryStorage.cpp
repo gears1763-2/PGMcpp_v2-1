@@ -94,6 +94,7 @@ double BatteryStorage :: getAcceptablekW(double dt_hrs) {
 void BatteryStorage :: commitChargekW(
     double charging_kW,
     double dt_hrs,
+    double t_hrs,
     int timestep
 ) {
     /*
@@ -104,6 +105,24 @@ void BatteryStorage :: commitChargekW(
     double accepted_kWh = 
         this->struct_battery_storage.charge_efficiency *
         charging_kW * dt_hrs;
+    
+    // incur operation and maintenance cost
+    if (charging_kW > 0) {
+        /*
+         *  ref: https://www.homerenergy.com/products/pro/docs/latest/real_discount_rate.html
+         *  ref: https://www.homerenergy.com/products/pro/docs/latest/present_value.html
+         */
+        double real_discount_scalar = 1.0 / pow(
+            1 + this->struct_storage.real_discount_rate_annual,
+            t_hrs / 8760
+        );
+        
+        double op_maint_cost = real_discount_scalar * 
+            this->struct_storage.op_maint_cost_per_kWh * 
+            charging_kW * dt_hrs;
+        
+        this->real_op_maint_cost_vec[timestep] = op_maint_cost;
+    }
     
     // update charge and record
     this->struct_storage.charge_kWh += accepted_kWh;
@@ -117,6 +136,7 @@ void BatteryStorage :: commitChargekW(
 void BatteryStorage :: commitDischargekW(
     double discharging_kW,
     double dt_hrs,
+    double t_hrs,
     int timestep
 ) {
     /*
@@ -126,6 +146,24 @@ void BatteryStorage :: commitDischargekW(
     // compute discharged energy
     double discharged_kWh = (discharging_kW * dt_hrs) / 
         this->struct_battery_storage.discharge_efficiency;
+    
+    // incur operation and maintenance cost
+    if (discharging_kW > 0) {
+        /*
+         *  ref: https://www.homerenergy.com/products/pro/docs/latest/real_discount_rate.html
+         *  ref: https://www.homerenergy.com/products/pro/docs/latest/present_value.html
+         */
+        double real_discount_scalar = 1.0 / pow(
+            1 + this->struct_storage.real_discount_rate_annual,
+            t_hrs / 8760
+        );
+        
+        double op_maint_cost = real_discount_scalar * 
+            this->struct_storage.op_maint_cost_per_kWh * 
+            discharging_kW * dt_hrs;
+        
+        this->real_op_maint_cost_vec[timestep] = op_maint_cost;
+    }
     
     // update charge and record 
     this->struct_storage.charge_kWh -= discharged_kWh;

@@ -31,43 +31,6 @@ Hydro :: Hydro(
 }
 
 
-void Hydro :: _writeTimeSeriesResults(
-    std::string _write_path,
-    std::vector<double>* ptr_2_time_vec_hr,
-    int asset_idx
-) {
-    /*
-     *  Helper method to write Hydro-level time series results
-     */
-    
-    // construct filename 
-    std::string filename = "non-Combustion/" +
-        std::to_string(int(this->struct_disp.cap_kW)) +
-        "kW_" + this->struct_disp.disp_type_str +
-        "_" + std::to_string(asset_idx) + "/" +
-        std::to_string(int(this->struct_disp.cap_kW)) +
-        "kW_" + this->struct_disp.disp_type_str +
-        "_" + std::to_string(asset_idx) +
-        "_results.csv";
-    
-    // init output file stream
-    std::ofstream ofs;
-    ofs.open(_write_path + filename);
-    
-    // write file header
-    //...
-    
-    // write file body
-    for (int i = 0; i < this->struct_disp.n_timesteps; i++) {
-        //...
-    }
-    
-    ofs.close();
-    
-    return;
-}
-
-
 void Hydro :: _writeSummary(std::string _write_path, int asset_idx) {
     /*
      *  Helper method to write Hydro-level summary
@@ -120,7 +83,7 @@ void Hydro :: writeResults(
      *  Method to write Hydro-level results
      */
     
-    this->_writeTimeSeriesResults(
+    Dispatchable::_writeTimeSeriesResults(
         _write_path, ptr_2_time_vec_hr, asset_idx
     );
     this->_writeSummary(_write_path, asset_idx);

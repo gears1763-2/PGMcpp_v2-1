@@ -154,6 +154,7 @@ try {
         std::endl;
     
     double dt_hrs = 1;
+    double t_hrs = 0;
     
     requested_production_vec_kW = {
         0, 0, 10, 15, 0, 5, 0, 0, 50, 60, 70, 80, 90, 0, 110, 120
@@ -173,6 +174,7 @@ try {
         test_diesel.commitProductionkW(
             production_kW,
             dt_hrs,
+            t_hrs,
             i
         );
         

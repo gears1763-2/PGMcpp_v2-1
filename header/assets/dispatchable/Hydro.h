@@ -25,7 +25,6 @@ class Hydro : public Dispatchable {
         //  2. methods
         Hydro(structDispatchable, structHydro);
         
-        void _writeTimeSeriesResults(std::string, std::vector<double>*, int);
         void _writeSummary(std::string, int);
         
         double requestProductionkW(double);

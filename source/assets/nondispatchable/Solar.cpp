@@ -20,22 +20,23 @@ Solar :: Solar(
     this->struct_nondisp.nondisp_type_str = "SOLAR";
     this->struct_solar = struct_solar;
     
-    /*
-     *  Init economic attributes
-     */
+    //  init economic attributes
     if (this->struct_nondisp.capital_cost < 0) {
+        // Canadian dollars
         this->struct_nondisp.capital_cost =
             this->struct_solar.capital_cost_per_kW * 
             this->struct_nondisp.cap_kW;
     }
     
     else {
+        // Canadian dollars
         this->struct_solar.capital_cost_per_kW = 
             this->struct_nondisp.capital_cost / 
             this->struct_nondisp.cap_kW;
     }
     
     if (this->struct_nondisp.op_maint_cost_per_kWh < 0) {
+        // Canadian dollars
         this->struct_nondisp.op_maint_cost_per_kWh = 0.01;
     }
     

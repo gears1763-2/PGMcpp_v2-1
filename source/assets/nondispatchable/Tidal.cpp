@@ -20,7 +20,33 @@ Tidal :: Tidal(
     this->struct_nondisp.nondisp_type_str = "TIDAL";
     this->struct_tidal = struct_tidal;
     
-    //...
+    //  init economic attributes
+    /*
+     *  ref:    Dr. S.L. MacDougall, Commercial Potential of Marine
+     *              Renewables in British Columbia, technical report
+     *              submitted to Natural Resources Canada, 
+     *              S.L. MacDougall Research & Consulting, 2019
+     */
+    if (this->struct_nondisp.capital_cost < 0) {
+        // Canadian dollars
+        this->struct_nondisp.capital_cost =
+            this->struct_nondisp.cap_kW * (
+            4497 * exp(
+                0.0002 * log(0.894596397) *
+                this->struct_nondisp.cap_kW
+            ) + 2000
+        );
+    }
+    
+    if (this->struct_nondisp.op_maint_cost_per_kWh < 0) {
+        // Canadian dollars
+        this->struct_nondisp.op_maint_cost_per_kWh = 0.05;
+    }
+    
+    if (not this->struct_nondisp.is_sunk) {
+        this->real_capital_cost_vec[0] =
+            this->struct_nondisp.capital_cost;
+    }
     
     if (this->struct_nondisp.test_flag) {
         std::cout << "\tTidal object constructed at " << this

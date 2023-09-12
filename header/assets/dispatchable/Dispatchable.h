@@ -18,6 +18,7 @@ enum DispatchableType {
 
 struct structDispatchable {
     bool is_running = false;
+    bool is_sunk = false;
     bool print_flag = false;
     bool test_flag = false;
     
@@ -30,6 +31,9 @@ struct structDispatchable {
     double cap_kW = 100;
     double running_hrs = 0;
     double replace_running_hrs = 30000;
+    
+    double capital_cost = -1;
+    double op_maint_cost_per_kWh = -1;
     
     double real_discount_rate_annual = -1;
     
@@ -50,12 +54,19 @@ class Dispatchable {
         std::vector<double> curtailment_vec_kW;
         std::vector<double> storage_vec_kW;
         
+        std::vector<double> real_capital_cost_vec;
+        std::vector<double> real_op_maint_cost_vec;
+        
         
         // methods
         Dispatchable(structDispatchable);
         
-        void _handleReplacement(int);
-        virtual void commitProductionkW(double, double, int);
+        void _handleReplacement(int, double);
+        void _writeTimeSeriesResults(
+            std::string, std::vector<double>* ptr_2_time_vec_hr, int
+        );
+        
+        virtual void commitProductionkW(double, double, double, int);
         double getDispatchkW(double, double);
         
         virtual double requestProductionkW(double) {return 0;}

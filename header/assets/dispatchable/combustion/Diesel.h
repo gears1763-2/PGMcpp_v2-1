@@ -25,16 +25,13 @@ class Diesel : public Combustion {
         //  1. attributes
         structDiesel struct_diesel;
         
-        std::vector<double> fuel_vec_L;
-        
         
         //  2. methods
         Diesel(structDispatchable, structCombustion, structDiesel);
-        
-        void _writeTimeSeriesResults(std::string, std::vector<double>*, int);
+
         void _writeSummary(std::string, int);
         
-        void commitProductionkW(double, double, int);
+        void commitProductionkW(double, double, double, int);
         double requestProductionkW(double);
         
         void writeResults(std::string, std::vector<double>*, int);
