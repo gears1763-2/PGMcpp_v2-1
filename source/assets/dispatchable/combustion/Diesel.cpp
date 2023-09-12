@@ -159,6 +159,20 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
         << "\n";
     ofs << "\ttotal dispatch (over project life): " << 
         this->total_dispatch_kWh << " kWh\n";
+    ofs << "\ttotal fuel consumed (over project life): " <<
+        this->total_fuel_consumed_L << " L\n";
+    ofs << "\ttotal CO2 emissions (over project life): " <<
+        this->total_CO2_emitted_kg << " kg\n";
+    ofs << "\ttotal CO emissions (over project life): " <<
+        this->total_CO_emitted_kg << " kg\n";
+    ofs << "\ttotal NOx emissions (over project life): " <<
+        this->total_NOx_emitted_kg << " kg\n";
+    ofs << "\ttotal SOx emissions (over project life): " <<
+        this->total_SOx_emitted_kg << " kg\n";
+    ofs << "\ttotal CH4 emissions (over project life): " <<
+        this->total_CH4_emitted_kg << " kg\n";
+    ofs << "\ttotal particulate matter emissions (over project life): " <<
+        this->total_PM_emitted_kg << " kg\n";
     ofs << "\tnet present cost: " <<
         this->struct_disp.net_present_cost << "\n";
     ofs << "\tlevellized cost of energy (per kWh dispatched): " <<
@@ -215,6 +229,8 @@ void Diesel :: commitProductionkW(
             Combustion::getFuelConsumptionL(production_kW, dt_hrs);
             
         this->fuel_vec_L[timestep] = fuel_consumption_L;
+        
+        this->total_fuel_consumed_L += fuel_consumption_L;
         
         // incur fuel cost
         /*

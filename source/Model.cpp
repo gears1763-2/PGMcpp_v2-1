@@ -506,8 +506,30 @@ void Model :: _computeFuelEmissions(void) {
      *  Helper method to compute fuel consumption and emissions totals
      *  of Model run
      */
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        Combustion* combustion_ptr = this->combustion_ptr_vec[i];
     
-    //...
+        this->total_fuel_consumed_L +=
+            combustion_ptr->total_fuel_consumed_L;
+        
+        this->total_CO2_emitted_kg +=
+            combustion_ptr->total_CO2_emitted_kg;
+        
+        this->total_CO_emitted_kg +=
+            combustion_ptr->total_CO_emitted_kg;
+        
+        this->total_NOx_emitted_kg +=
+            combustion_ptr->total_NOx_emitted_kg;
+        
+        this->total_SOx_emitted_kg +=
+            combustion_ptr->total_SOx_emitted_kg;
+        
+        this->total_CH4_emitted_kg +=
+            combustion_ptr->total_CH4_emitted_kg;
+        
+        this->total_PM_emitted_kg +=
+            combustion_ptr->total_PM_emitted_kg;
+    }
     
     return;
 }
@@ -594,6 +616,7 @@ void Model :: _computeEconomics(void) {
     if (total_load_served_kWh <= 0) {
         return;
     }
+    this->total_load_served_kWh = total_load_served_kWh;
     
     double capital_recovery_factor = 
         (
@@ -859,6 +882,22 @@ void Model :: _writeSummary(std::string _write_path) {
     // write results
     ofs << "\nResults:\n\n";
     
+    ofs << "\ttotal load served (over project life): " <<
+        this->total_load_served_kWh << " kWh\n";
+    ofs << "\ttotal fuel consumed (over project life): " <<
+        this->total_fuel_consumed_L << " L\n";
+    ofs << "\ttotal CO2 emissions (over project life): " <<
+        this->total_CO2_emitted_kg << " kg\n";
+    ofs << "\ttotal CO emissions (over project life): " <<
+        this->total_CO_emitted_kg << " kg\n";
+    ofs << "\ttotal NOx emissions (over project life): " <<
+        this->total_NOx_emitted_kg << " kg\n";
+    ofs << "\ttotal SOx emissions (over project life): " <<
+        this->total_SOx_emitted_kg << " kg\n";
+    ofs << "\ttotal CH4 emissions (over project life): " <<
+        this->total_CH4_emitted_kg << " kg\n";
+    ofs << "\ttotal particulate matter emissions (over project life): " <<
+        this->total_PM_emitted_kg << " kg\n";
     ofs << "\tnet present cost: " <<
         this->struct_model.net_present_cost << "\n";
     ofs << "\tlevellized cost of energy (per kWh served): " <<

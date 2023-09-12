@@ -31,8 +31,6 @@ struct structModel {
     double real_discount_rate_annual = 0;
     
     double net_present_cost = 0;
-    
-    double total_dispatch_kWh = 0;
     double levellized_cost_of_energy_per_kWh = 0;
     
     std::string path_2_load_data = "";
@@ -43,6 +41,17 @@ class Model {
     public:
         //  attributes
         structModel struct_model;
+        
+        double total_load_served_kWh = 0;
+        
+        double total_fuel_consumed_L = 0;
+        
+        double total_CO2_emitted_kg = 0;
+        double total_CO_emitted_kg = 0;
+        double total_NOx_emitted_kg = 0;
+        double total_SOx_emitted_kg = 0;
+        double total_CH4_emitted_kg = 0;
+        double total_PM_emitted_kg = 0;
         
         std::vector<double> dt_vec_hr;
         std::vector<double> load_vec_kW;

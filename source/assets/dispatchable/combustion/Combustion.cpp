@@ -327,6 +327,13 @@ void Combustion :: recordEmissions(
     this->CH4_vec_kg[timestep] = struct_emissions.CH4_kg;
     this->PM_vec_kg[timestep] = struct_emissions.PM_kg;
     
+    total_CO2_emitted_kg += struct_emissions.CO2_kg;
+    total_CO_emitted_kg += struct_emissions.CO_kg;
+    total_NOx_emitted_kg += struct_emissions.NOx_kg;
+    total_SOx_emitted_kg += struct_emissions.SOx_kg;
+    total_CH4_emitted_kg += struct_emissions.CH4_kg;
+    total_PM_emitted_kg += struct_emissions.PM_kg;
+    
     return;
 }
 

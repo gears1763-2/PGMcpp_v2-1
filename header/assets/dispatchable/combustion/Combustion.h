@@ -70,6 +70,15 @@ class Combustion : public Dispatchable {
         //  1. attributes
         structCombustion struct_combustion;
         
+        double total_fuel_consumed_L = 0;
+        
+        double total_CO2_emitted_kg = 0;
+        double total_CO_emitted_kg = 0;
+        double total_NOx_emitted_kg = 0;
+        double total_SOx_emitted_kg = 0;
+        double total_CH4_emitted_kg = 0;
+        double total_PM_emitted_kg = 0;
+        
         std::vector<double> fuel_interp_load_ratio_vec;
         std::vector<double> fuel_interp_consumption_vec_Lhr;
         
