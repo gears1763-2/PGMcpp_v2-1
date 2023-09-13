@@ -18,20 +18,15 @@ enum DispatchMode {
 
 
 struct structModel {
+    //  input attributes (structured)
+    //  these are the only attributes the user should interact with
     bool print_flag = false;
     bool test_flag = false;
     
     DispatchMode dispatch_mode = LOAD_FOLLOWING_IN_ORDER;
     
-    int n_timesteps = 8760;
-    
-    double project_life_yrs = 0;
     double nominal_inflation_rate_annual = 0.02;
     double nominal_discount_rate_annual = 0.04;
-    double real_discount_rate_annual = 0;
-    
-    double net_present_cost = 0;
-    double levellized_cost_of_energy_per_kWh = 0;
     
     std::string path_2_load_data = "";
 };
@@ -39,19 +34,26 @@ struct structModel {
 
 class Model {
     public:
-        //  attributes
+        //  modelling and output attributes (unstructured)
+        //  the user should not interact with these attributes
         structModel struct_model;
         
+        int n_timesteps = 8760;
+        
+        double project_life_yrs = 0;
         double total_load_served_kWh = 0;
-        
         double total_fuel_consumed_L = 0;
-        
+
         double total_CO2_emitted_kg = 0;
         double total_CO_emitted_kg = 0;
         double total_NOx_emitted_kg = 0;
         double total_SOx_emitted_kg = 0;
         double total_CH4_emitted_kg = 0;
         double total_PM_emitted_kg = 0;
+        
+        double real_discount_rate_annual = 0;
+        double net_present_cost = 0;
+        double levellized_cost_of_energy_per_kWh = 0;
         
         std::vector<double> dt_vec_hr;
         std::vector<double> load_vec_kW;
@@ -85,6 +87,8 @@ class Model {
             std::vector<std::string>,
             int
         );
+        
+        void _addNondispatchable(Nondispatchable*);
         
         double _getRenewableProductionkW(Nondispatchable*, int);
         void _generateNetLoadVector(void);

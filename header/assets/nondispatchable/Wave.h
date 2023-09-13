@@ -19,6 +19,8 @@ enum WavePowerMode {
 
 
 struct structWave {
+    //  input attributes (structured)
+    //  these are the only attributes the user should interact with
     int resource_key = 0;
     
     WavePowerMode power_mode = PARABOLOID;
@@ -32,7 +34,8 @@ struct structWave {
 
 class Wave : public Nondispatchable {
     public:
-        //  1. attributes
+        //  modelling and output attributes (unstructured)
+        //  the user should not interact with these attributes
         structWave struct_wave;
         
         double min_interp_sig_wave_height_m = 0;
@@ -45,7 +48,7 @@ class Wave : public Nondispatchable {
         std::vector<std::vector<double>> interp_normalized_performance_matrix;
         
         
-        //  2. methods
+        //  methods
         Wave(structNondispatchable, structWave);
         
         void _readInNormalizedPerformanceMatrix(void);
@@ -54,7 +57,7 @@ class Wave : public Nondispatchable {
         
         double getProductionkW(double, double);
         
-        void writeResults(std::string, std::vector<double>*, int);
+        void writeResults(std::string, int);
         
         ~Wave(void);
 };

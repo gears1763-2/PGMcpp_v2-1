@@ -16,16 +16,16 @@ Nondispatchable :: Nondispatchable(
     
     this->struct_nondisp = struct_nondisp;
     
-    this->is_running_vec.resize(this->struct_nondisp.n_timesteps, false);
-    this->replaced_vec.resize(this->struct_nondisp.n_timesteps, false);
+    this->is_running_vec.resize(this->n_timesteps, false);
+    this->replaced_vec.resize(this->n_timesteps, false);
     
-    this->production_vec_kW.resize(this->struct_nondisp.n_timesteps, 0);
-    this->dispatch_vec_kW.resize(this->struct_nondisp.n_timesteps, 0);
-    this->curtailment_vec_kW.resize(this->struct_nondisp.n_timesteps, 0);
-    this->storage_vec_kW.resize(this->struct_nondisp.n_timesteps, 0);
+    this->production_vec_kW.resize(this->n_timesteps, 0);
+    this->dispatch_vec_kW.resize(this->n_timesteps, 0);
+    this->curtailment_vec_kW.resize(this->n_timesteps, 0);
+    this->storage_vec_kW.resize(this->n_timesteps, 0);
     
-    this->real_capital_cost_vec.resize(this->struct_nondisp.n_timesteps, 0);
-    this->real_op_maint_cost_vec.resize(this->struct_nondisp.n_timesteps, 0);
+    this->real_capital_cost_vec.resize(this->n_timesteps, 0);
+    this->real_op_maint_cost_vec.resize(this->n_timesteps, 0);
     
     if (this->struct_nondisp.test_flag) {
         std::cout << "\tNondispatchable object constructed at " << this
@@ -36,32 +36,33 @@ Nondispatchable :: Nondispatchable(
 }
 
 
-void Nondispatchable :: _handleReplacement(int timestep, double t_hrs) {
+void Nondispatchable :: _handleReplacement(int timestep) {
     /*
      *  Helper method to handle running hours induced replacement
      */
     
     // reset attributes (replace with fresh Nondispatchable system)
-    this->struct_nondisp.is_running = false;
+    this->is_running = false;
     
     // incur capital cost
     /*
      *  ref: https://www.homerenergy.com/products/pro/docs/latest/real_discount_rate.html
      *  ref: https://www.homerenergy.com/products/pro/docs/latest/present_value.html
      */
+    double t_hrs = this->ptr_2_time_vec_hr->at(timestep);
     double real_discount_scalar = 1.0 / pow(
-        1 + this->struct_nondisp.real_discount_rate_annual,
+        1 + this->real_discount_rate_annual,
         t_hrs / 8760
     );
     
     this->real_capital_cost_vec[timestep] = real_discount_scalar *
         this->struct_nondisp.capital_cost;
         
-    this->struct_nondisp.net_present_cost +=
+    this->net_present_cost +=
         this->real_capital_cost_vec[timestep];
     
     // record replacements
-    this->struct_nondisp.n_replacements++;
+    this->n_replacements++;
     this->replaced_vec[timestep] = true;
     
     return;
@@ -70,7 +71,6 @@ void Nondispatchable :: _handleReplacement(int timestep, double t_hrs) {
 
 void Nondispatchable :: _writeTimeSeriesResults(
     std::string _write_path,
-    std::vector<double>* ptr_2_time_vec_hr,
     int asset_idx
 ) {
     /*
@@ -80,10 +80,10 @@ void Nondispatchable :: _writeTimeSeriesResults(
     // construct filename 
     std::string filename = "Nondispatchable/" +
         std::to_string(int(this->struct_nondisp.cap_kW)) +
-        "kW_" + this->struct_nondisp.nondisp_type_str +
+        "kW_" + this->nondisp_type_str +
         "_" + std::to_string(asset_idx) + "/" +
         std::to_string(int(this->struct_nondisp.cap_kW)) +
-        "kW_" + this->struct_nondisp.nondisp_type_str +
+        "kW_" + this->nondisp_type_str +
         "_" + std::to_string(asset_idx) +
         "_results.csv";
     
@@ -105,8 +105,8 @@ void Nondispatchable :: _writeTimeSeriesResults(
         << "\n";
     
     // write file body
-    for (int i = 0; i < this->struct_nondisp.n_timesteps; i++) {
-        ofs << std::to_string(ptr_2_time_vec_hr->at(i)) << ","
+    for (int i = 0; i < this->n_timesteps; i++) {
+        ofs << std::to_string(this->ptr_2_time_vec_hr->at(i)) << ","
             << std::to_string(this->production_vec_kW[i]) << ","
             << std::to_string(this->dispatch_vec_kW[i]) << ","
             << std::to_string(this->curtailment_vec_kW[i]) << ","
@@ -127,8 +127,6 @@ void Nondispatchable :: _writeTimeSeriesResults(
 
 void Nondispatchable :: commitProductionkW(
     double production_kW,
-    double dt_hrs,
-    double t_hrs,
     int timestep
 ) {
     /*
@@ -137,30 +135,32 @@ void Nondispatchable :: commitProductionkW(
     
     // track and record running state
     if (production_kW > 0) {
-        this->struct_nondisp.is_running = true;
+        this->is_running = true;
         this->is_running_vec[timestep] = true;
     }
     
     else {
-        this->struct_nondisp.is_running = false;
+        this->is_running = false;
     }
     
     // record production
     this->production_vec_kW[timestep] = production_kW;
     
     // increment running hours
-    if (this->struct_nondisp.is_running) {
-        this->struct_nondisp.running_hrs += dt_hrs;
+    double dt_hrs = this->ptr_2_dt_vec_hr->at(timestep);
+    if (this->is_running) {
+        this->running_hrs += dt_hrs;
     }
     
     // incur operation and maintenance cost
-    if (this->struct_nondisp.is_running) {
+    if (this->is_running) {
         /*
          *  ref: https://www.homerenergy.com/products/pro/docs/latest/real_discount_rate.html
          *  ref: https://www.homerenergy.com/products/pro/docs/latest/present_value.html
          */
+        double t_hrs = this->ptr_2_time_vec_hr->at(timestep);
         double real_discount_scalar = 1.0 / pow(
-            1 + this->struct_nondisp.real_discount_rate_annual,
+            1 + this->real_discount_rate_annual,
             t_hrs / 8760
         );
         
@@ -170,17 +170,17 @@ void Nondispatchable :: commitProductionkW(
         
         this->real_op_maint_cost_vec[timestep] = op_maint_cost;
         
-        this->struct_nondisp.net_present_cost +=
+        this->net_present_cost +=
             this->real_op_maint_cost_vec[timestep];
     }
     
     // trigger replacement, if necessary
     if (
-        this->struct_nondisp.running_hrs >=
-        (this->struct_nondisp.n_replacements + 1) *
+        this->running_hrs >=
+        (this->n_replacements + 1) *
         this->struct_nondisp.replace_running_hrs
     ) {
-        this->_handleReplacement(timestep, t_hrs);
+        this->_handleReplacement(timestep);
     }
     
     return;
@@ -216,10 +216,7 @@ double Nondispatchable :: getDispatchkW(
 }
 
 
-void Nondispatchable :: computeLevellizedCostOfEnergy(
-    double project_life_yrs,
-    std::vector<double>* ptr_2_dt_vec_hr
-) {
+void Nondispatchable :: computeLevellizedCostOfEnergy() {
     /*
      *  Method to compute levellized cost of energy
      * 
@@ -232,7 +229,7 @@ void Nondispatchable :: computeLevellizedCostOfEnergy(
     
     for (size_t i = 0; i < this->dispatch_vec_kW.size(); i++) {
         total_dispatch_kWh += this->dispatch_vec_kW[i] *
-            ptr_2_dt_vec_hr->at(i);
+            this->ptr_2_dt_vec_hr->at(i);
     }
     
     if (total_dispatch_kWh <= 0) {
@@ -242,24 +239,24 @@ void Nondispatchable :: computeLevellizedCostOfEnergy(
     
     double capital_recovery_factor = 
         (
-            this->struct_nondisp.real_discount_rate_annual *
+            this->real_discount_rate_annual *
             pow(
-                1 + this->struct_nondisp.real_discount_rate_annual,
-                project_life_yrs
+                1 + this->real_discount_rate_annual,
+                this->project_life_yrs
             )
         ) / 
         (
             pow(
-                1 + this->struct_nondisp.real_discount_rate_annual,
-                project_life_yrs
+                1 + this->real_discount_rate_annual,
+                this->project_life_yrs
             ) -
             1
         );
         
     double total_annualized_cost = capital_recovery_factor *
-        this->struct_nondisp.net_present_cost;
+        this->net_present_cost;
     
-    this->struct_nondisp.levellized_cost_of_energy_per_kWh =
+    this->levellized_cost_of_energy_per_kWh =
         total_annualized_cost / total_dispatch_kWh;
     
     return;

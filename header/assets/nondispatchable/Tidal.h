@@ -18,6 +18,8 @@ enum TidalPowerCurve {
 
 
 struct structTidal {
+    //  input attributes (structured)
+    //  these are the only attributes the user should interact with
     int resource_key = 0;
     
     TidalPowerCurve power_curve = CUBIC;
@@ -28,18 +30,19 @@ struct structTidal {
 
 class Tidal : public Nondispatchable {
     public:
-        //  1. attributes
+        //  modelling and output attributes (unstructured)
+        //  the user should not interact with these attributes
         structTidal struct_tidal;
         
         
-        //  2. methods
+        //  methods
         Tidal(structNondispatchable, structTidal);
         
         void _writeSummary(std::string, int);
         
         double getProductionkW(double);
         
-        void writeResults(std::string, std::vector<double>*, int);
+        void writeResults(std::string, int);
         
         ~Tidal(void);
 };

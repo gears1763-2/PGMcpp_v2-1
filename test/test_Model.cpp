@@ -24,7 +24,7 @@ try {
         std::endl;
     
     testFloatEquals(
-        test_model.struct_model.n_timesteps,
+        test_model.n_timesteps,
         8760,
         FLOAT_TOLERANCE,
         __FILE__,
@@ -69,7 +69,7 @@ try {
     }
     
     testFloatEquals(
-        test_model.struct_model.project_life_yrs,
+        test_model.project_life_yrs,
         8759.0 / 8760,
         FLOAT_TOLERANCE,
         __FILE__,
@@ -92,7 +92,7 @@ try {
     }
     
     testFloatEquals(
-        test_model.dt_vec_hr[test_model.struct_model.n_timesteps - 1],
+        test_model.dt_vec_hr[test_model.n_timesteps - 1],
         1,
         FLOAT_TOLERANCE,
         __FILE__,
@@ -102,7 +102,7 @@ try {
     
     // test post-construction economic parameters
     testFloatEquals(
-        test_model.struct_model.real_discount_rate_annual,
+        test_model.real_discount_rate_annual,
         (0.04 - 0.02) / (1 + 0.02),
         FLOAT_TOLERANCE,
         __FILE__,
@@ -450,8 +450,8 @@ try {
     testFloatEquals(
         test_model.nondisp_ptr_vec[
             test_model.nondisp_ptr_vec.size() - 1
-        ]->struct_nondisp.n_timesteps,
-        test_model.struct_model.n_timesteps,
+        ]->n_timesteps,
+        test_model.n_timesteps,
         FLOAT_TOLERANCE,
         __FILE__,
         __LINE__
@@ -460,9 +460,47 @@ try {
     testFloatEquals(
         test_model.nondisp_ptr_vec[
             test_model.nondisp_ptr_vec.size() - 1
-        ]->struct_nondisp.nondisp_type,
+        ]->nondisp_type,
         SOLAR,
         FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->project_life_yrs,
+        test_model.project_life_yrs,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->real_discount_rate_annual,
+        test_model.real_discount_rate_annual,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testTruth(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->ptr_2_dt_vec_hr ==
+        &(test_model.dt_vec_hr),
+        __FILE__,
+        __LINE__
+    );
+    
+    testTruth(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->ptr_2_time_vec_hr ==
+        &(test_model.time_vec_hr),
         __FILE__,
         __LINE__
     );
@@ -488,8 +526,8 @@ try {
     testFloatEquals(
         test_model.nondisp_ptr_vec[
             test_model.nondisp_ptr_vec.size() - 1
-        ]->struct_nondisp.n_timesteps,
-        test_model.struct_model.n_timesteps,
+        ]->n_timesteps,
+        test_model.n_timesteps,
         FLOAT_TOLERANCE,
         __FILE__,
         __LINE__
@@ -498,7 +536,7 @@ try {
     testFloatEquals(
         test_model.nondisp_ptr_vec[
             test_model.nondisp_ptr_vec.size() - 1
-        ]->struct_nondisp.nondisp_type,
+        ]->nondisp_type,
         TIDAL,
         FLOAT_TOLERANCE,
         __FILE__,
@@ -526,8 +564,8 @@ try {
     testFloatEquals(
         test_model.nondisp_ptr_vec[
             test_model.nondisp_ptr_vec.size() - 1
-        ]->struct_nondisp.n_timesteps,
-        test_model.struct_model.n_timesteps,
+        ]->n_timesteps,
+        test_model.n_timesteps,
         FLOAT_TOLERANCE,
         __FILE__,
         __LINE__
@@ -536,7 +574,7 @@ try {
     testFloatEquals(
         test_model.nondisp_ptr_vec[
             test_model.nondisp_ptr_vec.size() - 1
-        ]->struct_nondisp.nondisp_type,
+        ]->nondisp_type,
         WAVE,
         FLOAT_TOLERANCE,
         __FILE__,
@@ -564,8 +602,8 @@ try {
     testFloatEquals(
         test_model.nondisp_ptr_vec[
             test_model.nondisp_ptr_vec.size() - 1
-        ]->struct_nondisp.n_timesteps,
-        test_model.struct_model.n_timesteps,
+        ]->n_timesteps,
+        test_model.n_timesteps,
         FLOAT_TOLERANCE,
         __FILE__,
         __LINE__
@@ -574,7 +612,7 @@ try {
     testFloatEquals(
         test_model.nondisp_ptr_vec[
             test_model.nondisp_ptr_vec.size() - 1
-        ]->struct_nondisp.nondisp_type,
+        ]->nondisp_type,
         WIND,
         FLOAT_TOLERANCE,
         __FILE__,
@@ -609,7 +647,7 @@ try {
         test_model.combustion_ptr_vec[
             test_model.combustion_ptr_vec.size() - 1
         ]->struct_disp.n_timesteps,
-        test_model.struct_model.n_timesteps,
+        test_model.n_timesteps,
         FLOAT_TOLERANCE,
         __FILE__,
         __LINE__
@@ -646,7 +684,7 @@ try {
         test_model.noncombustion_ptr_vec[
             test_model.noncombustion_ptr_vec.size() - 1
         ]->struct_disp.n_timesteps,
-        test_model.struct_model.n_timesteps,
+        test_model.n_timesteps,
         FLOAT_TOLERANCE,
         __FILE__,
         __LINE__
@@ -696,7 +734,7 @@ try {
     
     testFloatEquals(
         liion_ptr->struct_storage.n_timesteps,
-        test_model.struct_model.n_timesteps,
+        test_model.n_timesteps,
         FLOAT_TOLERANCE,
         __FILE__,
         __LINE__
@@ -722,7 +760,7 @@ try {
     std::cout << "\tTesting post Model::run() attributes ..." <<
         std::endl;
     
-    for (int i = 0; i < test_model.struct_model.n_timesteps; i++) {
+    for (int i = 0; i < test_model.n_timesteps; i++) {
         double load_remaining_kW = test_model.load_vec_kW[i];
         
         for (size_t j = 0; j < test_model.combustion_ptr_vec.size(); j++) {

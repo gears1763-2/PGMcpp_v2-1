@@ -12,6 +12,8 @@
 
 
 struct structSolar {
+    //  input attributes (structured)
+    //  these are the only attributes the user should interact with
     int resource_key = 0;
     
     double derating = 0.8;
@@ -26,18 +28,19 @@ struct structSolar {
 
 class Solar : public Nondispatchable {
     public:
-        //  1. attributes
+        //  modelling and output attributes (unstructured)
+        //  the user should not interact with these attributes
         structSolar struct_solar;
         
         
-        //  2. methods
+        //  methods
         Solar(structNondispatchable, structSolar);
         
         void _writeSummary(std::string, int);
         
         double getProductionkW(double);
         
-        void writeResults(std::string, std::vector<double>*, int);
+        void writeResults(std::string, int);
         
         ~Solar(void);
 };

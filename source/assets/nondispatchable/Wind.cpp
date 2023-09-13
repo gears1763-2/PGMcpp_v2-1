@@ -16,8 +16,8 @@ Wind :: Wind(
      *  Wind class constructor
      */
     
-    this->struct_nondisp.nondisp_type = WIND;
-    this->struct_nondisp.nondisp_type_str = "WIND";
+    this->nondisp_type = WIND;
+    this->nondisp_type_str = "WIND";
     this->struct_wind = struct_wind;
     
     //  init ecomonomic attributes
@@ -45,7 +45,7 @@ Wind :: Wind(
         this->real_capital_cost_vec[0] =
             this->struct_nondisp.capital_cost;
             
-        this->struct_nondisp.net_present_cost +=
+        this->net_present_cost +=
             this->struct_nondisp.capital_cost;
     }
     
@@ -66,10 +66,10 @@ void Wind :: _writeSummary(std::string _write_path, int asset_idx) {
     // construct filename 
     std::string filename = "Nondispatchable/" +
         std::to_string(int(this->struct_nondisp.cap_kW)) +
-        "kW_" + this->struct_nondisp.nondisp_type_str +
+        "kW_" + this->nondisp_type_str +
         "_" + std::to_string(asset_idx) + "/" +
         std::to_string(int(this->struct_nondisp.cap_kW)) +
-        "kW_" + this->struct_nondisp.nondisp_type_str +
+        "kW_" + this->nondisp_type_str +
         "_" + std::to_string(asset_idx) +
         "_summary.txt";
     
@@ -92,21 +92,21 @@ void Wind :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs << "\toperation and maintenance cost (per kWh produced): " <<
         this->struct_nondisp.op_maint_cost_per_kWh << "\n";
     ofs << "\treal discount rate (annual): " <<
-        this->struct_nondisp.real_discount_rate_annual << "\n";
+        this->real_discount_rate_annual << "\n";
     
     // write results
     ofs << "\nResults:\n\n";
     
-    ofs << "\trunning hours: " << this->struct_nondisp.running_hrs
+    ofs << "\trunning hours: " << this->running_hrs
         << " hrs\n";
-    ofs << "\tnumber of replacements: " << this->struct_nondisp.n_replacements
+    ofs << "\tnumber of replacements: " << this->n_replacements
         << "\n";
     ofs << "\ttotal dispatch (over project life): " <<
         this->total_dispatch_kWh << " kWh\n";
     ofs << "\tnet present cost: " <<
-        this->struct_nondisp.net_present_cost << "\n";
+        this->net_present_cost << "\n";
     ofs << "\tlevellized cost of energy (per kWh dispatched): " <<
-        this->struct_nondisp.levellized_cost_of_energy_per_kWh << "\n";
+        this->levellized_cost_of_energy_per_kWh << "\n";
     
     ofs.close();
     
@@ -156,16 +156,13 @@ double Wind :: getProductionkW(double wind_resource_ms) {
 
 void Wind :: writeResults(
     std::string _write_path,
-    std::vector<double>* ptr_2_time_vec_hr,
     int asset_idx
 ) {
     /*
      *  Method to write Wind-level results
      */
     
-    Nondispatchable::_writeTimeSeriesResults(
-        _write_path, ptr_2_time_vec_hr, asset_idx
-    );
+    Nondispatchable::_writeTimeSeriesResults(_write_path, asset_idx);
     this->_writeSummary(_write_path, asset_idx);
     
     return;

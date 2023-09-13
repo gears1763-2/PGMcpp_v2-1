@@ -31,7 +31,7 @@ class Wind : public Nondispatchable {
         
         double getProductionkW(double);
         
-        void writeResults(std::string, std::vector<double>*, int);
+        void writeResults(std::string, int);
         
         ~Wind(void);
 };

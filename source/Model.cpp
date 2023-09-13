@@ -68,14 +68,14 @@ void Model :: _populateDeltaVecHr() {
      */
     
     // initialize
-    this->dt_vec_hr.resize(this->struct_model.n_timesteps, 0);
+    this->dt_vec_hr.resize(this->n_timesteps, 0);
     
     // populate dt_vec_hr
-    for (int i = 0; i < this->struct_model.n_timesteps; i++) {
+    for (int i = 0; i < this->n_timesteps; i++) {
         double dt_hr = 0;
         
         // handle running off end of time_vec_hr
-        if (i == this->struct_model.n_timesteps - 1) {
+        if (i == this->n_timesteps - 1) {
             dt_hr = this->time_vec_hr[i] - this->time_vec_hr[i - 1];
         }
         
@@ -171,7 +171,7 @@ void Model :: _readIn1dRenewableResource(
     
     if (
         this->resource_map_1D[map_key].size() !=
-        (size_t)(this->struct_model.n_timesteps)
+        (size_t)(this->n_timesteps)
     ) {
         std::cout << std::endl;
         
@@ -283,7 +283,7 @@ void Model :: _readIn2dRenewableResource(
     
     if (
         this->resource_map_2D[map_key].size() !=
-        (size_t)(this->struct_model.n_timesteps)
+        (size_t)(this->n_timesteps)
     ) {
         std::cout << std::endl;
         
@@ -311,6 +311,50 @@ void Model :: _readIn2dRenewableResource(
 }
 
 
+void Model :: _addNondispatchable(Nondispatchable* nondisp_ptr) {
+    /*
+     *  Helper method to add Nondispatchable asset to the Model
+     */
+    
+    // set timesteps and project life attributes
+    nondisp_ptr->n_timesteps = this->n_timesteps;
+    nondisp_ptr->project_life_yrs = this->project_life_yrs;
+    
+    //  set asset real discount rate
+    if (
+        nondisp_ptr->struct_nondisp.nominal_inflation_rate_annual !=
+        this->struct_model.nominal_inflation_rate_annual ||
+        nondisp_ptr->struct_nondisp.nominal_discount_rate_annual !=
+        this->struct_model.nominal_discount_rate_annual
+    ) {
+        /*
+         *
+         *  ref: https://www.homerenergy.com/products/pro/docs/3.11/real_discount_rate.html
+         */
+        nondisp_ptr->real_discount_rate_annual =
+            (
+                nondisp_ptr->struct_nondisp.nominal_discount_rate_annual - 
+                nondisp_ptr->struct_nondisp.nominal_inflation_rate_annual
+            ) / 
+            (1 + nondisp_ptr->struct_nondisp.nominal_inflation_rate_annual);
+    }
+    
+    else {
+        nondisp_ptr->real_discount_rate_annual =
+            this->real_discount_rate_annual;
+    }
+    
+    // set pointers to Model vectors
+    nondisp_ptr->ptr_2_dt_vec_hr = &(this->dt_vec_hr);
+    nondisp_ptr->ptr_2_time_vec_hr = &(this->time_vec_hr);
+    
+    // push back
+    this->nondisp_ptr_vec.push_back(nondisp_ptr);
+    
+    return;
+}
+
+
 double Model :: _getRenewableProductionkW(
     Nondispatchable* nondisp_ptr,
     int timestep
@@ -322,7 +366,7 @@ double Model :: _getRenewableProductionkW(
     
     double production_kW = 0;
     
-    switch (nondisp_ptr->struct_nondisp.nondisp_type) {
+    switch (nondisp_ptr->nondisp_type) {
         case (SOLAR): {
             int resource_key =
                 ((Solar*)nondisp_ptr)->struct_solar.resource_key;
@@ -398,9 +442,7 @@ void Model :: _generateNetLoadVector() {
      *  and commit renewable production, dispatch, and curtailment
      */
     
-    for (int i = 0; i < this->struct_model.n_timesteps; i++) {
-        double dt_hrs = this->dt_vec_hr[i];
-        double t_hrs = this->time_vec_hr[i];
+    for (int i = 0; i < this->n_timesteps; i++) {
         double load_kW = this->load_vec_kW[i];
         double net_load_kW = this->load_vec_kW[i];
         
@@ -413,9 +455,7 @@ void Model :: _generateNetLoadVector() {
                 i
             );
             
-            nondisp_ptr->commitProductionkW(
-                production_kW, dt_hrs, t_hrs, i
-            );
+            nondisp_ptr->commitProductionkW(production_kW, i);
             
             // compute and record renewable dispatch
             double dispatch_kW = nondisp_ptr->getDispatchkW(
@@ -451,7 +491,7 @@ void Model :: _handleDispatch() {
     
     switch (this->struct_model.dispatch_mode) {
         case (LOAD_FOLLOWING_IN_ORDER): {
-            for (int i = 0; i < this->struct_model.n_timesteps; i++) {
+            for (int i = 0; i < this->n_timesteps; i++) {
                 if (this->net_load_vec_kW[i] <= 0) {
                     this->_dispatchLoadFollowingInOrderCharging(i);
                 }
@@ -544,28 +584,28 @@ void Model :: _computeEconomics(void) {
     for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
         Combustion* combustion_ptr = this->combustion_ptr_vec[i];
         
-        this->struct_model.net_present_cost +=
+        this->net_present_cost +=
             combustion_ptr->struct_disp.net_present_cost;
     }
     
     for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
         Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
         
-        this->struct_model.net_present_cost +=
+        this->net_present_cost +=
             noncombustion_ptr->struct_disp.net_present_cost;
     }
     
     for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
         Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[i];
         
-        this->struct_model.net_present_cost +=
-            nondisp_ptr->struct_nondisp.net_present_cost;
+        this->net_present_cost +=
+            nondisp_ptr->net_present_cost;
     }
     
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
         Storage* storage_ptr = this->storage_ptr_vec[i];
         
-        this->struct_model.net_present_cost +=
+        this->net_present_cost +=
             storage_ptr->struct_storage.net_present_cost;
     }
     
@@ -575,7 +615,7 @@ void Model :: _computeEconomics(void) {
         Combustion* combustion_ptr = this->combustion_ptr_vec[i];
         
         combustion_ptr->computeLevellizedCostOfEnergy(
-            this->struct_model.project_life_yrs,
+            this->project_life_yrs,
             &(this->dt_vec_hr)
         );
     }
@@ -584,7 +624,7 @@ void Model :: _computeEconomics(void) {
         Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
         
         noncombustion_ptr->computeLevellizedCostOfEnergy(
-            this->struct_model.project_life_yrs,
+            this->project_life_yrs,
             &(this->dt_vec_hr)
         );
     }
@@ -592,10 +632,7 @@ void Model :: _computeEconomics(void) {
     for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
         Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[i];
         
-        nondisp_ptr->computeLevellizedCostOfEnergy(
-            this->struct_model.project_life_yrs,
-            &(this->dt_vec_hr)
-        );
+        nondisp_ptr->computeLevellizedCostOfEnergy();
     }
     
     // compute levellized cost of energy (for entire system)
@@ -620,24 +657,24 @@ void Model :: _computeEconomics(void) {
     
     double capital_recovery_factor = 
         (
-            this->struct_model.real_discount_rate_annual *
+            this->real_discount_rate_annual *
             pow(
-                1 + this->struct_model.real_discount_rate_annual,
-                this->struct_model.project_life_yrs
+                1 + this->real_discount_rate_annual,
+                this->project_life_yrs
             )
         ) / 
         (
             pow(
-                1 + this->struct_model.real_discount_rate_annual,
-                this->struct_model.project_life_yrs
+                1 + this->real_discount_rate_annual,
+                this->project_life_yrs
             ) -
             1
         );
         
     double total_annualized_cost = capital_recovery_factor *
-        this->struct_model.net_present_cost;
+        this->net_present_cost;
     
-    this->struct_model.levellized_cost_of_energy_per_kWh =
+    this->levellized_cost_of_energy_per_kWh =
         total_annualized_cost / total_load_served_kWh;
     
     return;
@@ -661,7 +698,7 @@ void Model :: _writeDispatchResults(std::string _write_path) {
         Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[i];
         
         std::string type_str =
-            nondisp_ptr->struct_nondisp.nondisp_type_str;
+            nondisp_ptr->nondisp_type_str;
             
         double cap_kW = nondisp_ptr->struct_nondisp.cap_kW;
         
@@ -724,7 +761,7 @@ void Model :: _writeDispatchResults(std::string _write_path) {
     ofs << "\n";
     
     // write file body
-    for (int i = 0; i < this->struct_model.n_timesteps; i++) {
+    for (int i = 0; i < this->n_timesteps; i++) {
         ofs << std::to_string(this->time_vec_hr[i]) << ","
             << std::to_string(this->load_vec_kW[i]) << ",";
         
@@ -787,7 +824,7 @@ void Model :: _writeLoadResults(std::string _write_path) {
         "Load Remaining (at end of time step after all dispatch) [kW]\n";
     
     // write file body
-    for (int i = 0; i < this->struct_model.n_timesteps; i++) {
+    for (int i = 0; i < this->n_timesteps; i++) {
         double time_hrs = this->time_vec_hr[i];
         double load_kW = this->load_vec_kW[i];
         double net_load_kW = this->net_load_vec_kW[i];
@@ -820,11 +857,11 @@ void Model :: _writeSummary(std::string _write_path) {
     
     ofs << "\tpath to load data: " <<
         this->struct_model.path_2_load_data << "\n";
-    ofs << "\ttimesteps: " << this->struct_model.n_timesteps << "\n";
-    ofs << "\tproject life: " << this->struct_model.project_life_yrs
+    ofs << "\ttimesteps: " << this->n_timesteps << "\n";
+    ofs << "\tproject life: " << this->project_life_yrs
         << " yrs\n";
     ofs << "\treal discount rate (annual): " <<
-        this->struct_model.real_discount_rate_annual << "\n";
+        this->real_discount_rate_annual << "\n";
     ofs << "\tdispatch mode: " << this->struct_model.dispatch_mode
         << " ";
     
@@ -899,9 +936,9 @@ void Model :: _writeSummary(std::string _write_path) {
     ofs << "\ttotal particulate matter emissions (over project life): " <<
         this->total_PM_emitted_kg << " kg\n";
     ofs << "\tnet present cost: " <<
-        this->struct_model.net_present_cost << "\n";
+        this->net_present_cost << "\n";
     ofs << "\tlevellized cost of energy (per kWh served): " <<
-        this->struct_model.levellized_cost_of_energy_per_kWh << "\n";
+        this->levellized_cost_of_energy_per_kWh << "\n";
     
     ofs.close();
     
@@ -922,16 +959,16 @@ Model :: Model(structModel struct_model) {
     // read in load data, set n_timesteps attribute, compute and set
     // project_life_yrs
     this->_readInLoadData();
-    this->struct_model.n_timesteps = this->time_vec_hr.size();
-    this->struct_model.project_life_yrs =
+    this->n_timesteps = this->time_vec_hr.size();
+    this->project_life_yrs =
         this->time_vec_hr[this->time_vec_hr.size() - 1] / 8760;
     
     // populate dt_vec_hrs
     this->_populateDeltaVecHr();
     
     // size net and remaining load vectors
-    this->net_load_vec_kW.resize(this->struct_model.n_timesteps, 0);
-    this->remaining_load_vec_kW.resize(this->struct_model.n_timesteps, 0);
+    this->net_load_vec_kW.resize(this->n_timesteps, 0);
+    this->remaining_load_vec_kW.resize(this->n_timesteps, 0);
     
     if (this->struct_model.test_flag) {
         std::cout << "Model object constructed at " << this <<
@@ -942,7 +979,7 @@ Model :: Model(structModel struct_model) {
      *
      *  ref: https://www.homerenergy.com/products/pro/docs/3.11/real_discount_rate.html
      */
-    this->struct_model.real_discount_rate_annual =
+    this->real_discount_rate_annual =
         (
             this->struct_model.nominal_discount_rate_annual - 
             this->struct_model.nominal_inflation_rate_annual
@@ -1111,7 +1148,6 @@ void Model :: add2dRenewableResource(
     return;
 }
 
-
 void Model :: addSolar(
     structNondispatchable struct_nondisp,
     structSolar struct_solar
@@ -1120,19 +1156,12 @@ void Model :: addSolar(
      *  Method to add Solar asset to the Model
      */
     
-    struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
-    
-    if (struct_nondisp.real_discount_rate_annual < 0) {
-        struct_nondisp.real_discount_rate_annual = 
-            this->struct_model.real_discount_rate_annual;
-    }
-    
     Nondispatchable* nondisp_ptr = new Solar(
         struct_nondisp,
         struct_solar
     );
     
-    this->nondisp_ptr_vec.push_back(nondisp_ptr);
+    this->_addNondispatchable(nondisp_ptr);
     
     return;
 }
@@ -1146,19 +1175,12 @@ void Model :: addTidal(
      *  Method to add Tidal asset to the Model
      */
     
-    struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
-    
-    if (struct_nondisp.real_discount_rate_annual < 0) {
-        struct_nondisp.real_discount_rate_annual = 
-            this->struct_model.real_discount_rate_annual;
-    }
-    
     Nondispatchable* nondisp_ptr = new Tidal(
         struct_nondisp,
         struct_tidal
     );
     
-    this->nondisp_ptr_vec.push_back(nondisp_ptr);
+    this->_addNondispatchable(nondisp_ptr);
     
     return;
 }
@@ -1172,19 +1194,12 @@ void Model :: addWave(
      *  Method to add Wave asset to the Model
      */
     
-    struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
-    
-    if (struct_nondisp.real_discount_rate_annual < 0) {
-        struct_nondisp.real_discount_rate_annual = 
-            this->struct_model.real_discount_rate_annual;
-    }
-    
     Nondispatchable* nondisp_ptr = new Wave(
         struct_nondisp,
         struct_wave
     );
     
-    this->nondisp_ptr_vec.push_back(nondisp_ptr);
+    this->_addNondispatchable(nondisp_ptr);
     
     return;
 }
@@ -1198,19 +1213,12 @@ void Model :: addWind(
      *  Method to add Wind asset to the Model
      */
     
-    struct_nondisp.n_timesteps = this->struct_model.n_timesteps;
-    
-    if (struct_nondisp.real_discount_rate_annual < 0) {
-        struct_nondisp.real_discount_rate_annual = 
-            this->struct_model.real_discount_rate_annual;
-    }
-    
     Nondispatchable* nondisp_ptr = new Wind(
         struct_nondisp,
         struct_wind
     );
     
-    this->nondisp_ptr_vec.push_back(nondisp_ptr);
+    this->_addNondispatchable(nondisp_ptr);
     
     return;
 }
@@ -1225,28 +1233,15 @@ void Model :: addDiesel(
      *  Method to add Diesel asset to the Model
      */
     
-    struct_disp.n_timesteps = this->struct_model.n_timesteps;
-    
-    if (struct_disp.real_discount_rate_annual < 0) {
-        struct_disp.real_discount_rate_annual = 
-            this->struct_model.real_discount_rate_annual;
-    }
-    
-    if (struct_combustion.real_fuel_discount_rate_annual < 0) {
-        /*
-         *
-         *  ref: https://www.homerenergy.com/products/pro/docs/3.11/real_discount_rate.html
-         */
-        struct_combustion.real_fuel_discount_rate_annual =
-            (this->struct_model.nominal_discount_rate_annual - 0.05) / 
-            1.05;
-    }
-    
     Combustion* combustion_ptr = new Diesel(
         struct_disp,
         struct_combustion,
         struct_diesel
     );
+    
+    //combustion_ptr->n_timesteps = this->n_timesteps;
+    
+    //...
     
     this->combustion_ptr_vec.push_back(combustion_ptr);
     
@@ -1261,18 +1256,14 @@ void Model :: addHydro(
     /*
      *  Method to add Hydro asset to the Model
      */
-    
-    struct_disp.n_timesteps = this->struct_model.n_timesteps;
-    
-    if (struct_disp.real_discount_rate_annual < 0) {
-        struct_disp.real_discount_rate_annual = 
-            this->struct_model.real_discount_rate_annual;
-    }
-    
     Dispatchable* disp_ptr = new Hydro(
         struct_disp,
         struct_hydro
     );
+    
+    //disp_ptr->n_timesteps = this->n_timesteps;
+    
+    //...
     
     this->noncombustion_ptr_vec.push_back(disp_ptr);
     
@@ -1289,18 +1280,15 @@ void Model :: addLiIon(
      *  Method to add LiIon asset to the Model
      */
     
-    struct_storage.n_timesteps = this->struct_model.n_timesteps;
-    
-    if (struct_storage.real_discount_rate_annual < 0) {
-        struct_storage.real_discount_rate_annual = 
-            this->struct_model.real_discount_rate_annual;
-    }
-    
     Storage* storage_ptr = new LiIon(
         struct_storage,
         struct_battery_storage,
         struct_liion
     );
+    
+    //storage_ptr->n_timesteps = this->n_timesteps;
+    
+    //...
     
     this->storage_ptr_vec.push_back(storage_ptr);
     
@@ -1423,13 +1411,11 @@ void Model :: writeResults(std::string write_path) {
             std::filesystem::create_directory(
                 _write_path + "Nondispatchable/" +
                 std::to_string(int(nondisp_ptr->struct_nondisp.cap_kW)) +
-                "kW_" + nondisp_ptr->struct_nondisp.nondisp_type_str +
+                "kW_" + nondisp_ptr->nondisp_type_str +
                 "_" + std::to_string(i) + "/"
             );
             
-            nondisp_ptr->writeResults(
-                _write_path, &(this->time_vec_hr), i
-            );
+            nondisp_ptr->writeResults(_write_path, i);
         }
     }
     
@@ -1529,8 +1515,8 @@ void Model :: reset() {
     this->net_load_vec_kW.clear();
     this->remaining_load_vec_kW.clear();
     
-    this->net_load_vec_kW.resize(this->struct_model.n_timesteps, 0);
-    this->remaining_load_vec_kW.resize(this->struct_model.n_timesteps, 0);
+    this->net_load_vec_kW.resize(this->n_timesteps, 0);
+    this->remaining_load_vec_kW.resize(this->n_timesteps, 0);
     
     return;
 }
