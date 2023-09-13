@@ -45,14 +45,14 @@ class Nondispatchable {
         
         bool is_running = false;
         
-        int n_timesteps = 8760;
+        int n_timesteps = 0;
         int n_replacements = 0;
         
         double project_life_yrs = 0;
         double running_hrs = 0;
         double total_dispatch_kWh = 0;
         
-        double real_discount_rate_annual = -1;
+        double real_discount_rate_annual = 0;
     
         double net_present_cost = 0;
         double levellized_cost_of_energy_per_kWh = 0;
@@ -74,7 +74,7 @@ class Nondispatchable {
         std::vector<double>* ptr_2_time_vec_hr;
         
         // methods
-        Nondispatchable(structNondispatchable);
+        Nondispatchable(structNondispatchable, int);
         
         void _handleReplacement(int);
         void _writeTimeSeriesResults(std::string, int);

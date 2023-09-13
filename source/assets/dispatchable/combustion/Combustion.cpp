@@ -10,23 +10,24 @@
 
 Combustion :: Combustion(
     structDispatchable struct_disp,
-    structCombustion struct_combustion
-) : Dispatchable(struct_disp) {
+    structCombustion struct_combustion,
+    int n_timesteps
+) : Dispatchable(struct_disp, n_timesteps) {
     /*
      *  Combustion class constructor
      */
     
     this->struct_combustion = struct_combustion;
     
-    this->fuel_vec_L.resize(this->struct_disp.n_timesteps, 0);
-    this->real_fuel_cost_vec.resize(this->struct_disp.n_timesteps, 0);
+    this->fuel_vec_L.resize(this->n_timesteps, 0);
+    this->real_fuel_cost_vec.resize(this->n_timesteps, 0);
     
-    this->CO2_vec_kg.resize(this->struct_disp.n_timesteps, 0);
-    this->CO_vec_kg.resize(this->struct_disp.n_timesteps, 0);
-    this->NOx_vec_kg.resize(this->struct_disp.n_timesteps, 0);
-    this->SOx_vec_kg.resize(this->struct_disp.n_timesteps, 0);
-    this->CH4_vec_kg.resize(this->struct_disp.n_timesteps, 0);
-    this->PM_vec_kg.resize(this->struct_disp.n_timesteps, 0);
+    this->CO2_vec_kg.resize(this->n_timesteps, 0);
+    this->CO_vec_kg.resize(this->n_timesteps, 0);
+    this->NOx_vec_kg.resize(this->n_timesteps, 0);
+    this->SOx_vec_kg.resize(this->n_timesteps, 0);
+    this->CH4_vec_kg.resize(this->n_timesteps, 0);
+    this->PM_vec_kg.resize(this->n_timesteps, 0);
     
     if (this->struct_combustion.fuel_mode == LOOKUP) {
         if (this->struct_combustion.path_2_fuel_consumption_data.empty()) {
@@ -139,7 +140,6 @@ double Combustion :: _fuelConsumptionLookupL(
 
 void Combustion :: _writeTimeSeriesResults(
     std::string _write_path,
-    std::vector<double>* ptr_2_time_vec_hr,
     int asset_idx
 ) {
     /*
@@ -149,10 +149,10 @@ void Combustion :: _writeTimeSeriesResults(
     // construct filename 
     std::string filename = "Combustion/" +
         std::to_string(int(this->struct_disp.cap_kW)) +
-        "kW_" + this->struct_disp.disp_type_str +
+        "kW_" + this->disp_type_str +
         "_" + std::to_string(asset_idx) + "/" +
         std::to_string(int(this->struct_disp.cap_kW)) +
-        "kW_" + this->struct_disp.disp_type_str +
+        "kW_" + this->disp_type_str +
         "_" + std::to_string(asset_idx) +
         "_results.csv";
     
@@ -182,8 +182,8 @@ void Combustion :: _writeTimeSeriesResults(
         << "\n";
     
     // write file body
-    for (int i = 0; i < this->struct_disp.n_timesteps; i++) {
-        ofs << std::to_string(ptr_2_time_vec_hr->at(i)) << ","
+    for (int i = 0; i < this->n_timesteps; i++) {
+        ofs << std::to_string(this->ptr_2_time_vec_hr->at(i)) << ","
             << std::to_string(this->production_vec_kW[i]) << ","
             << std::to_string(this->dispatch_vec_kW[i]) << ","
             << std::to_string(this->curtailment_vec_kW[i]) << ","
@@ -220,7 +220,7 @@ double Combustion :: getFuelConsumptionL(
      */
     
     // check running state
-    if (not this->struct_disp.is_running) {
+    if (not this->is_running) {
         return 0;
     }
     
@@ -272,7 +272,7 @@ structEmissions Combustion :: getEmissions(double fuel_consumption_L) {
     
     structEmissions struct_emissions;
     
-    switch (this->struct_combustion.fuel_type) {
+    switch (this->fuel_type) {
         case (FUEL_DIESEL): {
             struct_emissions.CO2_kg =
                 this->struct_combustion.diesel_CO2_kgL * fuel_consumption_L;
@@ -338,10 +338,7 @@ void Combustion :: recordEmissions(
 }
 
 
-void Combustion :: computeLevellizedCostOfEnergy(
-    double project_life_yrs,
-    std::vector<double>* ptr_2_dt_vec_hr
-) {
+void Combustion :: computeLevellizedCostOfEnergy() {
     /*
      *  Method to compute levellized cost of energy
      * 
@@ -350,9 +347,7 @@ void Combustion :: computeLevellizedCostOfEnergy(
      *  ref: https://www.homerenergy.com/products/pro/docs/3.12/capital_recovery_factor.html
      */
     
-    Dispatchable::computeLevellizedCostOfEnergy(
-        project_life_yrs, ptr_2_dt_vec_hr
-    );
+    Dispatchable::computeLevellizedCostOfEnergy();
     
     return;
 }

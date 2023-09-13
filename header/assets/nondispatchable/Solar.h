@@ -34,7 +34,7 @@ class Solar : public Nondispatchable {
         
         
         //  methods
-        Solar(structNondispatchable, structSolar);
+        Solar(structNondispatchable, structSolar, int);
         
         void _writeSummary(std::string, int);
         

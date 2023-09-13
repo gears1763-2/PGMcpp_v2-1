@@ -10,8 +10,9 @@
 
 Tidal :: Tidal(
     structNondispatchable struct_nondisp,
-    structTidal struct_tidal
-) : Nondispatchable(struct_nondisp) {
+    structTidal struct_tidal,
+    int n_timesteps
+) : Nondispatchable(struct_nondisp, n_timesteps) {
     /*
      *  Tidal class constructor
      */

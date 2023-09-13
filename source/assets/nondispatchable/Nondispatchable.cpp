@@ -8,13 +8,15 @@
 
 
 Nondispatchable :: Nondispatchable(
-    structNondispatchable struct_nondisp
+    structNondispatchable struct_nondisp,
+    int n_timesteps
 ) {
     /*
      *  Nondispatchable class constructor
      */
     
     this->struct_nondisp = struct_nondisp;
+    this->n_timesteps = n_timesteps;
     
     this->is_running_vec.resize(this->n_timesteps, false);
     this->replaced_vec.resize(this->n_timesteps, false);

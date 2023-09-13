@@ -13,7 +13,7 @@ try {
     
     structWind struct_wind;
     
-    Wind test_wind(struct_nondisp, struct_wind);
+    Wind test_wind(struct_nondisp, struct_wind, 16);
     
     
     //...

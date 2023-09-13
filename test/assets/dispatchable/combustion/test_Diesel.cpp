@@ -7,6 +7,14 @@ printGold("Testing Dispatchable <-- Combustion <-- Diesel ... ");
 std::cout << std::endl;
 
 try {
+    std::vector<double> time_vec_hr = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+    };
+    
+    std::vector<double> dt_vec_hr = {
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    };
+    
     //  construction
     structDispatchable struct_disp;
     struct_disp.test_flag = true;
@@ -15,20 +23,40 @@ try {
     
     structDiesel struct_diesel;
     
-    Diesel test_diesel(struct_disp, struct_combustion, struct_diesel);
+    Diesel test_diesel(
+        struct_disp,
+        struct_combustion,
+        struct_diesel,
+        16
+    );
+    
+    test_diesel.ptr_2_dt_vec_hr = &(dt_vec_hr);
+    test_diesel.ptr_2_time_vec_hr = &(time_vec_hr);
     
     struct_combustion.fuel_mode = LOOKUP;
     
     Diesel test_diesel_no_fuel_data_path(
-        struct_disp, struct_combustion, struct_diesel
+        struct_disp,
+        struct_combustion,
+        struct_diesel,
+        16
     );
+    
+    test_diesel_no_fuel_data_path.ptr_2_dt_vec_hr = &(dt_vec_hr);
+    test_diesel_no_fuel_data_path.ptr_2_time_vec_hr = &(time_vec_hr);
     
     struct_combustion.path_2_fuel_consumption_data =
         "data/input/test/diesel_fuel_curve.csv";
     
     Diesel test_diesel_fuel_lookup(
-        struct_disp, struct_combustion, struct_diesel
+        struct_disp,
+        struct_combustion,
+        struct_diesel,
+        16
     );
+    
+    test_diesel_fuel_lookup.ptr_2_dt_vec_hr = &(dt_vec_hr);
+    test_diesel_fuel_lookup.ptr_2_time_vec_hr = &(time_vec_hr);
     
     
     //  test post-construction attributes
@@ -153,9 +181,6 @@ try {
     std::cout << "\tTesting Diesel::commitProductionkW() ..." <<
         std::endl;
     
-    double dt_hrs = 1;
-    double t_hrs = 0;
-    
     requested_production_vec_kW = {
         0, 0, 10, 15, 0, 5, 0, 0, 50, 60, 70, 80, 90, 0, 110, 120
     };
@@ -173,8 +198,6 @@ try {
         
         test_diesel.commitProductionkW(
             production_kW,
-            dt_hrs,
-            t_hrs,
             i
         );
         

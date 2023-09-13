@@ -10,8 +10,9 @@
 
 Wind :: Wind(
     structNondispatchable struct_nondisp,
-    structWind struct_wind
-) : Nondispatchable(struct_nondisp) {
+    structWind struct_wind,
+    int n_timesteps
+) : Nondispatchable(struct_nondisp, n_timesteps) {
     /*
      *  Wind class constructor
      */

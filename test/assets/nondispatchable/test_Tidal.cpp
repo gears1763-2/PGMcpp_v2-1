@@ -13,7 +13,7 @@ try {
     
     structTidal struct_tidal;
     
-    Tidal test_tidal(struct_nondisp, struct_tidal);
+    Tidal test_tidal(struct_nondisp, struct_tidal, 16);
     
     
     //...

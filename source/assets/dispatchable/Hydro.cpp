@@ -10,14 +10,15 @@
 
 Hydro :: Hydro(
     structDispatchable struct_disp,
-    structHydro struct_Hydro
-) : Dispatchable(struct_disp) {
+    structHydro struct_Hydro,
+    int n_timesteps
+) : Dispatchable(struct_disp, n_timesteps) {
     /*
      *  Hydro class constructor
      */
     
-    this->struct_disp.disp_type = HYDRO;
-    this->struct_disp.disp_type_str = "HYDRO";
+    this->disp_type = HYDRO;
+    this->disp_type_str = "HYDRO";
     this->struct_hydro = struct_hydro;
     
     //...
@@ -39,10 +40,10 @@ void Hydro :: _writeSummary(std::string _write_path, int asset_idx) {
     // construct filename 
     std::string filename = "non-Combustion/" +
         std::to_string(int(this->struct_disp.cap_kW)) +
-        "kW_" + this->struct_disp.disp_type_str +
+        "kW_" + this->disp_type_str +
         "_" + std::to_string(asset_idx) + "/" +
         std::to_string(int(this->struct_disp.cap_kW)) +
-        "kW_" + this->struct_disp.disp_type_str +
+        "kW_" + this->disp_type_str +
         "_" + std::to_string(asset_idx) +
         "_summary.txt";
     
@@ -76,16 +77,13 @@ double Hydro :: requestProductionkW(double requested_production_kW) {
 
 void Hydro :: writeResults(
     std::string _write_path,
-    std::vector<double>* ptr_2_time_vec_hr,
     int asset_idx
 ) {
     /*
      *  Method to write Hydro-level results
      */
     
-    Dispatchable::_writeTimeSeriesResults(
-        _write_path, ptr_2_time_vec_hr, asset_idx
-    );
+    Dispatchable::_writeTimeSeriesResults(_write_path, asset_idx);
     this->_writeSummary(_write_path, asset_idx);
     
     return;

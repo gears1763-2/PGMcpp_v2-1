@@ -13,7 +13,7 @@ try {
     
     structHydro struct_hydro;
     
-    Hydro test_hydro(struct_disp, struct_hydro);
+    Hydro test_hydro(struct_disp, struct_hydro, 16);
     
     
     //...

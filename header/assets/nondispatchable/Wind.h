@@ -25,7 +25,7 @@ class Wind : public Nondispatchable {
         
         
         //  2. methods
-        Wind(structNondispatchable, structWind);
+        Wind(structNondispatchable, structWind, int);
         
         void _writeSummary(std::string, int);
         

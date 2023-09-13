@@ -12,24 +12,27 @@
 
 
 struct structHydro {
+    //  input attributes (structured)
+    //  these are the only attributes the user should interact with
     int resource_key = 0;
 };
 
 
 class Hydro : public Dispatchable {
     public:
-        //  1. attributes
+        //  modelling and output attributes (unstructured)
+        //  the user should not interact with these attributes
         structHydro struct_hydro;
         
         
-        //  2. methods
-        Hydro(structDispatchable, structHydro);
+        //  methods
+        Hydro(structDispatchable, structHydro, int);
         
         void _writeSummary(std::string, int);
         
         double requestProductionkW(double);
         
-        void writeResults(std::string, std::vector<double>*, int);
+        void writeResults(std::string, int);
         
         ~Hydro(void);
 };

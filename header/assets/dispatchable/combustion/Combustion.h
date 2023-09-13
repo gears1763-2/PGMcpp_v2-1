@@ -24,11 +24,11 @@ enum FuelType {
 
 
 struct structCombustion {
+    //  input attributes (structured)
+    //  these are the only attributes the user should interact with
     FuelMode fuel_mode = LINEAR;
-    FuelType fuel_type = FUEL_DIESEL;
     
     double fuel_cost_L = 1.50;
-    double real_fuel_discount_rate_annual = -1;
     
     /*
      *  LINEAR fuel consumption parameters
@@ -67,9 +67,12 @@ struct structEmissions {
 
 class Combustion : public Dispatchable {
     public:
-        //  1. attributes
+        //  modelling and output attributes (unstructured)
+        //  the user should not interact with these attributes
+        FuelType fuel_type = FUEL_DIESEL;
         structCombustion struct_combustion;
         
+        double real_fuel_discount_rate_annual = -1;
         double total_fuel_consumed_L = 0;
         
         double total_CO2_emitted_kg = 0;
@@ -93,27 +96,24 @@ class Combustion : public Dispatchable {
         std::vector<double> PM_vec_kg;
         
         
-        //  2. methods
-        Combustion(structDispatchable, structCombustion);
+        //  methods
+        Combustion(structDispatchable, structCombustion, int);
         
         void _readInFuelConsumptionData(void);
         double _fuelConsumptionLookupL(double, double);
-        void _writeTimeSeriesResults(
-            std::string, std::vector<double>* ptr_2_time_vec_hr, int
-        );
+        void _writeTimeSeriesResults(std::string, int);
         
         double getFuelConsumptionL(double, double);
         structEmissions getEmissions(double);
         void recordEmissions(structEmissions, int);
         
-        virtual void commitProductionkW(double, double, double, int) {return;}
+        virtual void commitProductionkW(double, int) {return;}
         virtual double requestProductionkW(double) {return 0;}
         
-        void computeLevellizedCostOfEnergy(double, std::vector<double>*);
+        void computeLevellizedCostOfEnergy(void);
         
         virtual void writeResults(
             std::string,
-            std::vector<double>*,
             int
         ) {return;}
         

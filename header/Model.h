@@ -89,6 +89,9 @@ class Model {
         );
         
         void _addNondispatchable(Nondispatchable*);
+        void _addNonCombustion(Dispatchable*);
+        void _addCombustion(Combustion*);
+        void _addStorage(Storage*);
         
         double _getRenewableProductionkW(Nondispatchable*, int);
         void _generateNetLoadVector(void);

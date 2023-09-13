@@ -36,7 +36,7 @@ class Tidal : public Nondispatchable {
         
         
         //  methods
-        Tidal(structNondispatchable, structTidal);
+        Tidal(structNondispatchable, structTidal, int);
         
         void _writeSummary(std::string, int);
         

@@ -13,12 +13,12 @@ try {
     
     structWave struct_wave;
     
-    Wave test_wave(struct_nondisp, struct_wave);
+    Wave test_wave(struct_nondisp, struct_wave, 16);
     
     struct_wave.path_2_normalized_performance_matrix =
         "data/input/test/normalized_performance_matrix.csv";
     
-    Wave test_wave_lookup(struct_nondisp, struct_wave);
+    Wave test_wave_lookup(struct_nondisp, struct_wave, 16);
     
     //  test post-construction attributes
     std::vector<double> exp_interp_significant_wave_height_vec_m = {

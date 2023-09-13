@@ -49,7 +49,7 @@ class Wave : public Nondispatchable {
         
         
         //  methods
-        Wave(structNondispatchable, structWave);
+        Wave(structNondispatchable, structWave, int);
         
         void _readInNormalizedPerformanceMatrix(void);
         void _writeSummary(std::string, int);

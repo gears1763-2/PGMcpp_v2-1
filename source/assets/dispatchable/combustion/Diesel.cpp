@@ -12,17 +12,18 @@
 Diesel :: Diesel(
     structDispatchable struct_disp,
     structCombustion struct_combustion,
-    structDiesel struct_diesel
-) : Combustion(struct_disp, struct_combustion) {
+    structDiesel struct_diesel,
+    int n_timesteps
+) : Combustion(struct_disp, struct_combustion, n_timesteps) {
     /*
      *  Diesel class constructor
      */
     
-    this->struct_disp.disp_type = DIESEL;
-    this->struct_disp.disp_type_str = "DIESEL";
+    this->disp_type = DIESEL;
+    this->disp_type_str = "DIESEL";
+    this->fuel_type = FUEL_DIESEL;
     this->struct_diesel = struct_diesel;
     
-    this->struct_combustion.fuel_type = FUEL_DIESEL;
     
     // init linear fuel consumption parameters if sentinel value detected
     if (this->struct_combustion.linear_fuel_intercept_LkWh < 0) {
@@ -64,7 +65,7 @@ Diesel :: Diesel(
         this->real_capital_cost_vec[0] =
             this->struct_disp.capital_cost;
         
-        this->struct_disp.net_present_cost +=
+        this->net_present_cost +=
             this->struct_disp.capital_cost;
     }
     
@@ -85,10 +86,10 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
     // construct filename 
     std::string filename = "Combustion/" +
         std::to_string(int(this->struct_disp.cap_kW)) +
-        "kW_" + this->struct_disp.disp_type_str +
+        "kW_" + this->disp_type_str +
         "_" + std::to_string(asset_idx) + "/" +
         std::to_string(int(this->struct_disp.cap_kW)) +
-        "kW_" + this->struct_disp.disp_type_str +
+        "kW_" + this->disp_type_str +
         "_" + std::to_string(asset_idx) +
         "_summary.txt";
     
@@ -144,18 +145,18 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs << "\tfuel cost (per L): " <<
         this->struct_combustion.fuel_cost_L << "\n";
     ofs << "\treal discount rate (annual): " <<
-        this->struct_disp.real_discount_rate_annual << "\n";
+        this->real_discount_rate_annual << "\n";
     ofs << "\treal fuel discount rate (annual): " <<
-        this->struct_combustion.real_fuel_discount_rate_annual << "\n";
+        this->real_fuel_discount_rate_annual << "\n";
     
     // write results
     ofs << "\nResults:\n\n";
     
-    ofs << "\trunning hours: " << this->struct_disp.running_hrs
+    ofs << "\trunning hours: " << this->running_hrs
         << " hrs\n";
-    ofs << "\tnumber of starts: " << this->struct_disp.n_starts
+    ofs << "\tnumber of starts: " << this->n_starts
         << "\n";
-    ofs << "\tnumber of replacements: " << this->struct_disp.n_replacements
+    ofs << "\tnumber of replacements: " << this->n_replacements
         << "\n";
     ofs << "\ttotal dispatch (over project life): " << 
         this->total_dispatch_kWh << " kWh\n";
@@ -174,9 +175,9 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs << "\ttotal particulate matter emissions (over project life): " <<
         this->total_PM_emitted_kg << " kg\n";
     ofs << "\tnet present cost: " <<
-        this->struct_disp.net_present_cost << "\n";
+        this->net_present_cost << "\n";
     ofs << "\tlevellized cost of energy (per kWh dispatched): " <<
-        this->struct_disp.levellized_cost_of_energy_per_kWh << "\n";
+        this->levellized_cost_of_energy_per_kWh << "\n";
     
     ofs.close();
     
@@ -186,8 +187,6 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
 
 void Diesel :: commitProductionkW(
     double production_kW,
-    double dt_hrs,
-    double t_hrs,
     int timestep
 ) {
     /*
@@ -196,34 +195,35 @@ void Diesel :: commitProductionkW(
     
     // enforce minimum runtime, handle stopping
     if (
-        this->struct_disp.is_running &&
+        this->is_running &&
         production_kW <= 0 &&
-        this->struct_diesel.time_since_last_start_hrs >=
+        this->time_since_last_start_hrs >=
             this->struct_diesel.minimum_runtime_hrs
     ) {
         // stop, reset time since last start
-        this->struct_disp.is_running = false;
-        this->struct_diesel.time_since_last_start_hrs = 0;
+        this->is_running = false;
+        this->time_since_last_start_hrs = 0;
     }
     
     // handle starting, track time since last start
     if (
-        not(this->struct_disp.is_running) &&
+        not(this->is_running) &&
         production_kW > 0
     ) {
-        this->struct_disp.is_running = true;
-        this->struct_disp.n_starts++;
+        this->is_running = true;
+        this->n_starts++;
     }
     
-    if (this->struct_disp.is_running) {
-        this->struct_diesel.time_since_last_start_hrs += dt_hrs;
+    double dt_hrs = this->ptr_2_dt_vec_hr->at(timestep);
+    if (this->is_running) {
+        this->time_since_last_start_hrs += dt_hrs;
     }
     
     // callback
-    Dispatchable::commitProductionkW(production_kW, dt_hrs, t_hrs, timestep);
+    Dispatchable::commitProductionkW(production_kW, timestep);
     
     
-    if (this->struct_disp.is_running) {
+    if (this->is_running) {
         // handle fuel consumption
         double fuel_consumption_L =
             Combustion::getFuelConsumptionL(production_kW, dt_hrs);
@@ -237,8 +237,9 @@ void Diesel :: commitProductionkW(
          *  ref: https://www.homerenergy.com/products/pro/docs/latest/real_discount_rate.html
          *  ref: https://www.homerenergy.com/products/pro/docs/latest/present_value.html
          */
+        double t_hrs = this->ptr_2_time_vec_hr->at(timestep);
         double real_discount_scalar = 1.0 / pow(
-            1 + this->struct_combustion.real_fuel_discount_rate_annual,
+            1 + this->real_fuel_discount_rate_annual,
             t_hrs / 8760
         );
 
@@ -248,7 +249,7 @@ void Diesel :: commitProductionkW(
 
         this->real_fuel_cost_vec[timestep] = fuel_cost;
 
-        this->struct_disp.net_present_cost +=
+        this->net_present_cost +=
             this->real_fuel_cost_vec[timestep];
         
         // handle emissions
@@ -293,16 +294,13 @@ double Diesel :: requestProductionkW(double requested_production_kW) {
 
 void Diesel :: writeResults(
     std::string _write_path,
-    std::vector<double>* ptr_2_time_vec_hr,
     int asset_idx
 ) {
     /*
      *  Method to write Diesel-level results
      */
     
-    Combustion::_writeTimeSeriesResults(
-        _write_path, ptr_2_time_vec_hr, asset_idx
-    );
+    Combustion::_writeTimeSeriesResults(_write_path, asset_idx);
     this->_writeSummary(_write_path, asset_idx);
     
     return;

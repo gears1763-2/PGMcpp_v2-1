@@ -10,8 +10,9 @@
 
 Wave :: Wave(
     structNondispatchable struct_nondisp,
-    structWave struct_wave
-) : Nondispatchable(struct_nondisp) {
+    structWave struct_wave,
+    int n_timesteps
+) : Nondispatchable(struct_nondisp, n_timesteps) {
     /*
      *  Wave class constructor
      */

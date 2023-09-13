@@ -17,39 +17,46 @@ enum DispatchableType {
 
 
 struct structDispatchable {
-    bool is_running = false;
+    //  input attributes (structured)
+    //  these are the only attributes the user should interact with
     bool is_sunk = false;
     bool print_flag = false;
     bool test_flag = false;
     
-    DispatchableType disp_type = DIESEL;
-    
-    int n_timesteps = 8760;
-    int n_replacements = 0;
-    int n_starts = 0;
-    
     double cap_kW = 100;
-    double running_hrs = 0;
     double replace_running_hrs = 30000;
+    
+    double nominal_inflation_rate_annual = 0.02;
+    double nominal_discount_rate_annual = 0.04;
     
     double capital_cost = -1;
     double op_maint_cost_per_kWh = -1;
-    
-    double real_discount_rate_annual = -1;
-    
-    double net_present_cost = 0;
-    double levellized_cost_of_energy_per_kWh = 0;
-    
-    std::string disp_type_str = "";
 };
 
 
 class Dispatchable {
     public:
-        // attributes
+        //  modelling and output attributes (unstructured)
+        //  the user should not interact with these attributes
+        DispatchableType disp_type = DIESEL;
         structDispatchable struct_disp;
         
+        bool is_running = false;
+        
+        int n_timesteps = 0;
+        int n_replacements = 0;
+        int n_starts = 0;
+        
+        double project_life_yrs = 0;
+        double running_hrs = 0;
         double total_dispatch_kWh = 0;
+        
+        double real_discount_rate_annual = -1;
+        
+        double net_present_cost = 0;
+        double levellized_cost_of_energy_per_kWh = 0;
+        
+        std::string disp_type_str = "";
         
         std::vector<bool> is_running_vec;
         std::vector<bool> replaced_vec;
@@ -62,26 +69,26 @@ class Dispatchable {
         std::vector<double> real_capital_cost_vec;
         std::vector<double> real_op_maint_cost_vec;
         
+        std::vector<double>* ptr_2_dt_vec_hr;
+        std::vector<double>* ptr_2_time_vec_hr;
         
-        // methods
-        Dispatchable(structDispatchable);
         
-        void _handleReplacement(int, double);
-        void _writeTimeSeriesResults(
-            std::string, std::vector<double>* ptr_2_time_vec_hr, int
-        );
+        //  methods
+        Dispatchable(structDispatchable, int);
         
-        virtual void commitProductionkW(double, double, double, int);
+        void _handleReplacement(int);
+        void _writeTimeSeriesResults(std::string, int);
+        
+        virtual void commitProductionkW(double, int);
         double getDispatchkW(double, double);
         
         virtual double requestProductionkW(double) {return 0;}
         virtual double getFuelConsumptionL(double) {return 0;}
         
-        void computeLevellizedCostOfEnergy(double, std::vector<double>*);
+        void computeLevellizedCostOfEnergy(void);
         
         virtual void writeResults(
             std::string,
-            std::vector<double>*,
             int
         ) {return;}
         

@@ -10,8 +10,9 @@
 
 Solar :: Solar(
     structNondispatchable struct_nondisp,
-    structSolar struct_solar
-) : Nondispatchable(struct_nondisp) {
+    structSolar struct_solar,
+    int n_timesteps
+) : Nondispatchable(struct_nondisp, n_timesteps) {
     /*
      *  Solar class constructor
      */

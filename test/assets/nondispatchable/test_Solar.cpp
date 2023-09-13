@@ -13,7 +13,7 @@ try {
     
     structSolar struct_solar;
     
-    Solar test_solar(struct_nondisp, struct_solar);
+    Solar test_solar(struct_nondisp, struct_solar, 16);
     
     
     //  test post-construction attributes

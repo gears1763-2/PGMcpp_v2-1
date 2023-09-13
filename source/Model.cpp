@@ -316,8 +316,7 @@ void Model :: _addNondispatchable(Nondispatchable* nondisp_ptr) {
      *  Helper method to add Nondispatchable asset to the Model
      */
     
-    // set timesteps and project life attributes
-    nondisp_ptr->n_timesteps = this->n_timesteps;
+    // set project life attribute
     nondisp_ptr->project_life_yrs = this->project_life_yrs;
     
     //  set asset real discount rate
@@ -353,6 +352,105 @@ void Model :: _addNondispatchable(Nondispatchable* nondisp_ptr) {
     
     return;
 }
+
+
+void Model :: _addNonCombustion(Dispatchable* noncombustion_ptr) {
+    /*
+     *  Helper method to add non-Combustion asset to the Model
+     */
+    
+    // set project life attribute
+    noncombustion_ptr->project_life_yrs = this->project_life_yrs;
+    
+    //  set asset real discount rate
+    if (
+        noncombustion_ptr->struct_disp.nominal_inflation_rate_annual !=
+        this->struct_model.nominal_inflation_rate_annual ||
+        noncombustion_ptr->struct_disp.nominal_discount_rate_annual !=
+        this->struct_model.nominal_discount_rate_annual
+    ) {
+        /*
+         *
+         *  ref: https://www.homerenergy.com/products/pro/docs/3.11/real_discount_rate.html
+         */
+        noncombustion_ptr->real_discount_rate_annual =
+            (
+                noncombustion_ptr->struct_disp.nominal_discount_rate_annual - 
+                noncombustion_ptr->struct_disp.nominal_inflation_rate_annual
+            ) / 
+            (1 + noncombustion_ptr->struct_disp.nominal_inflation_rate_annual);
+    }
+    
+    else {
+        noncombustion_ptr->real_discount_rate_annual =
+            this->real_discount_rate_annual;
+    }
+    
+    // set pointers to Model vectors
+    noncombustion_ptr->ptr_2_dt_vec_hr = &(this->dt_vec_hr);
+    noncombustion_ptr->ptr_2_time_vec_hr = &(this->time_vec_hr);
+    
+    // push back
+    this->noncombustion_ptr_vec.push_back(noncombustion_ptr);
+    
+    return;
+}
+
+
+void Model :: _addCombustion(Combustion* combustion_ptr) {
+    /*
+     *  Helper method to add Combustion asset to the Model
+     */
+    
+    // set project life attribute
+    combustion_ptr->project_life_yrs = this->project_life_yrs;
+    
+    //  set asset real discount rate
+    if (
+        combustion_ptr->struct_disp.nominal_inflation_rate_annual !=
+        this->struct_model.nominal_inflation_rate_annual ||
+        combustion_ptr->struct_disp.nominal_discount_rate_annual !=
+        this->struct_model.nominal_discount_rate_annual
+    ) {
+        /*
+         *
+         *  ref: https://www.homerenergy.com/products/pro/docs/3.11/real_discount_rate.html
+         */
+        combustion_ptr->real_discount_rate_annual =
+            (
+                combustion_ptr->struct_disp.nominal_discount_rate_annual - 
+                combustion_ptr->struct_disp.nominal_inflation_rate_annual
+            ) / 
+            (1 + combustion_ptr->struct_disp.nominal_inflation_rate_annual);
+    }
+    
+    else {
+        combustion_ptr->real_discount_rate_annual =
+            this->real_discount_rate_annual;
+    }
+    
+    // set pointers to Model vectors
+    combustion_ptr->ptr_2_dt_vec_hr = &(this->dt_vec_hr);
+    combustion_ptr->ptr_2_time_vec_hr = &(this->time_vec_hr);
+    
+    // push back
+    this->combustion_ptr_vec.push_back(combustion_ptr);
+    
+    return;
+}
+
+
+
+void Model :: _addStorage(Storage* storage_ptr) {
+    /*
+     *  Helper method to add Storage asset to the Model
+     */
+    
+    //...
+    
+    return;
+}
+
 
 
 double Model :: _getRenewableProductionkW(
@@ -585,14 +683,14 @@ void Model :: _computeEconomics(void) {
         Combustion* combustion_ptr = this->combustion_ptr_vec[i];
         
         this->net_present_cost +=
-            combustion_ptr->struct_disp.net_present_cost;
+            combustion_ptr->net_present_cost;
     }
     
     for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
         Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
         
         this->net_present_cost +=
-            noncombustion_ptr->struct_disp.net_present_cost;
+            noncombustion_ptr->net_present_cost;
     }
     
     for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
@@ -614,19 +712,13 @@ void Model :: _computeEconomics(void) {
     for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
         Combustion* combustion_ptr = this->combustion_ptr_vec[i];
         
-        combustion_ptr->computeLevellizedCostOfEnergy(
-            this->project_life_yrs,
-            &(this->dt_vec_hr)
-        );
+        combustion_ptr->computeLevellizedCostOfEnergy();
     }
     
     for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
         Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
         
-        noncombustion_ptr->computeLevellizedCostOfEnergy(
-            this->project_life_yrs,
-            &(this->dt_vec_hr)
-        );
+        noncombustion_ptr->computeLevellizedCostOfEnergy();
     }
     
     for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
@@ -738,7 +830,7 @@ void Model :: _writeDispatchResults(std::string _write_path) {
         Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
         
         std::string type_str =
-            noncombustion_ptr->struct_disp.disp_type_str;
+            noncombustion_ptr->disp_type_str;
             
         double cap_kW = noncombustion_ptr->struct_disp.cap_kW;
         
@@ -750,7 +842,7 @@ void Model :: _writeDispatchResults(std::string _write_path) {
         Combustion* combustion_ptr = this->combustion_ptr_vec[i];
         
         std::string type_str =
-            combustion_ptr->struct_disp.disp_type_str;
+            combustion_ptr->disp_type_str;
             
         double cap_kW = combustion_ptr->struct_disp.cap_kW;
         
@@ -1153,12 +1245,13 @@ void Model :: addSolar(
     structSolar struct_solar
 ) {
     /*
-     *  Method to add Solar asset to the Model
+     *  Method to add Nondispatchable <-- Solar asset to the Model
      */
     
     Nondispatchable* nondisp_ptr = new Solar(
         struct_nondisp,
-        struct_solar
+        struct_solar,
+        this->n_timesteps
     );
     
     this->_addNondispatchable(nondisp_ptr);
@@ -1172,12 +1265,13 @@ void Model :: addTidal(
     structTidal struct_tidal
 ) {
     /*
-     *  Method to add Tidal asset to the Model
+     *  Method to add Nondispatchable <-- Tidal asset to the Model
      */
     
     Nondispatchable* nondisp_ptr = new Tidal(
         struct_nondisp,
-        struct_tidal
+        struct_tidal,
+        this->n_timesteps
     );
     
     this->_addNondispatchable(nondisp_ptr);
@@ -1191,12 +1285,13 @@ void Model :: addWave(
     structWave struct_wave
 ) {
     /*
-     *  Method to add Wave asset to the Model
+     *  Method to add Nondispatchable <-- Wave asset to the Model
      */
     
     Nondispatchable* nondisp_ptr = new Wave(
         struct_nondisp,
-        struct_wave
+        struct_wave,
+        this->n_timesteps
     );
     
     this->_addNondispatchable(nondisp_ptr);
@@ -1210,12 +1305,13 @@ void Model :: addWind(
     structWind struct_wind
 ) {
     /*
-     *  Method to add Wind asset to the Model
+     *  Method to add Nondispatchable <-- Wind asset to the Model
      */
     
     Nondispatchable* nondisp_ptr = new Wind(
         struct_nondisp,
-        struct_wind
+        struct_wind,
+        this->n_timesteps
     );
     
     this->_addNondispatchable(nondisp_ptr);
@@ -1230,20 +1326,18 @@ void Model :: addDiesel(
     structDiesel struct_diesel
 ) {
     /*
-     *  Method to add Diesel asset to the Model
+     *  Method to add Dispatchable <-- Combustion <-- Diesel asset to
+     *  the Model
      */
     
     Combustion* combustion_ptr = new Diesel(
         struct_disp,
         struct_combustion,
-        struct_diesel
+        struct_diesel,
+        this->n_timesteps
     );
     
-    //combustion_ptr->n_timesteps = this->n_timesteps;
-    
-    //...
-    
-    this->combustion_ptr_vec.push_back(combustion_ptr);
+    this->_addCombustion(combustion_ptr);
     
     return;
 }
@@ -1254,18 +1348,15 @@ void Model :: addHydro(
     structHydro struct_hydro
 ) {
     /*
-     *  Method to add Hydro asset to the Model
+     *  Method to add Dispatchable <-- Hydro asset to the Model
      */
-    Dispatchable* disp_ptr = new Hydro(
+    Dispatchable* noncombustion_ptr = new Hydro(
         struct_disp,
-        struct_hydro
+        struct_hydro,
+        this->n_timesteps
     );
     
-    //disp_ptr->n_timesteps = this->n_timesteps;
-    
-    //...
-    
-    this->noncombustion_ptr_vec.push_back(disp_ptr);
+    this->_addNonCombustion(noncombustion_ptr);
     
     return;
 }
@@ -1277,7 +1368,8 @@ void Model :: addLiIon(
     structLiIon struct_liion
 ) {
     /*
-     *  Method to add LiIon asset to the Model
+     *  Method to add Storage <-- BatteryStorage <-- LiIon asset to the
+     *  Model
      */
     
     Storage* storage_ptr = new LiIon(
@@ -1368,13 +1460,11 @@ void Model :: writeResults(std::string write_path) {
             std::filesystem::create_directory(
                 _write_path + "Combustion/" +
                 std::to_string(int(combustion_ptr->struct_disp.cap_kW)) +
-                "kW_" + combustion_ptr->struct_disp.disp_type_str +
+                "kW_" + combustion_ptr->disp_type_str +
                 "_" + std::to_string(i) + "/"
             );
             
-            combustion_ptr->writeResults(
-                _write_path, &(this->time_vec_hr), i
-            );
+            combustion_ptr->writeResults(_write_path, i);
         }
         
     }
@@ -1390,13 +1480,11 @@ void Model :: writeResults(std::string write_path) {
             std::filesystem::create_directory(
                 _write_path + "non-Combustion/" +
                 std::to_string(int(noncombustion_ptr->struct_disp.cap_kW)) +
-                "kW_" + noncombustion_ptr->struct_disp.disp_type_str +
+                "kW_" + noncombustion_ptr->disp_type_str +
                 "_" + std::to_string(i) + "/"
             );
             
-            noncombustion_ptr->writeResults(
-                _write_path, &(this->time_vec_hr), i
-            );
+            noncombustion_ptr->writeResults(_write_path, i);
         }
     }
     

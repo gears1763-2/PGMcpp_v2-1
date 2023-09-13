@@ -480,6 +480,26 @@ try {
     testFloatEquals(
         test_model.nondisp_ptr_vec[
             test_model.nondisp_ptr_vec.size() - 1
+        ]->struct_nondisp.nominal_inflation_rate_annual,
+        test_model.struct_model.nominal_inflation_rate_annual,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
+        ]->struct_nondisp.nominal_discount_rate_annual,
+        test_model.struct_model.nominal_discount_rate_annual,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.nondisp_ptr_vec[
+            test_model.nondisp_ptr_vec.size() - 1
         ]->real_discount_rate_annual,
         test_model.real_discount_rate_annual,
         FLOAT_TOLERANCE,
@@ -646,7 +666,7 @@ try {
     testFloatEquals(
         test_model.combustion_ptr_vec[
             test_model.combustion_ptr_vec.size() - 1
-        ]->struct_disp.n_timesteps,
+        ]->n_timesteps,
         test_model.n_timesteps,
         FLOAT_TOLERANCE,
         __FILE__,
@@ -656,9 +676,67 @@ try {
     testFloatEquals(
         test_model.combustion_ptr_vec[
             test_model.combustion_ptr_vec.size() - 1
-        ]->struct_disp.disp_type,
+        ]->disp_type,
         DIESEL,
         FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.combustion_ptr_vec[
+            test_model.combustion_ptr_vec.size() - 1
+        ]->project_life_yrs,
+        test_model.project_life_yrs,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.combustion_ptr_vec[
+            test_model.combustion_ptr_vec.size() - 1
+        ]->struct_disp.nominal_inflation_rate_annual,
+        test_model.struct_model.nominal_inflation_rate_annual,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.combustion_ptr_vec[
+            test_model.combustion_ptr_vec.size() - 1
+        ]->struct_disp.nominal_discount_rate_annual,
+        test_model.struct_model.nominal_discount_rate_annual,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.combustion_ptr_vec[
+            test_model.combustion_ptr_vec.size() - 1
+        ]->real_discount_rate_annual,
+        test_model.real_discount_rate_annual,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testTruth(
+        test_model.combustion_ptr_vec[
+            test_model.combustion_ptr_vec.size() - 1
+        ]->ptr_2_dt_vec_hr ==
+        &(test_model.dt_vec_hr),
+        __FILE__,
+        __LINE__
+    );
+    
+    testTruth(
+        test_model.combustion_ptr_vec[
+            test_model.combustion_ptr_vec.size() - 1
+        ]->ptr_2_time_vec_hr ==
+        &(test_model.time_vec_hr),
         __FILE__,
         __LINE__
     );
@@ -683,7 +761,7 @@ try {
     testFloatEquals(
         test_model.noncombustion_ptr_vec[
             test_model.noncombustion_ptr_vec.size() - 1
-        ]->struct_disp.n_timesteps,
+        ]->n_timesteps,
         test_model.n_timesteps,
         FLOAT_TOLERANCE,
         __FILE__,
@@ -693,9 +771,67 @@ try {
     testFloatEquals(
         test_model.noncombustion_ptr_vec[
             test_model.noncombustion_ptr_vec.size() - 1
-        ]->struct_disp.disp_type,
+        ]->disp_type,
         HYDRO,
         FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.noncombustion_ptr_vec[
+            test_model.noncombustion_ptr_vec.size() - 1
+        ]->project_life_yrs,
+        test_model.project_life_yrs,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.noncombustion_ptr_vec[
+            test_model.noncombustion_ptr_vec.size() - 1
+        ]->struct_disp.nominal_inflation_rate_annual,
+        test_model.struct_model.nominal_inflation_rate_annual,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.noncombustion_ptr_vec[
+            test_model.noncombustion_ptr_vec.size() - 1
+        ]->struct_disp.nominal_discount_rate_annual,
+        test_model.struct_model.nominal_discount_rate_annual,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_model.noncombustion_ptr_vec[
+            test_model.noncombustion_ptr_vec.size() - 1
+        ]->real_discount_rate_annual,
+        test_model.real_discount_rate_annual,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testTruth(
+        test_model.noncombustion_ptr_vec[
+            test_model.noncombustion_ptr_vec.size() - 1
+        ]->ptr_2_dt_vec_hr ==
+        &(test_model.dt_vec_hr),
+        __FILE__,
+        __LINE__
+    );
+    
+    testTruth(
+        test_model.noncombustion_ptr_vec[
+            test_model.noncombustion_ptr_vec.size() - 1
+        ]->ptr_2_time_vec_hr ==
+        &(test_model.time_vec_hr),
         __FILE__,
         __LINE__
     );
