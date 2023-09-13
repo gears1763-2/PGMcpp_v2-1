@@ -15,7 +15,12 @@ try {
     
     structLiIon struct_liion;
     
-    LiIon test_Liion(struct_storage, struct_battery_storage, struct_liion);
+    LiIon test_Liion(
+        struct_storage,
+        struct_battery_storage,
+        struct_liion,
+        16
+    );
     
     
     //...

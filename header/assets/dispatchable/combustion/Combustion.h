@@ -29,6 +29,7 @@ struct structCombustion {
     FuelMode fuel_mode = LINEAR;
     
     double fuel_cost_L = 1.50;
+    double nominal_fuel_escalation_rate_annual = 0.05;
     
     /*
      *  LINEAR fuel consumption parameters
@@ -72,7 +73,7 @@ class Combustion : public Dispatchable {
         FuelType fuel_type = FUEL_DIESEL;
         structCombustion struct_combustion;
         
-        double real_fuel_discount_rate_annual = -1;
+        double real_fuel_discount_rate_annual = 0;
         double total_fuel_consumed_L = 0;
         
         double total_CO2_emitted_kg = 0;

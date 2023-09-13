@@ -13,8 +13,6 @@
 
 
 struct structLiIon {
-    double init_cap_kWh = 1000;
-    double SOH = 1;     // SOH = state of health
     double replace_SOH = 0.8;
     
     // degradation parameters
@@ -38,10 +36,12 @@ class LiIon : public BatteryStorage {
         //  1. attributes
         structLiIon struct_liion;
         
+        double SOH = 1;     // SOH = state of health
+        
         std::vector<double> SOH_vec;
         
         //  2. methods
-        LiIon(structStorage, structBatteryStorage, structLiIon);
+        LiIon(structStorage, structBatteryStorage, structLiIon, int);
         
         void _writeTimeSeriesResults(std::string, std::vector<double>*, int);
         void _writeSummary(std::string, int);

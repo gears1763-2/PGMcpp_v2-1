@@ -12,20 +12,19 @@
 LiIon :: LiIon(
     structStorage struct_storage,
     structBatteryStorage struct_battery_storage,
-    structLiIon struct_liion
-) : BatteryStorage(struct_storage, struct_battery_storage) {
+    structLiIon struct_liion,
+    int n_timesteps
+) : BatteryStorage(struct_storage, struct_battery_storage, n_timesteps) {
     /*
      *  LiIon class constructor
      */
     
-    this->struct_storage.storage_type = LIION;
-    this->struct_storage.storage_type_str = "LIION";
+    this->storage_type = LIION;
+    this->storage_type_str = "LIION";
     this->struct_liion = struct_liion;
     
-    this->struct_liion.init_cap_kWh = this->struct_storage.cap_kWh;
-    
-    this->SOH_vec.resize(this->struct_storage.n_timesteps, 0);
-    this->SOH_vec[0] = this->struct_liion.SOH;
+    this->SOH_vec.resize(this->n_timesteps, 0);
+    this->SOH_vec[0] = this->SOH;
     
     //  init economic attributes
     /*
@@ -71,14 +70,14 @@ void LiIon :: _writeTimeSeriesResults(
     std::string filename = "Storage/" +
         std::to_string(int(this->struct_storage.cap_kW)) +
         "kW_" +
-        std::to_string(int(this->struct_liion.init_cap_kWh)) +
+        std::to_string(int(this->struct_storage.cap_kWh)) +
         "kWh_" +
-        this->struct_storage.storage_type_str +
+        this->storage_type_str +
         "_" + std::to_string(asset_idx) + "/" +
         std::to_string(int(this->struct_storage.cap_kW)) +
         "kW_" +
-        std::to_string(int(this->struct_liion.init_cap_kWh)) +
-        "kWh_" + this->struct_storage.storage_type_str +
+        std::to_string(int(this->struct_storage.cap_kWh)) +
+        "kWh_" + this->storage_type_str +
         "_" + std::to_string(asset_idx) +
         "_results.csv";
     
@@ -99,7 +98,7 @@ void LiIon :: _writeTimeSeriesResults(
         << "\n";
     
     // write file body
-    for (int i = 0; i < this->struct_storage.n_timesteps; i++) {
+    for (int i = 0; i < this->n_timesteps; i++) {
         ofs << std::to_string(ptr_2_time_vec_hr->at(i)) << ","
             << std::to_string(this->charging_vec_kW[i]) << ","
             << std::to_string(this->discharging_vec_kW[i]) << ","
@@ -127,14 +126,14 @@ void LiIon :: _writeSummary(std::string _write_path, int asset_idx) {
     std::string filename = "Storage/" +
         std::to_string(int(this->struct_storage.cap_kW)) +
         "kW_" +
-        std::to_string(int(this->struct_liion.init_cap_kWh)) +
+        std::to_string(int(this->struct_storage.cap_kWh)) +
         "kWh_" +
-        this->struct_storage.storage_type_str +
+        this->storage_type_str +
         "_" + std::to_string(asset_idx) + "/" +
         std::to_string(int(this->struct_storage.cap_kW)) +
         "kW_" +
-        std::to_string(int(this->struct_liion.init_cap_kWh)) +
-        "kWh_" + this->struct_storage.storage_type_str +
+        std::to_string(int(this->struct_storage.cap_kWh)) +
+        "kWh_" + this->storage_type_str +
         "_" + std::to_string(asset_idx) +
         "_summary.txt";
     
@@ -144,7 +143,7 @@ void LiIon :: _writeSummary(std::string _write_path, int asset_idx) {
     
     // write attributes
     ofs << this->struct_storage.cap_kW << " kW, " << 
-        this->struct_liion.init_cap_kWh << " kWh LiIon Summary\n\n";
+        this->struct_storage.cap_kWh << " kWh LiIon Summary\n\n";
     ofs << "Attributes:\n\n";
     
     ofs << "\tcapital cost: " << this->struct_storage.capital_cost <<
@@ -152,13 +151,13 @@ void LiIon :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs << "\toperation and maintenance cost (per kWh produced): " <<
         this->struct_storage.op_maint_cost_per_kWh << "\n";
     ofs << "\treal discount rate (annual): " <<
-        this->struct_storage.real_discount_rate_annual << "\n";
+        this->real_discount_rate_annual << "\n";
     
     // write results
     ofs << "\nResults:\n\n";
     
     ofs << "\tnumber of replacements: " <<
-        this->struct_storage.n_replacements << "\n";
+        this->n_replacements << "\n";
     
     ofs.close();
     
@@ -172,10 +171,10 @@ double LiIon :: _getdSOHdt(double power_kW) {
      */
     
     // compute SOC and C-rate
-    double SOC = this->struct_storage.charge_kWh /
-        this->struct_liion.init_cap_kWh;
+    double SOC = this->charge_kWh /
+        this->struct_storage.cap_kWh;
     
-    double C_rate = power_kW / this->struct_liion.init_cap_kWh;
+    double C_rate = power_kW / this->struct_storage.cap_kWh;
     
     // build up dSOH_dt in steps
     double dSOH_dt = this->struct_liion.degr_Ea_cal_0;
@@ -190,7 +189,7 @@ double LiIon :: _getdSOHdt(double power_kW) {
     dSOH_dt *= 1 + this->struct_liion.degr_alpha * pow(
         C_rate, this->struct_liion.degr_beta
     );
-    dSOH_dt /= 2 * this->struct_liion.SOH;
+    dSOH_dt /= 2 * this->SOH;
     
     return dSOH_dt;
 }
@@ -210,22 +209,18 @@ void LiIon :: _handleDegradation(
     
     // update SOH
     double dSOH_dt = this->_getdSOHdt(power_kW);
-    this->struct_liion.SOH -= dSOH_dt * dt_hrs;
-    this->SOH_vec[timestep] = this->struct_liion.SOH;
+    this->SOH -= dSOH_dt * dt_hrs;
+    this->SOH_vec[timestep] = this->SOH;
     
     // update energy capacity and charge accordingly
-    this->struct_storage.cap_kWh = this->struct_liion.SOH * 
-        this->struct_liion.init_cap_kWh;
+    this->cap_kWh = this->SOH * this->cap_kWh;
         
-    if (
-        this->struct_storage.charge_kWh >=
-        this->struct_storage.cap_kWh
-    ) {
-        this->struct_storage.charge_kWh = this->struct_storage.cap_kWh;
+    if (this->charge_kWh >= this->cap_kWh) {
+        this->charge_kWh = this->cap_kWh;
     }
     
     // trigger replacement, if necessary
-    if (this->struct_liion.SOH <= this->struct_liion.replace_SOH) {
+    if (this->SOH <= this->struct_liion.replace_SOH) {
         this->_handleReplacement(timestep, t_hrs);
     }
     
@@ -239,13 +234,13 @@ void LiIon :: _handleReplacement(int timestep, double t_hrs) {
      */
     
     // reset attributes (replace with fresh LiIon system)
-    this->struct_storage.cap_kWh = this->struct_liion.init_cap_kWh;
+    this->cap_kWh = this->struct_storage.cap_kWh;
     
-    this->struct_storage.charge_kWh =
+    this->charge_kWh =
         this->struct_battery_storage.init_SOC *
         this->struct_storage.cap_kWh;
         
-    this->struct_liion.SOH = 1;
+    this->SOH = 1;
     
     // incur capital cost
     /*
@@ -253,7 +248,7 @@ void LiIon :: _handleReplacement(int timestep, double t_hrs) {
      *  ref: https://www.homerenergy.com/products/pro/docs/latest/present_value.html
      */
     double real_discount_scalar = 1.0 / pow(
-        1 + this->struct_storage.real_discount_rate_annual,
+        1 + this->real_discount_rate_annual,
         t_hrs / 8760
     );
     
@@ -261,7 +256,7 @@ void LiIon :: _handleReplacement(int timestep, double t_hrs) {
         this->struct_storage.capital_cost;
     
     // record replacements
-    this->struct_storage.n_replacements++;
+    this->n_replacements++;
     this->replaced_vec[timestep] = true;
     
     return;

@@ -51,8 +51,7 @@ class Dispatchable {
         double running_hrs = 0;
         double total_dispatch_kWh = 0;
         
-        double real_discount_rate_annual = -1;
-        
+        double real_discount_rate_annual = 0;
         double net_present_cost = 0;
         double levellized_cost_of_energy_per_kWh = 0;
         

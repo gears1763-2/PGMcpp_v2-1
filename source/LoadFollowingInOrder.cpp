@@ -60,10 +60,10 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
         Storage* storage_ptr = this->storage_ptr_vec[i];
         
-        storage_ptr->struct_storage.acceptable_kW =
+        storage_ptr->acceptable_kW =
             storage_ptr->getAcceptablekW(dt_hrs);
         
-        storage_ptr->struct_storage.charging_kW = 0;
+        storage_ptr->charging_kW = 0;
     }
     
     // for all combustion assets, attempt to charge from curtailment,
@@ -85,14 +85,14 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
                 combustion_ptr->curtailment_vec_kW[timestep];
             
             double increment_kW =
-                storage_ptr->struct_storage.acceptable_kW - 
-                storage_ptr->struct_storage.charging_kW;
+                storage_ptr->acceptable_kW - 
+                storage_ptr->charging_kW;
             
             if (curtailment_kW <= increment_kW) {
                 increment_kW = curtailment_kW;
             }
             
-            storage_ptr->struct_storage.charging_kW += increment_kW;
+            storage_ptr->charging_kW += increment_kW;
             combustion_ptr->curtailment_vec_kW[timestep] -= increment_kW;
             combustion_ptr->storage_vec_kW[timestep] += increment_kW;
         }
@@ -117,14 +117,14 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
                 noncombustion_ptr->curtailment_vec_kW[timestep];
             
             double increment_kW =
-                storage_ptr->struct_storage.acceptable_kW - 
-                storage_ptr->struct_storage.charging_kW;
+                storage_ptr->acceptable_kW - 
+                storage_ptr->charging_kW;
             
             if (curtailment_kW <= increment_kW) {
                 increment_kW = curtailment_kW;
             }
             
-            storage_ptr->struct_storage.charging_kW += increment_kW;
+            storage_ptr->charging_kW += increment_kW;
             noncombustion_ptr->curtailment_vec_kW[timestep] -= increment_kW;
             noncombustion_ptr->storage_vec_kW[timestep] += increment_kW;
         }
@@ -149,14 +149,14 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
                 nondisp_ptr->curtailment_vec_kW[timestep];
             
             double increment_kW =
-                storage_ptr->struct_storage.acceptable_kW - 
-                storage_ptr->struct_storage.charging_kW;
+                storage_ptr->acceptable_kW - 
+                storage_ptr->charging_kW;
             
             if (curtailment_kW <= increment_kW) {
                 increment_kW = curtailment_kW;
             }
             
-            storage_ptr->struct_storage.charging_kW += increment_kW;
+            storage_ptr->charging_kW += increment_kW;
             nondisp_ptr->curtailment_vec_kW[timestep] -= increment_kW;
             nondisp_ptr->storage_vec_kW[timestep] += increment_kW;
         }
@@ -166,7 +166,7 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
         Storage* storage_ptr = this->storage_ptr_vec[i];
         
-        double charging_kW = storage_ptr->struct_storage.charging_kW;
+        double charging_kW = storage_ptr->charging_kW;
         
         storage_ptr->commitChargekW(charging_kW, dt_hrs, t_hrs, timestep);
     }

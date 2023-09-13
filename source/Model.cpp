@@ -429,6 +429,30 @@ void Model :: _addCombustion(Combustion* combustion_ptr) {
             this->real_discount_rate_annual;
     }
     
+    //  set asset real fuel discount rate
+    if (
+        combustion_ptr->struct_combustion.nominal_fuel_escalation_rate_annual !=
+        this->struct_model.nominal_inflation_rate_annual ||
+        combustion_ptr->struct_disp.nominal_discount_rate_annual !=
+        this->struct_model.nominal_discount_rate_annual
+    ) {
+        /*
+         *
+         *  ref: https://www.homerenergy.com/products/pro/docs/3.11/real_discount_rate.html
+         */
+        combustion_ptr->real_fuel_discount_rate_annual =
+            (
+                combustion_ptr->struct_disp.nominal_discount_rate_annual - 
+                combustion_ptr->struct_combustion.nominal_fuel_escalation_rate_annual
+            ) / 
+            (1 + combustion_ptr->struct_disp.nominal_inflation_rate_annual);
+    }
+    
+    else {
+        combustion_ptr->real_fuel_discount_rate_annual =
+                this->real_discount_rate_annual;
+    }
+    
     // set pointers to Model vectors
     combustion_ptr->ptr_2_dt_vec_hr = &(this->dt_vec_hr);
     combustion_ptr->ptr_2_time_vec_hr = &(this->time_vec_hr);
@@ -446,7 +470,39 @@ void Model :: _addStorage(Storage* storage_ptr) {
      *  Helper method to add Storage asset to the Model
      */
     
-    //...
+    // set project life attribute
+    storage_ptr->project_life_yrs = this->project_life_yrs;
+    
+    //  set asset real discount rate
+    if (
+        storage_ptr->struct_storage.nominal_inflation_rate_annual !=
+        this->struct_model.nominal_inflation_rate_annual ||
+        storage_ptr->struct_storage.nominal_discount_rate_annual !=
+        this->struct_model.nominal_discount_rate_annual
+    ) {
+        /*
+         *
+         *  ref: https://www.homerenergy.com/products/pro/docs/3.11/real_discount_rate.html
+         */
+        storage_ptr->real_discount_rate_annual =
+            (
+                storage_ptr->struct_storage.nominal_discount_rate_annual - 
+                storage_ptr->struct_storage.nominal_inflation_rate_annual
+            ) / 
+            (1 + storage_ptr->struct_storage.nominal_inflation_rate_annual);
+    }
+    
+    else {
+        storage_ptr->real_discount_rate_annual =
+            this->real_discount_rate_annual;
+    }
+    
+    // set pointers to Model vectors
+    storage_ptr->ptr_2_dt_vec_hr = &(this->dt_vec_hr);
+    storage_ptr->ptr_2_time_vec_hr = &(this->time_vec_hr);
+    
+    // push back
+    this->storage_ptr_vec.push_back(storage_ptr);
     
     return;
 }
@@ -704,7 +760,7 @@ void Model :: _computeEconomics(void) {
         Storage* storage_ptr = this->storage_ptr_vec[i];
         
         this->net_present_cost +=
-            storage_ptr->struct_storage.net_present_cost;
+            storage_ptr->net_present_cost;
     }
     
     
@@ -802,25 +858,10 @@ void Model :: _writeDispatchResults(std::string _write_path) {
         Storage* storage_ptr = this->storage_ptr_vec[i];
         
         std::string type_str =
-            storage_ptr->struct_storage.storage_type_str;
+            storage_ptr->storage_type_str;
             
         double cap_kW = storage_ptr->struct_storage.cap_kW;
-        double cap_kWh = 0;
-        
-        switch (storage_ptr->struct_storage.storage_type) {
-            case (LIION): {
-                cap_kWh =
-                    ((LiIon*)storage_ptr)->struct_liion.init_cap_kWh;
-                    
-                break;
-            }
-            
-            default: {
-                cap_kWh = storage_ptr->struct_storage.cap_kWh;
-                
-                break;
-            }
-        }
+        double cap_kWh = storage_ptr->struct_storage.cap_kWh;
         
         ofs << "(" << cap_kW << " kW " << cap_kWh << " kWh) " <<
             type_str << " Discharge (over time step) [kW],";
@@ -1375,14 +1416,11 @@ void Model :: addLiIon(
     Storage* storage_ptr = new LiIon(
         struct_storage,
         struct_battery_storage,
-        struct_liion
+        struct_liion,
+        this->n_timesteps
     );
     
-    //storage_ptr->n_timesteps = this->n_timesteps;
-    
-    //...
-    
-    this->storage_ptr_vec.push_back(storage_ptr);
+    this->_addStorage(storage_ptr);
     
     return;
 }
@@ -1517,33 +1555,8 @@ void Model :: writeResults(std::string write_path) {
             
             std::string file_path = _write_path + "Storage/" +
                 std::to_string(int(storage_ptr->struct_storage.cap_kW)) +
-                "kW_";
-            
-            switch (storage_ptr->struct_storage.storage_type) {
-                case (LIION): {
-                    file_path +=
-                        std::to_string(
-                            int(
-                                ((LiIon*)storage_ptr)->struct_liion.init_cap_kWh
-                            )
-                        ) +
-                        "kWh_";
-                    
-                    break;
-                }
-                
-                default: {
-                    file_path +=
-                        std::to_string(
-                            int(storage_ptr->struct_storage.cap_kWh)
-                        ) +
-                        "kWh_";
-                    
-                    break;
-                }
-            }
-            
-            file_path += storage_ptr->struct_storage.storage_type_str +
+                "kW_" + std::to_string(int(storage_ptr->struct_storage.cap_kWh)) +
+                "kWh_" + storage_ptr->storage_type_str +
                 "_" + std::to_string(i) + "/";
             
             std::filesystem::create_directory(file_path);

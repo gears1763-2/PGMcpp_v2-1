@@ -10,23 +10,24 @@
 
 BatteryStorage :: BatteryStorage(
     structStorage struct_storage,
-    structBatteryStorage struct_battery_storage
-) : Storage(struct_storage) {
+    structBatteryStorage struct_battery_storage,
+    int n_timesteps
+) : Storage(struct_storage, n_timesteps) {
     /*
      *  BatteryStorage class constructor
      */
     
     this->struct_battery_storage = struct_battery_storage;
 
-    this->struct_storage.charge_kWh =
+    this->charge_kWh =
         this->struct_battery_storage.init_SOC *
         this->struct_storage.cap_kWh;
         
-    this->struct_storage.min_charge_kWh =
+    this->min_charge_kWh =
         this->struct_battery_storage.min_SOC *
         this->struct_storage.cap_kWh;
         
-    this->struct_storage.max_charge_kWh =
+    this->max_charge_kWh =
         this->struct_battery_storage.max_SOC *
         this->struct_storage.cap_kWh;
     
@@ -45,8 +46,8 @@ double BatteryStorage :: getAvailablekW(double dt_hrs) {
      */
     
     // compute available energy
-    double available_kWh = this->struct_storage.charge_kWh -
-        this->struct_storage.min_charge_kWh;
+    double available_kWh = this->charge_kWh -
+        this->min_charge_kWh;
     
     if (available_kWh <= 0) {
         return 0;
@@ -72,8 +73,8 @@ double BatteryStorage :: getAcceptablekW(double dt_hrs) {
      */
     
     // compute acceptable energy
-    double acceptable_kWh = this->struct_storage.max_charge_kWh - 
-        this->struct_storage.charge_kWh;
+    double acceptable_kWh = this->max_charge_kWh - 
+        this->charge_kWh;
     
     if (acceptable_kWh <= 0) {
         return 0;
@@ -113,7 +114,7 @@ void BatteryStorage :: commitChargekW(
          *  ref: https://www.homerenergy.com/products/pro/docs/latest/present_value.html
          */
         double real_discount_scalar = 1.0 / pow(
-            1 + this->struct_storage.real_discount_rate_annual,
+            1 + this->real_discount_rate_annual,
             t_hrs / 8760
         );
         
@@ -125,8 +126,8 @@ void BatteryStorage :: commitChargekW(
     }
     
     // update charge and record
-    this->struct_storage.charge_kWh += accepted_kWh;
-    this->charge_vec_kWh[timestep] = this->struct_storage.charge_kWh;
+    this->charge_kWh += accepted_kWh;
+    this->charge_vec_kWh[timestep] = this->charge_kWh;
     this->charging_vec_kW[timestep] = charging_kW;
     
     return;
@@ -154,7 +155,7 @@ void BatteryStorage :: commitDischargekW(
          *  ref: https://www.homerenergy.com/products/pro/docs/latest/present_value.html
          */
         double real_discount_scalar = 1.0 / pow(
-            1 + this->struct_storage.real_discount_rate_annual,
+            1 + this->real_discount_rate_annual,
             t_hrs / 8760
         );
         
@@ -166,8 +167,8 @@ void BatteryStorage :: commitDischargekW(
     }
     
     // update charge and record 
-    this->struct_storage.charge_kWh -= discharged_kWh;
-    this->charge_vec_kWh[timestep] = this->struct_storage.charge_kWh;
+    this->charge_kWh -= discharged_kWh;
+    this->charge_vec_kWh[timestep] = this->charge_kWh;
     this->discharging_vec_kW[timestep] = discharging_kW;
     
     return;

@@ -869,7 +869,7 @@ try {
     ]);
     
     testFloatEquals(
-        liion_ptr->struct_storage.n_timesteps,
+        liion_ptr->n_timesteps,
         test_model.n_timesteps,
         FLOAT_TOLERANCE,
         __FILE__,
@@ -877,7 +877,7 @@ try {
     );
     
     testFloatEquals(
-        liion_ptr->struct_storage.storage_type,
+        liion_ptr->storage_type,
         LIION,
         FLOAT_TOLERANCE,
         __FILE__,
