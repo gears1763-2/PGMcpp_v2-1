@@ -1,5 +1,16 @@
 /*
- *  Model class header file.
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Header file for Model class.
+ * 
+ *  This is the central container class for all other classes that make
+ *  up part of PGMcpp (see header/Model_includes.h).
  */
 
 

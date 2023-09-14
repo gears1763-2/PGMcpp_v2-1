@@ -1,5 +1,17 @@
 /*
- *  Dispatchable <-- Combustion <-- Diesel class header file
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Header file for the Diesel class, which is a child class of
+ *  Combustion.
+ * 
+ *  This class implements the dynamics of a standard, reciprocating
+ *  diesel generator unit.
  */
 
 

@@ -1,5 +1,17 @@
 /*
- *  Nondispatchable <-- Solar class header file
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Header file for the Solar class, which is a child class of
+ *  Dispatchable.
+ *
+ *  This class implements the dynamics of a solar photovoltaic (PV)
+ *  array.
  */
 
 

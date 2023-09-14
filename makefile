@@ -1,5 +1,5 @@
 #
-#   PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.0
+#   PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
 #
 #   Anthony Truelove MASc, P.Eng.
 #   email:  gears1763@tutanota.com
@@ -7,11 +7,16 @@
 #
 #   See license terms
 #
+#   Makefile for PGMcpp. Under normal use, the only thing the user
+#   should have to edit is PATH_2_PROJECT, which defines the path to the
+#   user's grid modelling project file. PATH_2_PROJECT is defined
+#   immediately below, under USER INPUT.
+#
 
 
 #### ---- USER INPUT ---- ####
 
-#...
+PATH_2_PROJECT = projects/example_project.cpp
 
 
 #### ---- COMPILER FLAGS ---- ####
@@ -19,8 +24,8 @@
 CXX = g++
 
 # -g is for gdb symbols
-CXXFLAGS = -O1 -std=c++17 -Wall -g
-#CXXFLAGS = -std=c++17 -Wall
+#CXXFLAGS = -O1 -std=c++17 -Wall -g
+CXXFLAGS = -O3 -std=c++17
 
 DEPS = -lpthread
 
@@ -218,6 +223,19 @@ $(OBJ_TEST): $(SRC_TEST)
 	$(CC) $(CFLAGS) -c $(SRC_TEST) -o $(OBJ_TEST) $(DEPS)
 
 
+## -------- Project -------- ##
+
+OBJ_PROJECT = object/project.o
+OUT_PROJECT = bin/project.out
+
+.PHONY: Project
+Project: $(OBJ_PROJECT)
+	$(CXX) $(CXXFLAGS) $(OBJ_PROJECT) $(OBJ_ALL) -o $(OUT_PROJECT) $(DEPS)
+
+$(OBJ_PROJECT): $(SRC_PROJECT)
+	$(CC) $(CFLAGS) -c $(PATH_2_PROJECT) -o $(OBJ_PROJECT) $(DEPS)
+
+
 #### ---- TARGETS ---- ####
 
 .PHONY: clean
@@ -225,12 +243,13 @@ clean:
 	rm -frv bin;
 	rm -frv core;
 	rm -frv object;
-	rm -frv data/output/example;
 	rm -frv data/output/test;
+	rm -frv data/output/example_project;
 
 
 .PHONY: all
 all:
+	make clean
 	mkdir -pv bin
 	mkdir -pv core
 	mkdir -pv object
@@ -242,8 +261,13 @@ all:
 	mkdir -pv object/assets/storage/batterystorage
 	mkdir -pv data/output
 	make $(MAKE_ALL) test
-
-
-.PHONY: run_test
-run_test:
 	./bin/test.out
+
+
+.PHONY: project
+project:
+	rm -frv $(OBJ_PROJECT)
+	rm -frv $(OUT_PROJECT)
+	make Project
+	./$(OUT_PROJECT)
+

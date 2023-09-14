@@ -1,5 +1,17 @@
 /*
- *  Storage <-- BatteryStorage class header file
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Header file for the BatteryStorage class, which is a child class of
+ *  Storage and the parent class to LiIon.
+ *
+ *  This class implements the general dynamics of (chemical) battery
+ *  storage assets.
  */
 
 

@@ -1,5 +1,18 @@
 /*
- *  Dispatchable <-- Combustion class implementation file
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Implementation file for the Combustion class, which is a child class
+ *  of Dispatchable and the parent class of Diesel.
+ * 
+ *  This class implements the general dynamics of combustion assets (
+ *  i.e., assets that burn some kind of fuel in order to dispatch
+ *  energy to the grid).
  */
 
 

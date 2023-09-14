@@ -1,5 +1,20 @@
 /*
- *  Dispatchable <-- Hydro class header file
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Header file for the Hydro class, which is a child class of
+ *  Dispatchable.
+ * 
+ *  This class implements the dynamics of a hydro electric asset, be it
+ *  with (i.e., traditional) or without (i.e., run-of-river) fluid
+ *  storage.
+ * 
+ *  WORK IN PROGRESS - NOT YET FULLY IMPLEMENTED
  */
 
 

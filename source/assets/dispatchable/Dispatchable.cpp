@@ -1,5 +1,14 @@
 /*
- *  Dispatchable class implementation file
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Implementation file for the Dispatchable class, which is the parent
+ *  class to Hydro and Combustion.
  */
 
 

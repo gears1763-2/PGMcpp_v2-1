@@ -1,5 +1,16 @@
 /*
- *  Model class implementation file
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Implementation file for Model class.
+ * 
+ *  This is the central container class for all other classes that make
+ *  up part of PGMcpp (see header/Model_includes.h).
  */
 
 
@@ -1000,6 +1011,10 @@ void Model :: _writeSummary(std::string _write_path) {
     ofs << "\ttimesteps: " << this->n_timesteps << "\n";
     ofs << "\tproject life: " << this->project_life_yrs
         << " yrs\n";
+    ofs << "\tnominal inflation rate (annual): " <<
+        this->struct_model.nominal_inflation_rate_annual << "\n";
+    ofs << "\tnominal discount rate (annual): " <<
+        this->struct_model.nominal_discount_rate_annual << "\n";
     ofs << "\treal discount rate (annual): " <<
         this->real_discount_rate_annual << "\n";
     ofs << "\tdispatch mode: " << this->struct_model.dispatch_mode
@@ -1028,7 +1043,7 @@ void Model :: _writeSummary(std::string _write_path) {
     // write resource map
     ofs << "\nResource Mapping:\n\n";
     
-    ofs << "1D Resources:\n\n";
+    ofs << "\t1D Resources:\n\n";
     if (not this->resource_path_map_1D.empty()) {
         std::map<int, std::string>::iterator itr;
         
@@ -1037,12 +1052,12 @@ void Model :: _writeSummary(std::string _write_path) {
             itr != this->resource_path_map_1D.end();
             itr++
         ) {
-            ofs << "\tresource key: " << itr->first << "  path: "
+            ofs << "\t\tresource key: " << itr->first << "  path: "
                 << itr->second << std::endl;
         }
     }
     
-    ofs << "\n2D Resources:\n\n";
+    ofs << "\n\t2D Resources:\n\n";
     if (not this->resource_path_map_2D.empty()) {
         std::map<int, std::string>::iterator itr;
         
@@ -1051,10 +1066,54 @@ void Model :: _writeSummary(std::string _write_path) {
             itr != this->resource_path_map_2D.end();
             itr++
         ) {
-            ofs << "\tresource key: " << itr->first << "  path: "
+            ofs << "\t\tresource key: " << itr->first << "  path: "
                 << itr->second << std::endl;
         }
     }
+    
+    // write assets
+    ofs << "\nAssets:\n\n";
+    
+    ofs << "\tCombustion (Dispatchable) assets:\n\n";
+    ofs << "\t\t{";
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        Combustion* combustion_ptr = this->combustion_ptr_vec[i];
+        
+        ofs << combustion_ptr->struct_disp.cap_kW << " kW " <<
+            combustion_ptr->disp_type_str << ", ";
+    }
+    ofs << "}\n\n";
+    
+    ofs << "\tnon-Combustion (Dispatchable) assets:\n\n";
+    ofs << "\t\t{";
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
+        
+        ofs << noncombustion_ptr->struct_disp.cap_kW << " kW " <<
+            noncombustion_ptr->disp_type_str << ", ";
+    }
+    ofs << "}\n\n";
+    
+    ofs << "\tNondispatchable assets:\n\n";
+    ofs << "\t\t{";
+    for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
+        Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[i];
+        
+        ofs << nondisp_ptr->struct_nondisp.cap_kW << " kW " <<
+            nondisp_ptr->nondisp_type_str << ", ";
+    }
+    ofs << "}\n\n";
+    
+    ofs << "\tStorage assets:\n\n";
+    ofs << "\t\t{";
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        Storage* storage_ptr = this->storage_ptr_vec[i];
+        
+        ofs << storage_ptr->struct_storage.cap_kW << " kW " <<
+            storage_ptr->struct_storage.cap_kWh << " kWh " <<
+            storage_ptr->storage_type_str << ", ";
+    }
+    ofs << "}\n";
     
     // write results
     ofs << "\nResults:\n\n";
@@ -1571,6 +1630,11 @@ void Model :: writeResults(std::string write_path) {
             storage_ptr->writeResults(_write_path, i);
         }
     }
+    
+    
+    // report to user where results were written
+    std::cout << "Results successfully written to " <<
+        _write_path << std::endl;
     
     return;
 }

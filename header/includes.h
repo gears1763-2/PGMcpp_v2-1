@@ -1,5 +1,14 @@
 /*
- *  Header file of standard and third party includes
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Header file of standard and third-party includes, as well as some
+ *  constants.
  */
 
 

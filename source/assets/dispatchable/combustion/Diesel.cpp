@@ -1,5 +1,17 @@
 /*
- *  Dispatchable <-- Combustion <-- Diesel class implementation file
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Implementation file for the Diesel class, which is a child class of
+ *  Combustion.
+ * 
+ *  This class implements the dynamics of a standard, reciprocating
+ *  diesel generator unit.
  */
 
 
@@ -101,6 +113,8 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs << this->struct_disp.cap_kW << " kW Diesel Summary\n\n";
     ofs << "Attributes:\n\n";
     
+    ofs << "\tsunk cost: " << std::boolalpha <<
+        this->struct_disp.is_sunk << std::noboolalpha << "\n";
     ofs << "\treplacement running hours: " << this->struct_disp.replace_running_hrs
         << " hrs\n";
     ofs << "\tminimum load ratio: " << this->struct_diesel.minimum_load_ratio
@@ -144,14 +158,34 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
         this->struct_disp.op_maint_cost_per_kWh << "\n";
     ofs << "\tfuel cost (per L): " <<
         this->struct_combustion.fuel_cost_L << "\n";
+    ofs << "\tnominal inflation rate (annual): " <<
+        this->struct_disp.nominal_inflation_rate_annual << "\n";
+    ofs << "\tnominal discount rate (annual): " <<
+        this->struct_disp.nominal_discount_rate_annual << "\n";
     ofs << "\treal discount rate (annual): " <<
         this->real_discount_rate_annual << "\n";
+    ofs << "\tnominal fuel escalation rate (annual): " <<
+        this->struct_combustion.nominal_fuel_escalation_rate_annual <<
+        "\n";
     ofs << "\treal fuel discount rate (annual): " <<
         this->real_fuel_discount_rate_annual << "\n";
+    ofs << "\tCO2 emissions rate (kg/L fuel consumed): " <<
+        this->struct_combustion.diesel_CO2_kgL << "\n";
+    ofs << "\tCO emissions rate (kg/L fuel consumed): " <<
+        this->struct_combustion.diesel_CO_kgL << "\n";
+    ofs << "\tNOx emissions rate (kg/L fuel consumed): " <<
+        this->struct_combustion.diesel_NOx_kgL << "\n";
+    ofs << "\tSOx emissions rate (kg/L fuel consumed): " <<
+        this->struct_combustion.diesel_SOx_kgL << "\n";
+    ofs << "\tCH4 emissions rate (kg/L fuel consumed): " <<
+        this->struct_combustion.diesel_CH4_kgL << "\n";
+    ofs << "\tparticulate matter emissions rate (kg/L fuel consumed): " <<
+        this->struct_combustion.diesel_PM_kgL << "\n";
     
     // write results
     ofs << "\nResults:\n\n";
     
+    ofs << "\tproject life: " << this->project_life_yrs << " yrs\n";
     ofs << "\trunning hours: " << this->running_hrs
         << " hrs\n";
     ofs << "\tnumber of starts: " << this->n_starts

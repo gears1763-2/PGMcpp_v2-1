@@ -1,5 +1,14 @@
 /*
- *  Implementation file for LOAD_FOLLOWING_IN_ORDER dispatch control
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Implementation file for the LOAD_FOLLOWING_IN_ORDER dispatch control
+ *  mode.
  */
 
 void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
