@@ -148,18 +148,53 @@ void LiIon :: _writeSummary(std::string _write_path, int asset_idx) {
         this->struct_storage.cap_kWh << " kWh LiIon Summary\n\n";
     ofs << "Attributes:\n\n";
     
-    ofs << "\treplacement SOH: " << this->struct_liion.replace_SOH <<
-        "\n";
+    ofs << "\tsunk cost: " << std::boolalpha <<
+        this->struct_storage.is_sunk << std::noboolalpha << "\n";
+    ofs << "\tinitial state of charge: " <<
+        this->struct_battery_storage.init_SOC << "\n";
+    ofs << "\tminimum state of charge: " <<
+        this->struct_battery_storage.min_SOC << "\n";
+    ofs << "\tmaximum state of charge: " <<
+        this->struct_battery_storage.max_SOC << "\n";
+    ofs << "\tcharging efficiency: " <<
+        this->struct_battery_storage.charge_efficiency << "\n";
+    ofs << "\tdischarging efficiency: " <<
+        this->struct_battery_storage.discharge_efficiency << "\n";
+    ofs << "\treplacement state of health: " <<
+        this->struct_liion.replace_SOH << "\n";
     ofs << "\tcapital cost: " << this->struct_storage.capital_cost <<
         "\n";
-    ofs << "\toperation and maintenance cost (per kWh charge/discharge): "
+    ofs << "\toperation and maintenance cost (per kWh charged/discharged): "
         << this->struct_storage.op_maint_cost_per_kWh << "\n";
+    ofs << "\tnominal inflation rate (annual): " <<
+        this->struct_storage.nominal_inflation_rate_annual << "\n";
+    ofs << "\tnominal discount rate (annual): " <<
+        this->struct_storage.nominal_discount_rate_annual << "\n";
     ofs << "\treal discount rate (annual): " <<
         this->real_discount_rate_annual << "\n";
+    
+    // write degradation parameters
+    ofs << "\nDegradation Parameters:\n\n";
+    
+    ofs << "\toperating temperature: " <<
+        this->struct_liion.temperature_K << " K\n";
+    ofs << "\tgas constant: " <<
+        this->struct_liion.gas_constant_JmolK << " J/mol.k\n\n";
+    
+    ofs << "\talpha = " << this->struct_liion.degr_alpha << "\n";
+    ofs << "\tbeta = " << this->struct_liion.degr_beta << "\n";
+    ofs << "\tB_hat_cal(0) = " <<
+        this->struct_liion.degr_B_hat_cal_0 << " 1/sqrt(hr)\n";
+    ofs << "\tr_cal = " << this->struct_liion.degr_r_cal << "\n";
+    ofs << "\tEa_cal(0) = " <<
+        this->struct_liion.degr_Ea_cal_0 << " J/mol\n";
+    ofs << "\ta_cal = " << this->struct_liion.degr_a_cal << " J/mol\n";
+    ofs << "\ts_cal = " << this->struct_liion.degr_s_cal << "\n";
     
     // write results
     ofs << "\nResults:\n\n";
     
+    ofs << "\tproject life: " << this->project_life_yrs << " yrs\n";
     ofs << "\tnumber of replacements: " <<
         this->n_replacements << "\n";
     ofs << "\ttotal throughput (over project life): " <<
@@ -177,6 +212,8 @@ void LiIon :: _writeSummary(std::string _write_path, int asset_idx) {
 double LiIon :: _getdSOHdt(double power_kW) {
     /*
      *  Helper method to compute and return dSOH_dt
+     *
+     *  ref: [point to battery degradation modelling document]
      */
     
     // compute SOC and C-rate

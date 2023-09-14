@@ -157,6 +157,8 @@ void Wave :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs << this->struct_nondisp.cap_kW << " kW Wave Summary\n\n";
     ofs << "Attributes:\n\n";
     
+    ofs << "\tsunk cost: " << std::boolalpha <<
+        this->struct_nondisp.is_sunk << std::noboolalpha << "\n";
     ofs << "\t2D resource key: " << this->struct_wave.resource_key
         << "\n";
     ofs << "\treplacement running hours: " << this->struct_nondisp.replace_running_hrs
@@ -201,12 +203,17 @@ void Wave :: _writeSummary(std::string _write_path, int asset_idx) {
         "\n";
     ofs << "\toperation and maintenance cost (per kWh produced): " <<
         this->struct_nondisp.op_maint_cost_per_kWh << "\n";
+    ofs << "\tnominal inflation rate (annual): " <<
+        this->struct_nondisp.nominal_inflation_rate_annual << "\n";
+    ofs << "\tnominal discount rate (annual): " <<
+        this->struct_nondisp.nominal_discount_rate_annual << "\n";
     ofs << "\treal discount rate (annual): " <<
         this->real_discount_rate_annual << "\n";
     
     // write results
     ofs << "\nResults:\n\n";
     
+    ofs << "\tproject life: " << this->project_life_yrs << " yrs\n";
     ofs << "\trunning hours: " << this->running_hrs
         << " hrs\n";
     ofs << "\tnumber of replacements: " << this->n_replacements

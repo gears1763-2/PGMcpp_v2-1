@@ -1,0 +1,40 @@
+    PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+
+    Anthony Truelove MASc, P.Eng.
+    email:   gears1763@tutanota.com
+    github:  gears1763-2
+
+    See license terms
+
+
+    The makefile and all source code was successfully tested on the following OS and architectures:
+
+        Operating System: Linux Mint 20.2
+                  Kernel: Linux 5.4.0-162-generic
+            Architecture: x86-64
+
+        Operating System: Windows 10 Home
+                 Version: 21H1 (build 19043.1586)
+            Architecture: 64-bit OS, x64-based processor
+
+
+    The following compilers were used in testing:
+
+        g++ (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0
+        g++ (Rev10, Built by MSYS2 project) 11.2.0
+
+
+    PGMcpp has the following dependencies (by compiler link):
+
+        -lpthread
+
+
+    In the directory for this project, you should find this README, a license file, a makefile, and the
+following sub-directories:
+
+    /data           (to hold model input and output data)
+    /docs           (to hold various documentation, including the user manual [which you should read!])
+    /header         (to hold header files)
+    /projects       (to hold project models)
+    /source         (to hold source files)
+    /third_party    (to hold third party content used in the development of PGMcpp)
