@@ -113,10 +113,7 @@ class Combustion : public Dispatchable {
         
         void computeLevellizedCostOfEnergy(void);
         
-        virtual void writeResults(
-            std::string,
-            int
-        ) {return;}
+        virtual void writeResults(std::string, int) {return;}
         
         ~Combustion(void);
 };

@@ -94,8 +94,6 @@ double BatteryStorage :: getAcceptablekW(double dt_hrs) {
 
 void BatteryStorage :: commitChargekW(
     double charging_kW,
-    double dt_hrs,
-    double t_hrs,
     int timestep
 ) {
     /*
@@ -103,6 +101,7 @@ void BatteryStorage :: commitChargekW(
      */
     
     // compute accepted energy
+    double dt_hrs = this->ptr_2_dt_vec_hr->at(timestep);
     double accepted_kWh = 
         this->struct_battery_storage.charge_efficiency *
         charging_kW * dt_hrs;
@@ -113,6 +112,7 @@ void BatteryStorage :: commitChargekW(
          *  ref: https://www.homerenergy.com/products/pro/docs/latest/real_discount_rate.html
          *  ref: https://www.homerenergy.com/products/pro/docs/latest/present_value.html
          */
+        double t_hrs = this->ptr_2_time_vec_hr->at(timestep);
         double real_discount_scalar = 1.0 / pow(
             1 + this->real_discount_rate_annual,
             t_hrs / 8760
@@ -123,6 +123,9 @@ void BatteryStorage :: commitChargekW(
             charging_kW * dt_hrs;
         
         this->real_op_maint_cost_vec[timestep] = op_maint_cost;
+        
+        this->net_present_cost +=
+            this->real_op_maint_cost_vec[timestep];
     }
     
     // update charge and record
@@ -136,8 +139,6 @@ void BatteryStorage :: commitChargekW(
 
 void BatteryStorage :: commitDischargekW(
     double discharging_kW,
-    double dt_hrs,
-    double t_hrs,
     int timestep
 ) {
     /*
@@ -145,8 +146,10 @@ void BatteryStorage :: commitDischargekW(
      */
     
     // compute discharged energy
+    double dt_hrs = this->ptr_2_dt_vec_hr->at(timestep);
     double discharged_kWh = (discharging_kW * dt_hrs) / 
         this->struct_battery_storage.discharge_efficiency;
+    this->total_throughput_kWh += discharged_kWh;
     
     // incur operation and maintenance cost
     if (discharging_kW > 0) {
@@ -154,6 +157,7 @@ void BatteryStorage :: commitDischargekW(
          *  ref: https://www.homerenergy.com/products/pro/docs/latest/real_discount_rate.html
          *  ref: https://www.homerenergy.com/products/pro/docs/latest/present_value.html
          */
+        double t_hrs = this->ptr_2_time_vec_hr->at(timestep);
         double real_discount_scalar = 1.0 / pow(
             1 + this->real_discount_rate_annual,
             t_hrs / 8760
@@ -164,6 +168,9 @@ void BatteryStorage :: commitDischargekW(
             discharging_kW * dt_hrs;
         
         this->real_op_maint_cost_vec[timestep] = op_maint_cost;
+        
+        this->net_present_cost +=
+            this->real_op_maint_cost_vec[timestep];
     }
     
     // update charge and record 

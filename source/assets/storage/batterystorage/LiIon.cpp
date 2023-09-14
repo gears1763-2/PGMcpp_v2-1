@@ -46,6 +46,9 @@ LiIon :: LiIon(
     if (not this->struct_storage.is_sunk) {
         this->real_capital_cost_vec[0] =
             this->struct_storage.capital_cost;
+        
+        this->net_present_cost +=
+            this->struct_storage.capital_cost;
     }
     
     if (this->struct_storage.test_flag) {
@@ -59,7 +62,6 @@ LiIon :: LiIon(
 
 void LiIon :: _writeTimeSeriesResults(
     std::string _write_path,
-    std::vector<double>* ptr_2_time_vec_hr,
     int asset_idx
 ) {
     /*
@@ -99,7 +101,7 @@ void LiIon :: _writeTimeSeriesResults(
     
     // write file body
     for (int i = 0; i < this->n_timesteps; i++) {
-        ofs << std::to_string(ptr_2_time_vec_hr->at(i)) << ","
+        ofs << std::to_string(this->ptr_2_time_vec_hr->at(i)) << ","
             << std::to_string(this->charging_vec_kW[i]) << ","
             << std::to_string(this->discharging_vec_kW[i]) << ","
             << std::to_string(this->charge_vec_kWh[i]) << ","
@@ -146,10 +148,12 @@ void LiIon :: _writeSummary(std::string _write_path, int asset_idx) {
         this->struct_storage.cap_kWh << " kWh LiIon Summary\n\n";
     ofs << "Attributes:\n\n";
     
+    ofs << "\treplacement SOH: " << this->struct_liion.replace_SOH <<
+        "\n";
     ofs << "\tcapital cost: " << this->struct_storage.capital_cost <<
         "\n";
-    ofs << "\toperation and maintenance cost (per kWh produced): " <<
-        this->struct_storage.op_maint_cost_per_kWh << "\n";
+    ofs << "\toperation and maintenance cost (per kWh charge/discharge): "
+        << this->struct_storage.op_maint_cost_per_kWh << "\n";
     ofs << "\treal discount rate (annual): " <<
         this->real_discount_rate_annual << "\n";
     
@@ -158,6 +162,11 @@ void LiIon :: _writeSummary(std::string _write_path, int asset_idx) {
     
     ofs << "\tnumber of replacements: " <<
         this->n_replacements << "\n";
+    ofs << "\ttotal throughput (over project life): " <<
+        this->total_throughput_kWh << " kWh\n";
+    ofs << "\tnet present cost: " << this->net_present_cost << "\n";
+    ofs << "\tlevellized cost of energy (per kWh throughput): " <<
+        this->levellized_cost_of_energy_per_kWh << "\n";
     
     ofs.close();
     
@@ -197,8 +206,6 @@ double LiIon :: _getdSOHdt(double power_kW) {
 
 void LiIon :: _handleDegradation(
     double power_kW,
-    double dt_hrs,
-    double t_hrs,
     int timestep
 ) {
     /*
@@ -208,12 +215,13 @@ void LiIon :: _handleDegradation(
      */
     
     // update SOH
+    double dt_hrs = this->ptr_2_dt_vec_hr->at(timestep);
     double dSOH_dt = this->_getdSOHdt(power_kW);
     this->SOH -= dSOH_dt * dt_hrs;
     this->SOH_vec[timestep] = this->SOH;
     
     // update energy capacity and charge accordingly
-    this->cap_kWh = this->SOH * this->cap_kWh;
+    this->cap_kWh = this->SOH * this->struct_storage.cap_kWh;
         
     if (this->charge_kWh >= this->cap_kWh) {
         this->charge_kWh = this->cap_kWh;
@@ -221,32 +229,33 @@ void LiIon :: _handleDegradation(
     
     // trigger replacement, if necessary
     if (this->SOH <= this->struct_liion.replace_SOH) {
-        this->_handleReplacement(timestep, t_hrs);
+        this->_handleReplacement(timestep);
     }
     
     return;
 }
 
 
-void LiIon :: _handleReplacement(int timestep, double t_hrs) {
+void LiIon :: _handleReplacement(int timestep) {
     /*
      *  Helper method to handle degradation induced replacement
      */
     
     // reset attributes (replace with fresh LiIon system)
     this->cap_kWh = this->struct_storage.cap_kWh;
+    this->SOH = 1;
     
     this->charge_kWh =
         this->struct_battery_storage.init_SOC *
         this->struct_storage.cap_kWh;
-        
-    this->SOH = 1;
+    
     
     // incur capital cost
     /*
      *  ref: https://www.homerenergy.com/products/pro/docs/latest/real_discount_rate.html
      *  ref: https://www.homerenergy.com/products/pro/docs/latest/present_value.html
      */
+    double t_hrs = this->ptr_2_time_vec_hr->at(timestep);
     double real_discount_scalar = 1.0 / pow(
         1 + this->real_discount_rate_annual,
         t_hrs / 8760
@@ -254,6 +263,8 @@ void LiIon :: _handleReplacement(int timestep, double t_hrs) {
     
     this->real_capital_cost_vec[timestep] = real_discount_scalar *
         this->struct_storage.capital_cost;
+    
+    this->net_present_cost += this->real_capital_cost_vec[timestep];
     
     // record replacements
     this->n_replacements++;
@@ -265,8 +276,6 @@ void LiIon :: _handleReplacement(int timestep, double t_hrs) {
 
 void LiIon :: commitChargekW(
     double charging_kW,
-    double dt_hrs,
-    double t_hrs,
     int timestep
 ) {
     /*
@@ -274,12 +283,10 @@ void LiIon :: commitChargekW(
      */
     
     // call out to BatteryStorage :: commitChargekW()
-    BatteryStorage::commitChargekW(
-        charging_kW, dt_hrs, t_hrs, timestep
-    );
+    BatteryStorage::commitChargekW(charging_kW, timestep);
     
     // handle degradation
-    this->_handleDegradation(charging_kW, dt_hrs, t_hrs, timestep);
+    this->_handleDegradation(charging_kW, timestep);
     
     return;
 }
@@ -287,8 +294,6 @@ void LiIon :: commitChargekW(
 
 void LiIon :: commitDischargekW(
     double discharging_kW,
-    double dt_hrs,
-    double t_hrs,
     int timestep
 ) {
     /*
@@ -296,12 +301,10 @@ void LiIon :: commitDischargekW(
      */
     
     // call out to BatteryStorage :: commitDischargekW()
-    BatteryStorage::commitDischargekW(
-        discharging_kW, dt_hrs, t_hrs, timestep
-    );
+    BatteryStorage::commitDischargekW(discharging_kW, timestep);
     
     // handle degradation
-    this->_handleDegradation(discharging_kW, dt_hrs, t_hrs, timestep);
+    this->_handleDegradation(discharging_kW, timestep);
     
     return;
 }
@@ -309,16 +312,13 @@ void LiIon :: commitDischargekW(
 
 void LiIon :: writeResults(
     std::string _write_path,
-    std::vector<double>* ptr_2_time_vec_hr,
     int asset_idx
 ) {
     /*
      *  Method to write LiIon-level results
      */
     
-    this->_writeTimeSeriesResults(
-        _write_path, ptr_2_time_vec_hr, asset_idx
-    );
+    this->_writeTimeSeriesResults(_write_path, asset_idx);
     this->_writeSummary(_write_path, asset_idx);
     
     return;

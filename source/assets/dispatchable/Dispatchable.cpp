@@ -250,7 +250,8 @@ void Dispatchable :: computeLevellizedCostOfEnergy() {
         this->net_present_cost;
     
     this->levellized_cost_of_energy_per_kWh =
-        total_annualized_cost / total_dispatch_kWh;
+        (this->project_life_yrs * total_annualized_cost) /
+        total_dispatch_kWh;
     
     return;
 }

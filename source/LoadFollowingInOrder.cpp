@@ -9,7 +9,6 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
      */
     
     double dt_hrs = this->dt_vec_hr[timestep];
-    double t_hrs = this->time_vec_hr[timestep];
     
     // for all combustion assets, request zero production and commit,
     // record production, dispatch, and curtailment
@@ -168,7 +167,7 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
         
         double charging_kW = storage_ptr->charging_kW;
         
-        storage_ptr->commitChargekW(charging_kW, dt_hrs, t_hrs, timestep);
+        storage_ptr->commitChargekW(charging_kW, timestep);
     }
     
     return;
@@ -182,7 +181,6 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
      */
     
     double dt_hrs = this->dt_vec_hr[timestep];
-    double t_hrs = this->time_vec_hr[timestep];
     double load_kW = this->net_load_vec_kW[timestep];
     
     // for all storage assets, get available, discharge up to load, 
@@ -202,9 +200,7 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
         }
         
         // commit
-        storage_ptr->commitDischargekW(
-            discharging_kW, dt_hrs, t_hrs, timestep
-        );
+        storage_ptr->commitDischargekW(discharging_kW, timestep);
         
         // update load
         load_kW -= discharging_kW;

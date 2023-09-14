@@ -29,7 +29,7 @@ Wind :: Wind(
      */
     if (this->struct_nondisp.capital_cost < 0) {
         this->struct_nondisp.capital_cost =
-            this->struct_nondisp.cap_kW * (
+            2 * this->struct_nondisp.cap_kW * (
             4525 * exp(
                 0.333333333 * log(0.8839779) *
                 this->struct_nondisp.cap_kW

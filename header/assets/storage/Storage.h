@@ -23,7 +23,7 @@ struct structStorage {
     bool test_flag = false;
     
     double cap_kW = 100;
-    double cap_kWh = 1000;
+    double cap_kWh = 1000;  // this is "nominal capacity", and is static
     
     double nominal_inflation_rate_annual = 0.02;
     double nominal_discount_rate_annual = 0.04;
@@ -43,13 +43,14 @@ class Storage {
         int n_timesteps = 8760;
         int n_replacements = 0;
         
-        double cap_kWh = 0;
+        double cap_kWh = 0; // this is "dynamic capacity", and is subject to degradation
         
         double charge_kWh = 0;
         double min_charge_kWh = 0;
         double max_charge_kWh = 1000;
         
         double project_life_yrs = 0;
+        double total_throughput_kWh = 0;
         
         double acceptable_kW = 0;
         double charging_kW = 0;
@@ -80,14 +81,12 @@ class Storage {
         virtual double getAvailablekW(double) {return 0;}
         virtual double getAcceptablekW(double) {return 0;}
         
-        virtual void commitChargekW(double, double, double, int) {return;}
-        virtual void commitDischargekW(double, double, double, int) {return;}
+        virtual void commitChargekW(double, int) {return;}
+        virtual void commitDischargekW(double, int) {return;}
         
-        virtual void writeResults(
-            std::string,
-            std::vector<double>*,
-            int
-        ) {return;}
+        void computeLevellizedCostOfEnergy(void);
+        
+        virtual void writeResults(std::string, int) {return;}
         
         virtual ~Storage(void);
 };

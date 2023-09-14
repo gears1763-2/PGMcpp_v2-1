@@ -783,6 +783,12 @@ void Model :: _computeEconomics(void) {
         nondisp_ptr->computeLevellizedCostOfEnergy();
     }
     
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        Storage* storage_ptr = this->storage_ptr_vec[i];
+        
+        storage_ptr->computeLevellizedCostOfEnergy();
+    }
+    
     // compute levellized cost of energy (for entire system)
     /*
      *  ref: https://www.homerenergy.com/products/pro/docs/3.12/levelized_cost_of_energy.html
@@ -823,7 +829,8 @@ void Model :: _computeEconomics(void) {
         this->net_present_cost;
     
     this->levellized_cost_of_energy_per_kWh =
-        total_annualized_cost / total_load_served_kWh;
+        (this->project_life_yrs * total_annualized_cost) /
+        total_load_served_kWh;
     
     return;
 }
@@ -1561,9 +1568,7 @@ void Model :: writeResults(std::string write_path) {
             
             std::filesystem::create_directory(file_path);
             
-            storage_ptr->writeResults(
-                _write_path, &(this->time_vec_hr), i
-            );
+            storage_ptr->writeResults(_write_path, i);
         }
     }
     

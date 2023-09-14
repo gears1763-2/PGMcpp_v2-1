@@ -36,14 +36,10 @@ class BatteryStorage : public Storage {
         double getAcceptablekW(double);
         double getAvailablekW(double);
         
-        virtual void commitChargekW(double, double, double, int);
-        virtual void commitDischargekW(double, double, double, int);
+        virtual void commitChargekW(double, int);
+        virtual void commitDischargekW(double, int);
         
-        virtual void writeResults(
-            std::string,
-            std::vector<double>*,
-            int
-        ) {return;}
+        virtual void writeResults(std::string, int) {return;}
         
         ~BatteryStorage(void);
 };

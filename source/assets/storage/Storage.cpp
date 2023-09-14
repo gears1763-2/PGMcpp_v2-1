@@ -37,7 +37,44 @@ Storage :: Storage(
 }
 
 
-//...
+void Storage :: computeLevellizedCostOfEnergy() {
+    /*
+     *  Method to compute levellized cost of energy
+     * 
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.12/levelized_cost_of_energy.html
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.12/total_annualized_cost.html
+     *  ref: https://www.homerenergy.com/products/pro/docs/3.12/capital_recovery_factor.html
+     */
+    
+    if (this->total_throughput_kWh <= 0) {
+        return;
+    }
+    
+    double capital_recovery_factor = 
+        (
+            this->real_discount_rate_annual *
+            pow(
+                1 + this->real_discount_rate_annual,
+                this->project_life_yrs
+            )
+        ) / 
+        (
+            pow(
+                1 + this->real_discount_rate_annual,
+                this->project_life_yrs
+            ) -
+            1
+        );
+        
+    double total_annualized_cost = capital_recovery_factor *
+        this->net_present_cost;
+    
+    this->levellized_cost_of_energy_per_kWh =
+        (this->project_life_yrs * total_annualized_cost) /
+        this->total_throughput_kWh;
+    
+    return;
+}
 
 
 Storage :: ~Storage() {

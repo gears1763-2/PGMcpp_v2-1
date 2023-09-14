@@ -87,10 +87,7 @@ class Nondispatchable {
         
         void computeLevellizedCostOfEnergy(void);
         
-        virtual void writeResults(
-            std::string,
-            int
-        ) {return;}
+        virtual void writeResults(std::string, int) {return;}
         
         virtual ~Nondispatchable(void);
 };
