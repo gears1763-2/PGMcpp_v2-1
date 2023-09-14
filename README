@@ -7,6 +7,11 @@
     See license terms
 
 
+    This is a microgrid modelling code, which can be used to assess the economic and environmental impacts of
+    integrating renewable energy and energy storage assets into an otherwise isolated microgrid (presumably
+    reliant on diesel, or other fuel-based, generation).
+
+
     The makefile and all source code was successfully tested on the following OS and architectures:
 
         Operating System: Linux Mint 20.2
