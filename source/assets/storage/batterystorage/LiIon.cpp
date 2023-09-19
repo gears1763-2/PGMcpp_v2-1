@@ -179,7 +179,7 @@ void LiIon :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs << "\toperating temperature: " <<
         this->struct_liion.temperature_K << " K\n";
     ofs << "\tgas constant: " <<
-        this->struct_liion.gas_constant_JmolK << " J/mol.k\n\n";
+        this->struct_liion.gas_constant_JmolK << " J/mol.K\n\n";
     
     ofs << "\talpha = " << this->struct_liion.degr_alpha << "\n";
     ofs << "\tbeta = " << this->struct_liion.degr_beta << "\n";
