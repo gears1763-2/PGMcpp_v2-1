@@ -134,8 +134,11 @@ double Solar :: getProductionkW(double solar_resource_kWm2) {
     } 
     
     // otherwise, simple linear model
+    double panel_area_m2 = this->struct_nondisp.cap_kW; // one-to-one area [m2] to capacity [kW]
+    
     double production_kW = this->struct_solar.derating *
-        this->struct_nondisp.cap_kW * solar_resource_kWm2;
+        panel_area_m2 * solar_resource_kWm2;
+        
     return production_kW;
 }
 

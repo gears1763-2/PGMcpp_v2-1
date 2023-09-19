@@ -1679,9 +1679,24 @@ void Model :: reset() {
      *  parameters prior to calling run() again
      */
     
+    // clear assets
     this->clearAssets();
     
-    // clear and size net and remaining load vectors
+    // reset scalar attributes (as applicable)
+    this->total_load_served_kWh = 0;
+    this->total_fuel_consumed_L = 0;
+
+    this->total_CO2_emitted_kg = 0;
+    this->total_CO_emitted_kg = 0;
+    this->total_NOx_emitted_kg = 0;
+    this->total_SOx_emitted_kg = 0;
+    this->total_CH4_emitted_kg = 0;
+    this->total_PM_emitted_kg = 0;
+    
+    this->net_present_cost = 0;
+    this->levellized_cost_of_energy_per_kWh = 0;
+    
+    // reset vector attributes (as applicable)
     this->net_load_vec_kW.clear();
     this->remaining_load_vec_kW.clear();
     

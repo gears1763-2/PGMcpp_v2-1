@@ -8,15 +8,15 @@
 #   See license terms
 #
 #   Makefile for PGMcpp. Under normal use, the only thing the user
-#   should have to edit is PATH_2_PROJECT, which defines the path to the
-#   user's grid modelling project file. PATH_2_PROJECT is defined
-#   immediately below, under USER INPUT.
+#   should have to edit is PROJECT_NAME, which defines the name (not
+#   including the file extension!) of the user's grid modelling project.
+#   PROJECT_NAME is defined immediately below, under USER INPUT.
 #
 
 
 #### ---- USER INPUT ---- ####
 
-PATH_2_PROJECT = projects/example_project.cpp
+PROJECT_NAME = example_project
 
 
 #### ---- COMPILER FLAGS ---- ####
@@ -225,15 +225,16 @@ $(OBJ_TEST): $(SRC_TEST)
 
 ## -------- Project -------- ##
 
-OBJ_PROJECT = object/project.o
-OUT_PROJECT = bin/project.out
+SRC_PROJECT = projects/$(PROJECT_NAME).cpp
+OBJ_PROJECT = object/$(PROJECT_NAME).o
+OUT_PROJECT = bin/$(PROJECT_NAME).out
 
 .PHONY: Project
 Project: $(OBJ_PROJECT)
 	$(CXX) $(CXXFLAGS) $(OBJ_PROJECT) $(OBJ_ALL) -o $(OUT_PROJECT) $(DEPS)
 
 $(OBJ_PROJECT): $(SRC_PROJECT)
-	$(CC) $(CFLAGS) -c $(PATH_2_PROJECT) -o $(OBJ_PROJECT) $(DEPS)
+	$(CC) $(CFLAGS) -c $(SRC_PROJECT) -o $(OBJ_PROJECT) $(DEPS)
 
 
 #### ---- TARGETS ---- ####
