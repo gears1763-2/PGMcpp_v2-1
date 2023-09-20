@@ -847,14 +847,14 @@ void Model :: _computeEconomics(void) {
 }
 
 
-void Model :: _writeDispatchResults(std::string _write_path) {
+void Model :: _writeDispatchResults(std::string write_path) {
     /*
      *  Helper method to write Model-level dispatch results
      */
     
     // init output file stream
     std::ofstream ofs;
-    ofs.open(_write_path + "Model/Model_dispatch_results.csv");
+    ofs.open(write_path + "Model/Model_dispatch_results.csv");
     
     // write file header
     ofs << "Time [hrs]," <<
@@ -959,14 +959,14 @@ void Model :: _writeDispatchResults(std::string _write_path) {
 }
 
 
-void Model :: _writeLoadResults(std::string _write_path) {
+void Model :: _writeLoadResults(std::string write_path) {
     /*
      *  Helper method to write Model-level load results
      */
     
     // init output file stream
     std::ofstream ofs;
-    ofs.open(_write_path + "Model/Model_load_results.csv");
+    ofs.open(write_path + "Model/Model_load_results.csv");
     
     // write file header
     ofs << "Time [hrs]," <<
@@ -993,14 +993,14 @@ void Model :: _writeLoadResults(std::string _write_path) {
 }
 
 
-void Model :: _writeSummary(std::string _write_path) {
+void Model :: _writeSummary(std::string write_path) {
     /*
      *  Helper method to write Model-level summary
      */
     
     // init output file stream
     std::ofstream ofs;
-    ofs.open(_write_path + "Model/Model_summary.txt");
+    ofs.open(write_path + "Model/Model_summary.txt");
     
     // write attributes
     ofs << "Model Summary\n\n";
@@ -1521,54 +1521,54 @@ void Model :: run() {
 }
 
 
-void Model :: writeResults(std::string write_path) {
+void Model :: writeResults(std::string project_name) {
     /*
      *  Method to write modelling results to given path
      */
     
-    // expand write_path 
-    std::string _write_path = "data/output/";
-    _write_path += write_path;
-    _write_path += "/";
+    // construct write_path 
+    std::string write_path = "data/output/";
+    write_path += project_name;
+    write_path += "/";
     
     
     // create directories (overwrite if already exists)
-    if (std::filesystem::is_directory(_write_path)) {
+    if (std::filesystem::is_directory(write_path)) {
         std::string warning_str = "WARNING:  Model::writeResults():  ";
-        warning_str += _write_path;
+        warning_str += write_path;
         warning_str += " already exists, contents will be overwritten!";
         
         std::cout << warning_str << std::endl;
         
-        std::filesystem::remove_all(_write_path);
+        std::filesystem::remove_all(write_path);
     }
     
-    std::filesystem::create_directory(_write_path);
+    std::filesystem::create_directory(write_path);
     
     
     // write Model-level results
-    std::filesystem::create_directory(_write_path + "Model/");
+    std::filesystem::create_directory(write_path + "Model/");
     
-    this->_writeDispatchResults(_write_path);
-    this->_writeLoadResults(_write_path);
-    this->_writeSummary(_write_path);
+    this->_writeDispatchResults(write_path);
+    this->_writeLoadResults(write_path);
+    this->_writeSummary(write_path);
     
     
     // write Combustion-level results
     if (not this->combustion_ptr_vec.empty()) {
-        std::filesystem::create_directory(_write_path + "Combustion/");
+        std::filesystem::create_directory(write_path + "Combustion/");
         
         for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
             Combustion* combustion_ptr = this->combustion_ptr_vec[i];
             
             std::filesystem::create_directory(
-                _write_path + "Combustion/" +
+                write_path + "Combustion/" +
                 std::to_string(int(combustion_ptr->struct_disp.cap_kW)) +
                 "kW_" + combustion_ptr->disp_type_str +
                 "_" + std::to_string(i) + "/"
             );
             
-            combustion_ptr->writeResults(_write_path, i);
+            combustion_ptr->writeResults(write_path, i);
         }
         
     }
@@ -1576,50 +1576,50 @@ void Model :: writeResults(std::string write_path) {
     
     // write non-Combustion-level results
     if (not this->noncombustion_ptr_vec.empty()) {
-        std::filesystem::create_directory(_write_path + "non-Combustion/");
+        std::filesystem::create_directory(write_path + "non-Combustion/");
         
         for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
             Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
             
             std::filesystem::create_directory(
-                _write_path + "non-Combustion/" +
+                write_path + "non-Combustion/" +
                 std::to_string(int(noncombustion_ptr->struct_disp.cap_kW)) +
                 "kW_" + noncombustion_ptr->disp_type_str +
                 "_" + std::to_string(i) + "/"
             );
             
-            noncombustion_ptr->writeResults(_write_path, i);
+            noncombustion_ptr->writeResults(write_path, i);
         }
     }
     
     
     // write Nondispatchable-level results
     if (not this->nondisp_ptr_vec.empty()) {
-        std::filesystem::create_directory(_write_path + "Nondispatchable/");
+        std::filesystem::create_directory(write_path + "Nondispatchable/");
         
         for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
             Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[i];
             
             std::filesystem::create_directory(
-                _write_path + "Nondispatchable/" +
+                write_path + "Nondispatchable/" +
                 std::to_string(int(nondisp_ptr->struct_nondisp.cap_kW)) +
                 "kW_" + nondisp_ptr->nondisp_type_str +
                 "_" + std::to_string(i) + "/"
             );
             
-            nondisp_ptr->writeResults(_write_path, i);
+            nondisp_ptr->writeResults(write_path, i);
         }
     }
     
     
     // write Storage-level results
     if (not this->storage_ptr_vec.empty()) {
-        std::filesystem::create_directory(_write_path + "Storage/");
+        std::filesystem::create_directory(write_path + "Storage/");
         
         for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
             Storage* storage_ptr = this->storage_ptr_vec[i];
             
-            std::string file_path = _write_path + "Storage/" +
+            std::string file_path = write_path + "Storage/" +
                 std::to_string(int(storage_ptr->struct_storage.cap_kW)) +
                 "kW_" + std::to_string(int(storage_ptr->struct_storage.cap_kWh)) +
                 "kWh_" + storage_ptr->storage_type_str +
@@ -1627,14 +1627,14 @@ void Model :: writeResults(std::string write_path) {
             
             std::filesystem::create_directory(file_path);
             
-            storage_ptr->writeResults(_write_path, i);
+            storage_ptr->writeResults(write_path, i);
         }
     }
     
     
     // report to user where results were written
     std::cout << "Results successfully written to " <<
-        _write_path << std::endl;
+        write_path << std::endl;
     
     return;
 }

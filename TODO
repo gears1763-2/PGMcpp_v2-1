@@ -3,4 +3,4 @@
 - implement LOAD_FOLLOWING_SMART_COMBUSTION control
 - implement Hydro asset
 - implement foresight control
-- implement Sean's degradation model
+- implement Sean's battery degradation model
