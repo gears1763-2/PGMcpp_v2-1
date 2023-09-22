@@ -135,7 +135,7 @@ double Wind :: getProductionkW(double wind_resource_ms) {
     
     // otherwise, apply power curve
     /*
-     *  ref: docs/wind_tidal_wave.pdf
+     *  ref: docs/refs/wind_tidal_wave.pdf
      */
     double production = 0;
     double turbine_speed = 0;

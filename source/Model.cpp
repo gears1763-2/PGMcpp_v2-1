@@ -664,33 +664,13 @@ void Model :: _handleDispatch() {
                 else {
                     this->_dispatchLoadFollowingInOrderDischarging(i);
                 }
-                
-                /*
-                for (size_t j = 0; j < this->storage_ptr_vec.size(); j++) {
-                    Storage* storage_ptr = this->storage_ptr_vec[j];
-
-                    if (
-                        storage_ptr->struct_storage.charge_kWh > 
-                        storage_ptr->struct_storage.min_charge_kWh
-                    ) {
-                        std::cout << "Net " << this->net_load_vec_kW[i]
-                            << " kW  C " << storage_ptr->charging_vec_kW[i]
-                            << " kW  D " << storage_ptr->discharging_vec_kW[i]
-                            << " kW  Q " << storage_ptr->charge_vec_kWh[i]
-                            << " kWh" << std::endl << std::endl;
-                    }
-                    
-                    std::cout << ((LiIon*)storage_ptr)->struct_liion.SOH
-                        << std::endl;
-                }
-                */
             }
             
             break;
         }
         
         case (LOAD_FOLLOWING_SMART_COMBUSTION): {
-            //...
+            //  *** WORK IN PROGRESS - NOT YET FULLY IMPLEMENTED ***
             
             break;
         }

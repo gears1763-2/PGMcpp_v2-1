@@ -197,7 +197,7 @@ double Tidal :: getProductionkW(double tidal_resource_ms) {
         
         case (EXPONENTIAL): {
             /*
-             *  ref: docs/wind_tidal_wave.pdf
+             *  ref: docs/refs/wind_tidal_wave.pdf
              */
             
             turbine_speed =

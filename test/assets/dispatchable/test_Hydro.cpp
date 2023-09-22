@@ -1,5 +1,15 @@
 /*
- *  Testing for Dispatchable <-- Hydro class
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Testing suite for the Dispatchable <-- Hydro class.
+ *
+ *  *** WORK IN PROGRESS - NOT YET FULLY IMPLEMENTED ***
  */
 
 std::cout << std::endl;

@@ -64,7 +64,7 @@ class Wave : public Nondispatchable {
         
         void _readInNormalizedPerformanceMatrix(void);
         void _writeSummary(std::string, int);
-        double _productionLookupkW(double, double);
+        double _productionLookup(double, double);
         
         double getProductionkW(double, double);
         

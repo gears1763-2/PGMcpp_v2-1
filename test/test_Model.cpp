@@ -1,5 +1,13 @@
 /*
- *  Testing for Model class
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Testing suite for the Model class.
  */
 
 std::cout << std::endl;

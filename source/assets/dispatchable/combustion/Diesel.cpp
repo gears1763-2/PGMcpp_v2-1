@@ -320,8 +320,6 @@ double Diesel :: requestProductionkW(double requested_production_kW) {
         production_kW = this->struct_disp.cap_kW;
     }
     
-    //...
-    
     return production_kW;
 }
 

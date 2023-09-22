@@ -29,7 +29,7 @@ struct structLiIon {
     
     // degradation parameters
     //
-    //  ref: [point to battery degradation modelling doc]
+    //  ref: docs/refs/battery_degradation.pdf
     //
     double degr_alpha = 10;             // [ ]
     double degr_beta = 1.1;             // [ ]

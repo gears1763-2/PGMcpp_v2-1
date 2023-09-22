@@ -231,13 +231,13 @@ void Wave :: _writeSummary(std::string _write_path, int asset_idx) {
 }
 
 
-double Wave :: _productionLookupkW(
+double Wave :: _productionLookup(
     double significant_wave_height_m,
     double energy_period_s
 ) {
     /*
-     *  Helper method to lookup and return wave energy converter
-     *  production
+     *  Helper method to lookup and return normalized wave energy
+     *  converter production
      */
     
     if (
@@ -313,7 +313,7 @@ double Wave :: _productionLookupkW(
         ]                                                       // z_11
     );
     
-    return normalized_production * this->struct_nondisp.cap_kW;
+    return normalized_production;
 }
 
 
@@ -346,14 +346,17 @@ double Wave :: getProductionkW(
              *  Interpolate over given normalized performance matrix
              */
              
-            //...
+            production = this->_productionLookup(
+                significant_wave_height_m,
+                energy_period_s
+            );
             
             break;
         }
         
         case (GAUSSIAN): {
             /*
-             *  ref: docs/wind_tidal_wave.pdf
+             *  ref: docs/refs/wind_tidal_wave.pdf
              */
             
             H_s_nondim = 

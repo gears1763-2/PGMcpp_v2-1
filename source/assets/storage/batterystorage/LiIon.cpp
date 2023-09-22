@@ -213,7 +213,7 @@ double LiIon :: _getdSOHdt(double power_kW) {
     /*
      *  Helper method to compute and return dSOH_dt
      *
-     *  ref: [point to battery degradation modelling document]
+     *  ref: docs/refs/battery_degradation.pdf
      */
     
     // compute SOC and C-rate
@@ -248,7 +248,7 @@ void LiIon :: _handleDegradation(
     /*
      *  Helper method to handle degradation dynamics
      *
-     *  ref: [point to battery degradation modelling document]
+     *  ref: docs/refs/battery_degradation.pdf
      */
     
     // update SOH

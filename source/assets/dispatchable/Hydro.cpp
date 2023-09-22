@@ -14,7 +14,7 @@
  *  with (i.e., traditional) or without (i.e., run-of-river) fluid
  *  storage.
  * 
- *  WORK IN PROGRESS - NOT YET FULLY IMPLEMENTED
+ *  *** WORK IN PROGRESS - NOT YET FULLY IMPLEMENTED ***
  */
 
 

@@ -309,7 +309,7 @@ structEmissions Combustion :: getEmissions(double fuel_consumption_L) {
         }
         
         case (FUEL_GAS): {
-            //...
+            //  *** WORK IN PROGRESS - NOT YET FULLY IMPLEMENTED ***
             
             break;
         }

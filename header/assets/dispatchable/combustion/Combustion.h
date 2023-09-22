@@ -57,8 +57,8 @@ struct structCombustion {
     
     /*
      *  Diesel emissions parameters
-     *  ref: docs/diesel_emissions_ref_1.pdf
-     *  ref: docs/diesel_emissions_ref_2.pdf
+     *  ref: docs/refs/diesel_emissions_ref_1.pdf
+     *  ref: docs/refs/diesel_emissions_ref_2.pdf
      */
     double diesel_CO2_kgL = 2.7;
     double diesel_CO_kgL = 0.0178;

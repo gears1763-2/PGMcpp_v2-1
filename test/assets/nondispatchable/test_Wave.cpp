@@ -1,5 +1,13 @@
 /*
- *  Testing for Nondispatchable <-- Wave class
+ *  PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+ *
+ *  Anthony Truelove MASc, P.Eng.
+ *  email:  gears1763@tutanota.com
+ *  github: gears1763-2
+ *
+ *  See license terms
+ *
+ *  Testing suite for the Nondispatchable <-- Wave class.
  */
 
 std::cout << std::endl;
@@ -150,12 +158,12 @@ try {
     }
     
     
-    // test _productionLookupkW()
-    std::cout << "\tTesting Wave::_productionLookupkW() ..." <<
+    // test _productionLookup()
+    std::cout << "\tTesting Wave::_productionLookup() ..." <<
         std::endl;
     
     testFloatEquals(
-        test_wave_lookup._productionLookupkW(
+        test_wave_lookup._productionLookup(
             test_wave_lookup.min_interp_sig_wave_height_m - 1,
             10
         ),
@@ -166,7 +174,7 @@ try {
     );
     
     testFloatEquals(
-        test_wave_lookup._productionLookupkW(
+        test_wave_lookup._productionLookup(
             test_wave_lookup.max_interp_sig_wave_height_m + 1,
             10
         ),
@@ -177,7 +185,7 @@ try {
     );
     
     testFloatEquals(
-        test_wave_lookup._productionLookupkW(
+        test_wave_lookup._productionLookup(
             2,
             test_wave_lookup.min_interp_energy_period_s - 1
         ),
@@ -188,7 +196,7 @@ try {
     );
     
     testFloatEquals(
-        test_wave_lookup._productionLookupkW(
+        test_wave_lookup._productionLookup(
             2,
             test_wave_lookup.max_interp_energy_period_s + 1
         ),
@@ -255,12 +263,11 @@ try {
     for (int i = 0; i < test_significant_wave_height_vec_m.size(); i++) {
         for (int j = 0; j < test_energy_period_vec_s.size(); j++) {
             testFloatEquals(
-                test_wave_lookup._productionLookupkW(
+                test_wave_lookup._productionLookup(
                     test_significant_wave_height_vec_m[i],
                     test_energy_period_vec_s[j]
                 ),
-                test_wave_lookup.struct_nondisp.cap_kW * 
-                    exp_normalized_performance[j][i],
+                exp_normalized_performance[j][i],
                 FLOAT_TOLERANCE,
                 __FILE__,
                 __LINE__
