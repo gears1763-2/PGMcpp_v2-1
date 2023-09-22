@@ -18,15 +18,15 @@
                   Kernel: Linux 5.4.0-162-generic
             Architecture: x86-64
 
-        Operating System: Windows 10 Home
-                 Version: 21H1 (build 19043.1586)
+        Operating System: Windows 11 Home
+                 Version: 10.0.22621 Build 22621
             Architecture: 64-bit OS, x64-based processor
 
 
     The following compilers were used in testing:
 
         g++ (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0
-        g++ (Rev10, Built by MSYS2 project) 11.2.0
+        g++ (Rev10, Built by MSYS2 project) 13.2.0
 
 
     PGMcpp has the following dependencies (by compiler link):

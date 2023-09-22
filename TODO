@@ -1,6 +1,5 @@
 - draft documentation for battery degradation modelling
-- draft user manual
 - implement LOAD_FOLLOWING_SMART_COMBUSTION control
 - implement Hydro asset
-- implement foresight control
+- implement some kind of foresight, or receding horizon, control
 - implement Sean's battery degradation model

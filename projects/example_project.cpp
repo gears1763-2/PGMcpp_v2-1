@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
         tidal_resource_key
     );
     
-    //  4. Wave
+    //  4. wave
     int wave_resource_key = 4;
     
     model.add2dRenewableResource(
