@@ -37,9 +37,10 @@
     In the directory for this project, you should find this README, a license file, a makefile, and the
 following sub-directories:
 
-    /data           (to hold model input and output data)
-    /docs           (to hold various documentation, including the user manual [which you should read!])
-    /header         (to hold header files)
-    /projects       (to hold project models)
-    /source         (to hold source files)
-    /third_party    (to hold third party content used in the development of PGMcpp)
+    data/           (to hold model input and output data)
+    docs/           (to hold various documentation, including the user manual [which you should read!])
+    header/         (to hold header files)
+    projects/       (to hold project models)
+    source/         (to hold source files)
+    test/           (to hold the source files for a suite of tests)
+    third_party/    (to hold third party content used in the development of PGMcpp)
