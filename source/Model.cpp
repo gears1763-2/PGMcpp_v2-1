@@ -1099,21 +1099,37 @@ void Model :: _writeSummary(std::string write_path) {
     ofs << "\nResults:\n\n";
     
     ofs << "\ttotal load served (over project life): " <<
-        this->total_load_served_kWh << " kWh\n";
+        this->total_load_served_kWh << " kWh (" <<
+        this->total_load_served_kWh / this->project_life_yrs <<
+        " kWh/yr)\n";
     ofs << "\ttotal fuel consumed (over project life): " <<
-        this->total_fuel_consumed_L << " L\n";
+        this->total_fuel_consumed_L << " L (" <<
+        this->total_fuel_consumed_L / this->project_life_yrs <<
+        " L/yr)\n";
     ofs << "\ttotal CO2 emissions (over project life): " <<
-        this->total_CO2_emitted_kg << " kg\n";
+        this->total_CO2_emitted_kg << " kg (" <<
+        this->total_CO2_emitted_kg / this->project_life_yrs <<
+        " kg/yr)\n";
     ofs << "\ttotal CO emissions (over project life): " <<
-        this->total_CO_emitted_kg << " kg\n";
+        this->total_CO_emitted_kg << " kg (" <<
+        this->total_CO_emitted_kg / this->project_life_yrs <<
+        " kg/yr)\n";
     ofs << "\ttotal NOx emissions (over project life): " <<
-        this->total_NOx_emitted_kg << " kg\n";
+        this->total_NOx_emitted_kg << " kg (" <<
+        this->total_NOx_emitted_kg / this->project_life_yrs <<
+        " kg/yr)\n";
     ofs << "\ttotal SOx emissions (over project life): " <<
-        this->total_SOx_emitted_kg << " kg\n";
+        this->total_SOx_emitted_kg << " kg (" <<
+        this->total_SOx_emitted_kg / this->project_life_yrs <<
+        " kg/yr)\n";
     ofs << "\ttotal CH4 emissions (over project life): " <<
-        this->total_CH4_emitted_kg << " kg\n";
+        this->total_CH4_emitted_kg << " kg (" <<
+        this->total_CH4_emitted_kg / this->project_life_yrs <<
+        " kg/yr)\n";
     ofs << "\ttotal particulate matter emissions (over project life): " <<
-        this->total_PM_emitted_kg << " kg\n";
+        this->total_PM_emitted_kg << " kg (" <<
+        this->total_PM_emitted_kg / this->project_life_yrs <<
+        " kg/yr)\n";
     ofs << "\tnet present cost: " <<
         this->net_present_cost << "\n";
     ofs << "\tlevellized cost of energy (per kWh served): " <<
