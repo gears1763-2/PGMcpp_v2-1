@@ -42,7 +42,7 @@ try {
     );
     
     testFloatEquals(
-        test_solar.struct_solar.DC2AC_conversion_ratio,
+        test_solar.struct_solar.power_transformation_ratio,
         0.9,
         FLOAT_TOLERANCE,
         __FILE__,
