@@ -137,7 +137,9 @@ double Solar :: getProductionkW(double solar_resource_kWm2) {
     double panel_area_m2 = this->struct_nondisp.cap_kW; // one-to-one area [m2] to capacity [kW]
     
     double production_kW = this->struct_solar.derating *
-        panel_area_m2 * solar_resource_kWm2;
+        this->struct_solar.DC2AC_conversion_ratio *
+        panel_area_m2 *
+        solar_resource_kWm2;
         
     return production_kW;
 }

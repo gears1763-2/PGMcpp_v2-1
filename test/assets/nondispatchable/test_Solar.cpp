@@ -33,6 +33,22 @@ try {
         __LINE__
     );
     
+    testFloatEquals(
+        test_solar.struct_solar.derating,
+        0.8,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_solar.struct_solar.DC2AC_conversion_ratio,
+        0.9,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
 } catch (...) {
     printRed("\n\t\t\t\tNondispatchable <-- Solar Tests:  FAIL\n");
     std::cout << std::endl;
