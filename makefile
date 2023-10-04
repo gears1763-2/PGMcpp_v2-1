@@ -261,10 +261,10 @@ all:
 	mkdir -pv object/assets/storage
 	mkdir -pv object/assets/storage/batterystorage
 	mkdir -pv data/output
-	find header/ -exec touch {} +
-	find source/ -exec touch {} +
-	find test/ -exec touch {} +
-	find third_party/ -exec touch {} +
+	#find header/ -exec touch {} +
+	#find source/ -exec touch {} +
+	#find test/ -exec touch {} +
+	#find third_party/ -exec touch {} +
 	make $(MAKE_ALL) test
 	./bin/test.out
 
@@ -273,10 +273,10 @@ all:
 project:
 	rm -frv $(OBJ_PROJECT)
 	rm -frv $(OUT_PROJECT)
-	find header/ -exec touch {} +
-	find source/ -exec touch {} +
-	find test/ -exec touch {} +
-	find third_party/ -exec touch {} +
+	#find header/ -exec touch {} +
+	#find source/ -exec touch {} +
+	#find test/ -exec touch {} +
+	#find third_party/ -exec touch {} +
 	make Project
 	./$(OUT_PROJECT)
 

@@ -91,6 +91,7 @@ class Dispatchable {
         double getDispatchkW(double, double);
         
         virtual double requestProductionkW(double) {return 0;}
+        virtual double requestProductionkW(double, double, double) {return 0;}
         virtual double getFuelConsumptionL(double) {return 0;}
         
         void computeLevellizedCostOfEnergy(void);

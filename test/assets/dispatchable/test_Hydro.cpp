@@ -26,6 +26,60 @@ try {
     Hydro test_hydro(struct_disp, struct_hydro, 16);
     
     
+    //  test post-construction attributes
+    std::cout << "\tTesting post-construction attributes ..." <<
+        std::endl;
+    
+    testFloatEquals(
+        test_hydro.resource_key,
+        0,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_hydro.reservoir_capacity_m3,
+        100,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_hydro.reservoir_volume_m3,
+        50,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_hydro.minimum_discharge_m3hr,
+        10,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    testFloatEquals(
+        test_hydro.reservoir_volume_vec_m3.size(),
+        16,
+        FLOAT_TOLERANCE,
+        __FILE__,
+        __LINE__
+    );
+    
+    
+    //  test requestProductionkW()
+    std::cout << "\tTesting Hydro::requestProductionkW() ..." <<
+        std::endl;
+    //...
+    
+    
+    //  test commitProductionkW()
+    std::cout << "\tTesting Hydro::commitProductionkW() ..." <<
+        std::endl;
     //...
     
 } catch (...) {

@@ -30,6 +30,10 @@ struct structHydro {
     //  input attributes (structured)
     //  these are the only attributes the user should interact with
     int resource_key = 0;
+    
+    double reservoir_capacity_m3 = 100;
+    double reservoir_init_state = 0.5;
+    double minimum_discharge_m3hr = 10;
 };
 
 
@@ -39,13 +43,23 @@ class Hydro : public Dispatchable {
         //  the user should not interact with these attributes
         structHydro struct_hydro;
         
+        int resource_key;
+        
+        double reservoir_capacity_m3;
+        double reservoir_init_state;
+        double reservoir_volume_m3;
+        double minimum_discharge_m3hr;
+        
+        std::vector<double> reservoir_volume_vec_m3;
+        
         
         //  methods
         Hydro(structDispatchable, structHydro, int);
         
         void _writeSummary(std::string, int);
+        void commitProductionkW(double, int);
         
-        double requestProductionkW(double);
+        double requestProductionkW(double, double, double);
         
         void writeResults(std::string, int);
         

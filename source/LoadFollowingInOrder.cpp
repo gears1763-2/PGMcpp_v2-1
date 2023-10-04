@@ -47,7 +47,33 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
         // request zero production and commit
         Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
         
-        double production_kW = noncombustion_ptr->requestProductionkW(0);
+        double production_kW = 0;
+        switch (noncombustion_ptr->disp_type) {
+            case (HYDRO): {
+                int resource_key =
+                    ((Hydro*)noncombustion_ptr)->resource_key;
+            
+                double hydro_resource_m3hr = this->resource_map_1D[
+                    resource_key
+                ][timestep];
+                
+                production_kW =
+                    noncombustion_ptr->requestProductionkW(
+                        0,
+                        hydro_resource_m3hr,
+                        dt_hrs
+                    );
+                
+                break;
+            }
+            
+            default: {
+                production_kW =
+                    noncombustion_ptr->requestProductionkW(0);
+                
+                break;
+            }
+        }
         
         noncombustion_ptr->commitProductionkW(production_kW, timestep);
         
@@ -221,7 +247,33 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
         // request production and commit
         Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
         
-        double production_kW = noncombustion_ptr->requestProductionkW(load_kW);
+        double production_kW = 0;
+        switch (noncombustion_ptr->disp_type) {
+            case (HYDRO): {
+                int resource_key =
+                    ((Hydro*)noncombustion_ptr)->resource_key;
+            
+                double hydro_resource_m3hr = this->resource_map_1D[
+                    resource_key
+                ][timestep];
+                
+                production_kW =
+                    noncombustion_ptr->requestProductionkW(
+                        0,
+                        hydro_resource_m3hr,
+                        dt_hrs
+                    );
+                
+                break;
+            }
+            
+            default: {
+                production_kW =
+                    noncombustion_ptr->requestProductionkW(load_kW);
+                
+                break;
+            }
+        }
         
         noncombustion_ptr->commitProductionkW(production_kW, timestep);
         

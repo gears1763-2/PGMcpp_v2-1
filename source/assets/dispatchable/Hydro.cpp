@@ -36,7 +36,15 @@ Hydro :: Hydro(
     this->disp_type_str = "HYDRO";
     this->struct_hydro = struct_hydro;
     
-    //...
+    this->resource_key = struct_hydro.resource_key;
+        
+    this->reservoir_capacity_m3 = struct_hydro.reservoir_capacity_m3;
+    this->reservoir_init_state = struct_hydro.reservoir_init_state;
+    this->reservoir_volume_m3 =
+        this->reservoir_capacity_m3 * this->reservoir_init_state;
+    this->minimum_discharge_m3hr = struct_hydro.minimum_discharge_m3hr;
+    
+    this->reservoir_volume_vec_m3.resize(this->n_timesteps, 0);
     
     if (this->struct_disp.test_flag) {
         std::cout << "\tHydro object constructed at " << this
@@ -78,11 +86,38 @@ void Hydro :: _writeSummary(std::string _write_path, int asset_idx) {
 }
 
 
-double Hydro :: requestProductionkW(double requested_production_kW) {
+void Hydro :: commitProductionkW(
+    double production_kW,
+    int timestep
+) {
+    /*
+     *  Method to commit to given production
+     */
+    
+    // call out to base method
+    Dispatchable::commitProductionkW(production_kW, timestep);
+    
+    // handle hydro storage
+    //...
+    
+    return;
+}
+
+
+double Hydro :: requestProductionkW(
+    double requested_production_kW,
+    double hydro_resource_m3hr,
+    double dt_hrs
+) {
     /*
      *  Method to handle production requests (subject to active
      *  operating constraints) and return provided production
      */
+    
+    // check against hydro resource
+    double available_flow_m3hr = hydro_resource_m3hr -
+        this->minimum_discharge_m3hr +
+        this->reservoir_volume_m3 / dt_hrs;
     
     //...
     
