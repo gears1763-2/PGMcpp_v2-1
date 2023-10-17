@@ -89,7 +89,7 @@ try {
     
     testFloatEquals(
         test_diesel.struct_combustion.linear_fuel_slope_LkWh,
-        0.3062 * pow(struct_disp.cap_kW, -0.0370),
+        0.4234 * pow(struct_disp.cap_kW, -0.1012),
         FLOAT_TOLERANCE,
         __FILE__,
         __LINE__

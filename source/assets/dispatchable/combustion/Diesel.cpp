@@ -45,7 +45,8 @@ Diesel :: Diesel(
     
     if (this->struct_combustion.linear_fuel_slope_LkWh < 0) {
         this->struct_combustion.linear_fuel_slope_LkWh =
-            0.3062 * pow(this->struct_disp.cap_kW, -0.0370);
+            //0.3062 * pow(this->struct_disp.cap_kW, -0.0370);
+            0.4234 * pow(this->struct_disp.cap_kW, -0.1012);    // tuned under new data 17 Oct 2023
     }
     
     //  init ecomonomic attributes
