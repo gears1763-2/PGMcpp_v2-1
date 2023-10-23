@@ -126,20 +126,18 @@ double Solar :: getProductionkW(double solar_resource_kWm2) {
      *  resource. Temperature effects are not modelled.
      * 
      *  ref: https://www.homerenergy.com/products/pro/docs/3.11/how_homer_calculates_the_pv_array_power_output.html
+     * 
+     *  P = d * (r / 1 kW/m2) * P_rated
      */
      
     // first, check if no resource 
     if (solar_resource_kWm2 <= 0) {
         return 0;
-    } 
-    
-    // otherwise, simple linear model
-    double panel_area_m2 = this->struct_nondisp.cap_kW; // one-to-one area [m2] to capacity [kW]
+    }
     
     double production_kW = this->struct_solar.derating *
-        this->struct_solar.power_transformation_ratio *
-        panel_area_m2 *
-        solar_resource_kWm2;
+        solar_resource_kWm2 *
+        this->struct_nondisp.cap_kW;
         
     return production_kW;
 }

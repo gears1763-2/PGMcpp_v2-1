@@ -29,7 +29,6 @@ struct structSolar {
     int resource_key = 0;
     
     double derating = 0.8;
-    double power_transformation_ratio = 0.9;    // a.k.a. performance ratio
     
     /*
      *  ref: survey of Solar models in HOMER Pro 3.12.3. (Canadian dollars)
