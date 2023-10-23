@@ -669,7 +669,6 @@ The \texttt{Solar} class implements the modelling of a solar photovoltaic (PV) a
         int resource_key = 0;
         
         double derating = 0.8;
-        double power_transformation_ratio = 0.9;
         double capital_cost_per_kW = 3000;
     };
 \end{verbatim}
@@ -684,8 +683,7 @@ The \texttt{Solar} class implements the modelling of a solar photovoltaic (PV) a
         \hline
         \textbf{Attribute} & \textbf{Type} & \textbf{Default Value} & \textbf{Description} \\\hline\hline
         \texttt{resource\_key} & {integer} & {0} & {The key to the corresponding solar (one-dimensional) resource. This is the key used to index into the \texttt{resource\_map\_1D} attribute of the \texttt{Model}.} \\\hline
-        \texttt{derating} & {double} & {0.8} & {This is the derating factor applied to the modelling of production under a given solar resource value. This covers losses from irradiance to panel output.} \\\hline
-        \texttt{power\_transformation\_ratio} & {double} & {0.9} & {This models additional losses incurred in the process of power transformation (DC$\to$AC, DC$\to$DC, etc).} \\\hline
+        \texttt{derating} & {double} & {0.8} & {This is the derating factor applied to the modelling of production under a given solar resource value.} \\\hline
         \texttt{capital\_cost\_per\_kW} & {double} & {3000} & {This is the model capital cost, per kiloWatt installed capacity, used to compute the capital cost of the object. This value is only used if the generic capital cost model within the \texttt{Nondispatchable} class constructor is triggered.} \\\hline
     \end{tabular}
     }
