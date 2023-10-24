@@ -965,61 +965,18 @@ try {
         }
         
         if (test_model.net_load_vec_kW[i] > 0) {
+            
             for (size_t j = 0; j < test_model.storage_ptr_vec.size(); j++) {
                 Storage* storage_ptr = test_model.storage_ptr_vec[j];
                 
-                testGreaterThanOrEqualTo(
-                    storage_ptr->discharging_vec_kW[i],
-                    0,
-                    __FILE__,
-                    __LINE__
-                );
-                
-                testFloatEquals(
-                    storage_ptr->charging_vec_kW[i],
-                    0,
-                    FLOAT_TOLERANCE,
+                testTruth(
+                    not ((storage_ptr->discharging_vec_kW[i] > 0) and
+                    (storage_ptr->charging_vec_kW[i] > 0)),
                     __FILE__,
                     __LINE__
                 );
                 
                 load_remaining_kW -= storage_ptr->discharging_vec_kW[i];
-            }
-            
-            for (size_t j = 0; j < test_model.combustion_ptr_vec.size(); j++) {
-                Combustion* combustion_ptr = test_model.combustion_ptr_vec[j];
-                
-                testFloatEquals(
-                    combustion_ptr->storage_vec_kW[i],
-                    0,
-                    FLOAT_TOLERANCE,
-                    __FILE__,
-                    __LINE__
-                );
-            }
-            
-            for (size_t j = 0; j < test_model.noncombustion_ptr_vec.size(); j++) {
-                Dispatchable* noncombustion_ptr = test_model.noncombustion_ptr_vec[j];
-                
-                testFloatEquals(
-                    noncombustion_ptr->storage_vec_kW[i],
-                    0,
-                    FLOAT_TOLERANCE,
-                    __FILE__,
-                    __LINE__
-                );
-            }
-            
-            for (size_t j = 0; j < test_model.nondisp_ptr_vec.size(); j++) {
-                Nondispatchable* nondisp_ptr = test_model.nondisp_ptr_vec[j];
-                
-                testFloatEquals(
-                    nondisp_ptr->storage_vec_kW[i],
-                    0,
-                    FLOAT_TOLERANCE,
-                    __FILE__,
-                    __LINE__
-                );
             }
         }
         
@@ -1043,6 +1000,13 @@ try {
                     storage_ptr->discharging_vec_kW[i],
                     0,
                     FLOAT_TOLERANCE,
+                    __FILE__,
+                    __LINE__
+                );
+                
+                testTruth(
+                    not ((storage_ptr->discharging_vec_kW[i] > 0) and
+                    (storage_ptr->charging_vec_kW[i] > 0)),
                     __FILE__,
                     __LINE__
                 );
@@ -1082,6 +1046,7 @@ try {
             __FILE__,
             __LINE__
         );
+        
     }
     
     

@@ -19,6 +19,8 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
     
     double dt_hrs = this->dt_vec_hr[timestep];
     
+    // ======== REQUEST ZERO PRODUCTION FROM DISPATCHABLE ASSETS ======== //
+    
     // for all combustion assets, request zero production and commit,
     // record production, dispatch, and curtailment
     for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
@@ -88,6 +90,8 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
         double curtailment_kW = production_kW - dispatch_kW;
         noncombustion_ptr->curtailment_vec_kW[timestep] = curtailment_kW;
     }
+    
+    // ======== CHARGE STORAGE FROM OVERPRODUCTION ======== //
     
     // for all storage assets, compute and record acceptable power,
     // reset charging
@@ -218,8 +222,12 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
     double dt_hrs = this->dt_vec_hr[timestep];
     double load_kW = this->net_load_vec_kW[timestep];
     
+    // ======== DISCHARGE STORAGE ======== //
+    
     // for all storage assets, get available, discharge up to load, 
     // commit, and update load
+    // flag depleted storage (to attempt charging with overproduction in this step)
+    std::vector<Storage*> depleted_storage_ptr_vec;
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
         // get available power
         Storage* storage_ptr = this->storage_ptr_vec[i];
@@ -232,6 +240,8 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
         
         if (discharging_kW <= 0) {
             discharging_kW = 0;
+            depleted_storage_ptr_vec.push_back(storage_ptr);
+            continue;
         }
         
         // commit
@@ -240,6 +250,8 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
         // update load
         load_kW -= discharging_kW;
     }
+    
+    // ======== DISPATCH ======== //
     
     // for all noncombustion assets, request production and commit,
     // record production, dispatch, and curtailment, and update load
@@ -320,6 +332,125 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
     // if remaining load >= 0, record
     if (load_kW >= 0) {
         this->remaining_load_vec_kW[timestep] = load_kW;
+    }
+    
+    // ======== CHARGE DEPLETED STORAGE FROM OVERPRODUCTION ======== //
+    if (not depleted_storage_ptr_vec.empty()) {
+        // for all depleted storage assets, compute and record acceptable power,
+        // reset charging
+        for (size_t i = 0; i < depleted_storage_ptr_vec.size(); i++) {
+            Storage* storage_ptr = depleted_storage_ptr_vec[i];
+            
+            storage_ptr->acceptable_kW =
+                storage_ptr->getAcceptablekW(dt_hrs);
+            
+            storage_ptr->charging_kW = 0;
+        }
+        
+        // for all combustion assets, attempt to charge from curtailment,
+        // update curtailment, and record storage
+        for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+            Combustion* combustion_ptr = this->combustion_ptr_vec[i];
+            
+            // if no curtailment, no energy to charge with!
+            if (combustion_ptr->curtailment_vec_kW[timestep] <= 0) {
+                continue;
+            }
+            
+            // otherwise, for all depleted storage assets, update storage charging,
+            // combustion curtailment and storage
+            for (size_t j = 0; j < depleted_storage_ptr_vec.size(); j++) {
+                Storage* storage_ptr = depleted_storage_ptr_vec[j];
+                
+                double curtailment_kW =
+                    combustion_ptr->curtailment_vec_kW[timestep];
+                
+                double increment_kW =
+                    storage_ptr->acceptable_kW - 
+                    storage_ptr->charging_kW;
+                
+                if (curtailment_kW <= increment_kW) {
+                    increment_kW = curtailment_kW;
+                }
+                
+                storage_ptr->charging_kW += increment_kW;
+                combustion_ptr->curtailment_vec_kW[timestep] -= increment_kW;
+                combustion_ptr->storage_vec_kW[timestep] += increment_kW;
+            }
+        }
+        
+        // for all noncombustion assets, attempt to charge from curtailment,
+        // update curtailment, and record storage
+        for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+            Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
+            
+            // if no curtailment, no energy to charge with!
+            if (noncombustion_ptr->curtailment_vec_kW[timestep] <= 0) {
+                continue;
+            }
+            
+            // otherwise, for all depleted storage assets, update storage charging,
+            // noncombustion curtailment and storage
+            for (size_t j = 0; j < depleted_storage_ptr_vec.size(); j++) {
+                Storage* storage_ptr = depleted_storage_ptr_vec[j];
+                
+                double curtailment_kW =
+                    noncombustion_ptr->curtailment_vec_kW[timestep];
+                
+                double increment_kW =
+                    storage_ptr->acceptable_kW - 
+                    storage_ptr->charging_kW;
+                
+                if (curtailment_kW <= increment_kW) {
+                    increment_kW = curtailment_kW;
+                }
+                
+                storage_ptr->charging_kW += increment_kW;
+                noncombustion_ptr->curtailment_vec_kW[timestep] -= increment_kW;
+                noncombustion_ptr->storage_vec_kW[timestep] += increment_kW;
+            }
+        }
+        
+        // for all nondispatchable assets, attempt to charge from curtailment,
+        // update curtailment, and record storage
+        for (size_t i = 0; i < this->nondisp_ptr_vec.size(); i++) {
+            Nondispatchable* nondisp_ptr = this->nondisp_ptr_vec[i];
+            
+            // if no curtailment, no energy to charge with!
+            if (nondisp_ptr->curtailment_vec_kW[timestep] <= 0) {
+                continue;
+            }
+            
+            // otherwise, for all depleted storage assets, update storage charging,
+            // nondispatchable curtailment and storage
+            for (size_t j = 0; j < depleted_storage_ptr_vec.size(); j++) {
+                Storage* storage_ptr = depleted_storage_ptr_vec[j];
+                
+                double curtailment_kW =
+                    nondisp_ptr->curtailment_vec_kW[timestep];
+                
+                double increment_kW =
+                    storage_ptr->acceptable_kW - 
+                    storage_ptr->charging_kW;
+                
+                if (curtailment_kW <= increment_kW) {
+                    increment_kW = curtailment_kW;
+                }
+                
+                storage_ptr->charging_kW += increment_kW;
+                nondisp_ptr->curtailment_vec_kW[timestep] -= increment_kW;
+                nondisp_ptr->storage_vec_kW[timestep] += increment_kW;
+            }
+        }
+        
+        // for all depleted storage assets, commit charge
+        for (size_t i = 0; i < depleted_storage_ptr_vec.size(); i++) {
+            Storage* storage_ptr = depleted_storage_ptr_vec[i];
+            
+            double charging_kW = storage_ptr->charging_kW;
+            
+            storage_ptr->commitChargekW(charging_kW, timestep);
+        }
     }
     
     return;
