@@ -43,6 +43,12 @@ struct structModel {
 };
 
 
+struct dischargeStorageStruct {
+    double load_kW;
+    std::vector<Storage*> depleted_storage_ptr_vec;
+};
+
+
 class Model {
     public:
         //  modelling and output attributes (unstructured)
@@ -107,6 +113,9 @@ class Model {
         double _getRenewableProductionkW(Nondispatchable*, int);
         void _generateNetLoadVector(void);
         
+        double _controlDispatchable(int, double, double);
+        dischargeStorageStruct _dischargeStorage(int, double, double);
+        void _chargeStorage(int, double, bool, std::vector<Storage*>);
         void _dispatchLoadFollowingInOrderCharging(int);
         void _dispatchLoadFollowingInOrderDischarging(int);
         void _handleDispatch(void);
