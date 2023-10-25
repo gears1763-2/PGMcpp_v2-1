@@ -290,7 +290,9 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
     
     // capture as much overproduction as possible by way of charging Storage assets
     // prioritize Combustion, then non-Combustion, then Nondispatchable
-    this->_chargeStorage(timestep, dt_hrs, false, {});
+    if (not this->storage_ptr_vec.empty()) {
+        this->_chargeStorage(timestep, dt_hrs, false, {});
+    }
     
     return;
 }
@@ -304,12 +306,15 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
     
     double dt_hrs = this->dt_vec_hr[timestep];
     double load_kW = this->net_load_vec_kW[timestep];
+    dischargeStorageStruct discharge_storage_struct;
     
     // discharge Storage assets to cover a maximum of load, tracking depleted assets
     // update load
-    dischargeStorageStruct discharge_storage_struct =
-        this->_dischargeStorage(timestep, load_kW, dt_hrs);
-    load_kW = discharge_storage_struct.load_kW;
+    if (not this->storage_ptr_vec.empty()) {
+        discharge_storage_struct =
+            this->_dischargeStorage(timestep, load_kW, dt_hrs);
+        load_kW = discharge_storage_struct.load_kW;
+    }
     
     // request sufficient production from Dispatchable asets
     // update load and track any remaining (i.e., unsatisfied) load
@@ -321,12 +326,15 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
     
     // capture as much overproduction as possible by way of charging depleted Storage assets
     // prioritize Combustion, then non-Combustion, then Nondispatchable
-    this->_chargeStorage(
-        timestep,
-        dt_hrs,
-        true,
-        discharge_storage_struct.depleted_storage_ptr_vec
-    );
+    if (not discharge_storage_struct.depleted_storage_ptr_vec.empty()) {
+        this->_chargeStorage(
+            timestep,
+            dt_hrs,
+            true,
+            discharge_storage_struct.depleted_storage_ptr_vec
+        );
+    }
+    
     
     return;
 }

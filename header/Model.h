@@ -44,8 +44,8 @@ struct structModel {
 
 
 struct dischargeStorageStruct {
-    double load_kW;
-    std::vector<Storage*> depleted_storage_ptr_vec;
+    double load_kW = 0;
+    std::vector<Storage*> depleted_storage_ptr_vec = {};
 };
 
 
