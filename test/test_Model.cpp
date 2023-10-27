@@ -15,9 +15,13 @@ printGold("Testing Model ... ");
 std::cout << std::endl;
 
 try {
+    // ======== LOAD_FOLLOWING_IN_ORDER ======== //
+    
+    
     //  construction
     structModel struct_model;
     
+    struct_model.dispatch_mode = LOAD_FOLLOWING_IN_ORDER;
     struct_model.print_flag = true;
     struct_model.test_flag = true;
     
@@ -855,6 +859,7 @@ try {
     
     
     structBatteryStorage struct_battery_storage;
+    //struct_battery_storage.hysteresis_SOC = 0.2;
     
     structLiIon struct_liion;
     
@@ -1067,7 +1072,75 @@ try {
     std::cout << "\tTesting Model::writeResults() ..." <<
         std::endl;
     
-    test_model.writeResults("test");
+    test_model.writeResults("test/LoadFollowingInOrder");
+    
+    
+    // ======== CYCLE_CHARGING_IN_ORDER ======== //
+    
+    // reset, change dispatch control mode
+    test_model.reset();
+    test_model.struct_model.dispatch_mode = CYCLE_CHARGING_IN_ORDER;
+    
+    // test addSolar()
+    std::cout << "\tTesting Model::addSolar() ..." <<
+        std::endl;
+    
+    test_model.addSolar(struct_nondisp, struct_solar);
+    
+    // test addTidal()
+    std::cout << "\tTesting Model::addTidal() ..." <<
+        std::endl;
+    
+    test_model.addTidal(struct_nondisp, struct_tidal);
+    
+    // test addWave()
+    std::cout << "\tTesting Model::addWave() ..." <<
+        std::endl;
+    
+    test_model.addWave(struct_nondisp, struct_wave);
+    
+    // test addWind()
+    std::cout << "\tTesting Model::addWind() ..." <<
+        std::endl;
+
+    test_model.addWind(struct_nondisp, struct_wind);
+    
+    // test addDiesel()
+    std::cout << "\tTesting Model::addDiesel() ..." <<
+        std::endl;
+
+    test_model.addDiesel(struct_disp, struct_combustion, struct_diesel);
+    
+    // test addHydro()
+    std::cout << "\tTesting Model::addHydro() ..." <<
+        std::endl;
+    
+    test_model.addHydro(struct_disp, struct_hydro);
+    
+    // test addLiIon()
+    std::cout << "\tTesting Model::addLiIon() ..." <<
+        std::endl;
+    
+    test_model.addLiIon(
+        struct_storage,
+        struct_battery_storage,
+        struct_liion
+    );
+    
+    // test run()
+    std::cout << "\tTesting Model::run() ..." <<
+        std::endl;
+    
+    test_model.run();
+    
+    // test post-run attributes
+    //...
+    
+    // test writeResults()
+    std::cout << "\tTesting Model::writeResults() ..." <<
+        std::endl;
+    
+    test_model.writeResults("test/CycleChargingInOrder");
     
 } catch (...) {
     printRed("\n\t\t\t\tModel Tests:  FAIL\n");

@@ -41,6 +41,8 @@ struct structCombustion {
     //  these are the only attributes the user should interact with
     FuelMode fuel_mode = LINEAR;
     
+    double cycle_charging_load_ratio = 0.85;
+    
     double fuel_cost_L = 1.50;
     double nominal_fuel_escalation_rate_annual = 0.05;
     

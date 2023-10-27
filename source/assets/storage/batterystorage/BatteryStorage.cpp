@@ -45,6 +45,11 @@ double BatteryStorage :: getAvailablekW(double dt_hrs) {
      *  Method to compute and return available power [kW] over timestep
      */
     
+    // check if depleted
+    if (this->depleted_flag) {
+        return 0;
+    }
+    
     // compute available energy
     double available_kWh = this->charge_kWh -
         this->min_charge_kWh;
@@ -133,6 +138,14 @@ void BatteryStorage :: commitChargekW(
     this->charge_vec_kWh[timestep] = this->charge_kWh;
     this->charging_vec_kW[timestep] = charging_kW;
     
+    // set depleted flag
+    if (this->depleted_flag) {
+        double SOC = this->charge_kWh / this->struct_storage.cap_kWh;
+        if (SOC >= this->struct_battery_storage.hysteresis_SOC) {
+            this->depleted_flag = false;
+        }
+    }
+    
     return;
 }
 
@@ -177,6 +190,14 @@ void BatteryStorage :: commitDischargekW(
     this->charge_kWh -= discharged_kWh;
     this->charge_vec_kWh[timestep] = this->charge_kWh;
     this->discharging_vec_kW[timestep] = discharging_kW;
+    
+    // set depleted flag
+    if (not this->depleted_flag) {
+        double SOC = this->charge_kWh / this->struct_storage.cap_kWh;
+        if (SOC <= this->struct_battery_storage.min_SOC) {
+            this->depleted_flag = true;
+        }
+    }
     
     return;
 }

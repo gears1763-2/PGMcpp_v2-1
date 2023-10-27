@@ -18,6 +18,12 @@
 #include "../header/Model_includes.h"
 #include "../header/Model.h"
 
+#include "control/control_Combustion.cpp"
+#include "control/control_Noncombustion.cpp"
+#include "control/control_Storage.cpp"
+#include "control/LOAD_FOLLOWING_IN_ORDER.cpp"
+#include "control/CYCLE_CHARGING_IN_ORDER.cpp"
+
 
 // -------- HELPER METHODS -------- //
 
@@ -645,10 +651,6 @@ void Model :: _generateNetLoadVector() {
     return;
 }
 
-
-#include "LoadFollowingInOrder.cpp"
-
-
 void Model :: _handleDispatch() {
     /*
      *  Helper method to handle dispatch under choice of dispatch mode
@@ -669,7 +671,33 @@ void Model :: _handleDispatch() {
             break;
         }
         
+        case (CYCLE_CHARGING_IN_ORDER): {
+            for (int i = 0; i < this->n_timesteps; i++) {
+                if (this->net_load_vec_kW[i] <= 0) {
+                    this->_dispatchCycleChargingInOrderCharging(i);
+                }
+                
+                else {
+                    this->_dispatchCycleChargingInOrderDischarging(i);
+                }
+            }
+            
+            break;
+        }
+        
         case (LOAD_FOLLOWING_SMART_COMBUSTION): {
+            //  *** WORK IN PROGRESS - NOT YET FULLY IMPLEMENTED ***
+            
+            break;
+        }
+        
+        case (CYCLE_CHARGING_SMART_COMBUSTION): {
+            //  *** WORK IN PROGRESS - NOT YET FULLY IMPLEMENTED ***
+            
+            break;
+        }
+        
+        case (FORESIGHT): {
             //  *** WORK IN PROGRESS - NOT YET FULLY IMPLEMENTED ***
             
             break;

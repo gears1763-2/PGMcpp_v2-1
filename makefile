@@ -244,7 +244,9 @@ clean:
 	rm -frv bin;
 	rm -frv core;
 	rm -frv object;
-	rm -frv data/output/test;
+	rm -frv data/output/test/;
+	rm -frv data/output/test/LoadFollowingInOrder;
+	rm -frv data/output/test/CycleChargingInOrder;
 	rm -frv data/output/example_project;
 
 
@@ -261,6 +263,7 @@ all:
 	mkdir -pv object/assets/storage
 	mkdir -pv object/assets/storage/batterystorage
 	mkdir -pv data/output
+	mkdir -pv data/output/test
 	#find header/ -exec touch {} +
 	#find source/ -exec touch {} +
 	#find test/ -exec touch {} +

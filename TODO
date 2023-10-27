@@ -1,3 +1,4 @@
+- implement CYCLE_CHARGING_IN_ORDER control
 - implement LOAD_FOLLOWING_SMART_COMBUSTION control
 - implement Dispatchable <-- Hydro asset
 - implement Sean's battery degradation model

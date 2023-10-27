@@ -15,6 +15,8 @@ Storage :: Storage(
      *  Storage class constructor
      */
     
+    this->depleted_flag = false;
+    
     this->struct_storage = struct_storage;
     this->n_timesteps = n_timesteps;
     this->cap_kWh = this->struct_storage.cap_kWh;

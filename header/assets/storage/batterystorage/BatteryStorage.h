@@ -30,6 +30,8 @@ struct structBatteryStorage {
     double min_SOC = 0.2;
     double max_SOC = 0.9;
     
+    double hysteresis_SOC = 0.5;
+    
     double charge_efficiency = 0.9;
     double discharge_efficiency = 0.9;
 };

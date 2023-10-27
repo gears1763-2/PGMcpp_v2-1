@@ -46,6 +46,8 @@ class Storage {
     public:
         //  modelling and output attributes (unstructured)
         //  the user should not interact with these attributes
+        bool depleted_flag;
+        
         StorageType storage_type = LIION;
         structStorage struct_storage;
         

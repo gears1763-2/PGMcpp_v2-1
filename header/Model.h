@@ -24,7 +24,10 @@
 
 enum DispatchMode {
     LOAD_FOLLOWING_IN_ORDER,
-    LOAD_FOLLOWING_SMART_COMBUSTION
+    CYCLE_CHARGING_IN_ORDER,
+    LOAD_FOLLOWING_SMART_COMBUSTION,
+    CYCLE_CHARGING_SMART_COMBUSTION,
+    FORESIGHT
 };
 
 
@@ -40,12 +43,6 @@ struct structModel {
     double nominal_discount_rate_annual = 0.04;
     
     std::string path_2_load_data = "";
-};
-
-
-struct dischargeStorageStruct {
-    double load_kW = 0;
-    std::vector<Storage*> depleted_storage_ptr_vec = {};
 };
 
 
@@ -113,11 +110,25 @@ class Model {
         double _getRenewableProductionkW(Nondispatchable*, int);
         void _generateNetLoadVector(void);
         
-        double _controlDispatchable(int, double, double);
-        dischargeStorageStruct _dischargeStorage(int, double, double);
-        void _chargeStorage(int, double, bool, std::vector<Storage*>);
+        double _controlCombustion(int, double, bool);
+        double _controlNoncombustion(int, double, double);
+        
+        std::vector<Storage*> _getDepletedStorage(void);
+        std::vector<Storage*> _getNondepletedStorage(void);
+        
+        double _dischargeStorage(int, double, double, std::vector<Storage*>);
+        
+        void _chargeStorageFromCombustion(int, double, std::vector<Storage*>);
+        void _chargeStorageFromNoncombustion(int, double, std::vector<Storage*>);
+        void _chargeStorageFromNondispatchable(int, double, std::vector<Storage*>);
+        void _chargeStorage(int, double, std::vector<Storage*>);
+        
         void _dispatchLoadFollowingInOrderCharging(int);
         void _dispatchLoadFollowingInOrderDischarging(int);
+        
+        void _dispatchCycleChargingInOrderCharging(int);
+        void _dispatchCycleChargingInOrderDischarging(int);
+        
         void _handleDispatch(void);
         
         void _computeFuelEmissions(void);
@@ -153,3 +164,4 @@ class Model {
 
 
 #endif  /* MODEL_H */
+
