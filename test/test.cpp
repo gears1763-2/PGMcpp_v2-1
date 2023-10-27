@@ -16,22 +16,22 @@
 
 
 #ifdef _WIN32
-#include <windows.h>
+    #include <windows.h>
 
-void activateVirtualTerminal(void)
-{
-    /*
-     *  Helper function to activate virtual terminal, so that Windows can
-     *  attempt to pretend to be almost as awesome as Linux ...
-     */
+    void activateVirtualTerminal(void)
+    {
+        /*
+         *  Helper function to activate virtual terminal, so that Windows can
+         *  attempt to pretend to be almost as awesome as Linux ...
+         */
 
-    HANDLE handleOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    DWORD consoleMode;
-    GetConsoleMode(handleOut , &consoleMode);
-    consoleMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-    consoleMode |= DISABLE_NEWLINE_AUTO_RETURN;
-    SetConsoleMode(handleOut , consoleMode);
-}
+        HANDLE handleOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        DWORD consoleMode;
+        GetConsoleMode(handleOut , &consoleMode);
+        consoleMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        consoleMode |= DISABLE_NEWLINE_AUTO_RETURN;
+        SetConsoleMode(handleOut , consoleMode);
+    }
 
 #endif  /* _WIN32 */
 
@@ -263,6 +263,9 @@ void printGold(std::string input_str) {
 
 
 int main(int argc, char** argv) {
+    #ifdef _WIN32
+        activateVirtualTerminal();
+    #endif  /* _WIN32 */
     
     //  colour streaming
     std::cout << std::endl;

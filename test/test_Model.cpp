@@ -969,6 +969,20 @@ try {
             for (size_t j = 0; j < test_model.storage_ptr_vec.size(); j++) {
                 Storage* storage_ptr = test_model.storage_ptr_vec[j];
                 
+                testGreaterThanOrEqualTo(
+                    storage_ptr->charging_vec_kW[i],
+                    0,
+                    __FILE__,
+                    __LINE__
+                );
+                
+                testGreaterThanOrEqualTo(
+                    storage_ptr->discharging_vec_kW[i],
+                    0,
+                    __FILE__,
+                    __LINE__
+                );
+                
                 testTruth(
                     not ((storage_ptr->discharging_vec_kW[i] > 0) and
                     (storage_ptr->charging_vec_kW[i] > 0)),
@@ -996,10 +1010,9 @@ try {
                     __LINE__
                 );
                 
-                testFloatEquals(
+                testGreaterThanOrEqualTo(
                     storage_ptr->discharging_vec_kW[i],
                     0,
-                    FLOAT_TOLERANCE,
                     __FILE__,
                     __LINE__
                 );
