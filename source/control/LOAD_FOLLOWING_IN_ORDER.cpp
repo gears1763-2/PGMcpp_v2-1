@@ -16,7 +16,7 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
      *  Helper method to handle load following in order dispatch, under
      *  storage charging, for a single timestep
      *
-     *  In this mode, net load <= zero.
+     *  In this mode, net load <= 0.
      */
     
     double dt_hrs = this->dt_vec_hr[timestep];

@@ -35,7 +35,10 @@ double Model :: _controlCombustion(
                 combustion_ptr->struct_combustion.cycle_charging_load_ratio *
                 combustion_ptr->struct_disp.cap_kW;
             
-            if (request_kW < load_kW) {
+            if (load_kW <= 0) {
+                request_kW = 0;
+            }
+            else if (request_kW < load_kW) {
                 request_kW = load_kW;
             }
             
