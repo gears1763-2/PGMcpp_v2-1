@@ -17,6 +17,10 @@
         Operating System: Linux Mint 20.2
                   Kernel: Linux 5.4.0-162-generic
             Architecture: x86-64
+        
+        Operating System: Linux Mint 21.2
+                  Kernel: Linux 6.5.4-76060504-generic
+            Architecture: x86-64
 
         Operating System: Windows 11 Home
                  Version: 10.0.22621 Build 22621
@@ -26,6 +30,7 @@
     The following compilers were used in testing:
 
         g++ (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0
+        g++ (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
         g++ (Rev10, Built by MSYS2 project) 13.2.0
 
 

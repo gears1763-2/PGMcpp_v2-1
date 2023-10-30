@@ -116,7 +116,6 @@ This user manual will go over the features of PGMcpp, including the various clas
 
 \chapter{The \texttt{Model} Class}
 
-
 \begin{large}
 \noindent\underline{Header}:\quad\texttt{header/Model.h}\par
 \noindent\underline{Source}:\quad\texttt{source/Model.cpp}\par
@@ -1320,7 +1319,7 @@ The control strategy applied to the components of a microgrid can have a signifi
     }
 \end{verbatim}
 
-\noindent This control enumeration will be expanded and updated as new dispatch control strategies are added to PGMcpp.
+\noindent and this control enumeration will be expanded and updated as new dispatch control strategies are added to PGMcpp. Furthermore, given the importance of control, all associated code is stored in \texttt{source/control/}.
 
 \section{Net Load}
 
@@ -1345,6 +1344,11 @@ Finally, note that the production, dispatch, and curtailment of all nondispatcha
 
 \section{Load Following, In Order}
 
+\begin{large}
+\noindent\underline{Source}:\quad\texttt{source/control/LOAD\_FOLLOWING\_IN\_ORDER.cpp}\par
+\end{large}
+\vspace{5mm}
+
 Load following, in order is perhaps the simplest control strategy, and the intent is to meet the load at every point in time using a minimum of production and dispatch. At each point in time, depending on the sign of the net load, dispatch control enters either a charging mode or a discharging mode.\par 
 When in charging mode (i.e., $\widehat{L}_i \leq 0$), the following sequence of actions are taken
 
@@ -1366,6 +1370,11 @@ When in discharging mode (i.e., $\widehat{L}_i > 0$), the following sequence of 
 Finally, the ``in order" part of the control algorithm is important. As detailed above, different classes of asset take priority over others when either producing to meet load or sending overproduction to storage. In every case, sending overproduction to storage is always done in the order combustion, then non-combustion, then nondispatchable. Conversely, when in discharging mode, production/dispatch is always storage first, then non-combustion, then combustion. Furthermore, order within each class is also followed, with this order being defined simply by the order in which objects are added to the \texttt{Model}; understanding this offers the user control over asset priority within any given class.
 
 \section{Cycle Charging, In Order}
+
+\begin{large}
+\noindent\underline{Source}:\quad\texttt{source/control/CYCLE\_CHARGING\_IN\_ORDER.cpp}\par
+\end{large}
+\vspace{5mm}
 
 Cycle charging, in order control is largely similar to load following, in order control except for one key difference; whenever there are depleted storage assets, the combustion assets are run at at least some proportion of their capacity in order to charge storage assets more quickly while consuming fuel more efficiently. This ``some proportion" is defined by the \texttt{cycle\_charging\_load\_ratio} attribute of \texttt{structCombustion}. The simple logic here is, if the combustion asset would run at less than this proportion in load following mode, then it will run at this proportion in cycle charging mode (with the exception of zero; if the asset can shut down, then it will still do so). Conversely, if the combustion asset would run at greater than this proportion in load following mode, then it will also do so in cycle charging mode. 
 
@@ -1637,3 +1646,23 @@ The \texttt{Storage/} folder contains the results for each \texttt{Storage} obje
 \section{More Example Code}
 
 More examples of how to interact with a \texttt{Model} object can also be found in\\\texttt{test/test\_Model.cpp}.
+
+% ----- REFERENCES -----
+
+%\newpage
+%\addcontentsline{toc}{chapter}{References}
+%\bibliography{refs.bib}{}
+%\bibliographystyle{IEEEtran} 
+%\bibliographystyle{apalike} 
+
+
+% ---- APPENDICES ----
+
+%\appendix
+%\chapter{Supporting Tables}
+%\pagenumbering{arabic}
+%\renewcommand*{\thepage}{A-\arabic{page}}
+
+%[...]
+
+\end{document}
