@@ -1035,8 +1035,26 @@ void Model :: _writeSummary(std::string write_path) {
             break;
         }
         
+        case (CYCLE_CHARGING_IN_ORDER): {
+            ofs << "(CYCLE_CHARGING_IN_ORDER)\n";
+            
+            break;
+        }
+        
         case (LOAD_FOLLOWING_SMART_COMBUSTION): {
             ofs << "(LOAD_FOLLOWING_SMART_COMBUSTION)\n";
+            
+            break;
+        }
+        
+        case (CYCLE_CHARGING_SMART_COMBUSTION): {
+            ofs << "(CYCLE_CHARGING_SMART_COMBUSTION)\n";
+            
+            break;
+        }
+        
+        case (FORESIGHT): {
+            ofs << "(FORESIGHT)\n";
             
             break;
         }

@@ -3,5 +3,6 @@
 - implement Dispatchable <-- Hydro asset
 - implement Sean's battery degradation model
 - implement some kind of foresight, or receding horizon, control (will need linear programming functionality for this)
+- Python wrapper with per timestep callback functionality (so Python objects can work with PGMcpp objects)
 
 - ONGOING: update docs!
