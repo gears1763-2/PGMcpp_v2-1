@@ -942,6 +942,8 @@ The \texttt{Combustion} class is the root of its branch of the class hierarchy. 
 \begin{verbatim}
     struct structCombustion {
         FuelMode fuel_mode = LINEAR;
+
+        double cycle_charging_load_ratio = 0.85;
         
         double fuel_cost_L = 1.50;
         double nominal_fuel_escalation_rate_annual = 0.05;
@@ -970,6 +972,7 @@ The \texttt{Combustion} class is the root of its branch of the class hierarchy. 
         \hline
         \textbf{Attribute} & \textbf{Type} & \textbf{Default Value} & \textbf{Description} \\\hline\hline
         \texttt{fuel\_mode} & {FuelMode} & {LINEAR} & {Defines the approach to be used in modelling fuel consumption.} \\\hline
+        \texttt{cycle\_charging\_load\_ratio} & {double} & {0.85} & {Defines the proportion of \texttt{cap\_kW} at which the object produces when running in cycle charging mode.} \\\hline
         \texttt{fuel\_cost\_L} & {double} & {1.50} & {Defines the price of fuel per unit volume (expressed in litres). The units of currency are left undefined.} \\\hline
         \texttt{nominal\_fuel\_escalation\_rate} & {double} & {0.05} & {Defines the nominal escalation rate in fuel cost (annual), used in computing real fuel costs. This rate is used instead of the given nominal inflation rate.} \\\hline
         \texttt{linear\_fuel\_intercept\_LkWh} & {double} & {-1 (sentinel)} & {Defines the linear fuel intercept, expressed in litres per kiloWatt-hour produced, to be used in modelling fuel consumption. The default value of -1 is a sentinel value, which triggers a generic fuel intercept model within the constructor. This is only used if \texttt{fuel\_mode} = LINEAR.} \\\hline
@@ -1226,6 +1229,8 @@ The \texttt{BatteryStorage} class is the root of its branch of the class hierarc
         double init_SOC = 0.5;  // SOC = state of charge
         double min_SOC = 0.2;
         double max_SOC = 0.9;
+
+        double hysteresis_SOC = 0.5;
         
         double charge_efficiency = 0.9;
         double discharge_efficiency = 0.9;
@@ -1244,6 +1249,7 @@ The \texttt{BatteryStorage} class is the root of its branch of the class hierarc
         \texttt{init\_SOC} & {double} & {0.5} & {Defines the initial state of charge (SOC) of the object. This is defined as \texttt{Storage :: charge\_kWh} / \texttt{Storage :: structStorage :: cap\_kWh}. This attribute will alter the initial value of \texttt{Storage :: charge\_kWh}.} \\\hline
         \texttt{min\_SOC} & {double} & {0.2} & {Defines the minimum SOC of the object. This attribute will alter the initial value of \texttt{Storage :: min\_charge\_kWh}.} \\\hline
         \texttt{max\_SOC} & {double} & {0.9} & {Defines the maximum SOC of the object. This attribute will alter the initial value of \texttt{Storage :: max\_charge\_kWh}.} \\\hline
+        \texttt{hysteresis\_SOC} & {double} & {0.5} & {Defines the SOC that must be attained after reaching the minimum SOC before the object can be discharged again.} \\\hline
         \texttt{charge\_efficiency} & {double} & {0.9} & {Defines how efficiently the object transforms a charging (i.e., input) power into an increase in charge (i.e., energy content).} \\\hline
         \texttt{discharge\_efficiency} & {double} & {0.9} & {Defines how efficiently the object transforms a decrease in charge (i.e., energy content) into a discharging (i.e., output) power.} \\\hline
     \end{tabular}
@@ -1310,21 +1316,58 @@ The control strategy applied to the components of a microgrid can have a signifi
 \begin{verbatim}
     enum DispatchMode {
         LOAD_FOLLOWING_IN_ORDER,
+        CYCLE_CHARGING_IN_ORDER
     }
 \end{verbatim}
 
 \noindent This control enumeration will be expanded and updated as new dispatch control strategies are added to PGMcpp.
 
+\section{Net Load}
+
+Before summarizing the handling (i.e., control) of dispatchable assets, a word on the handling of nondispatchable assets (i.e., the renewable assets) is warranted. Whenever a call is made to \texttt{Model :: run()}, the following sequence of actions is taken
+
+\begin{enumerate}
+    \item The net load over the entire modelled project life is computed. (This is where the nondispatchable assets are handled.)
+    \item The control of the dispatchable assets is then handled for each point in time. (This is where \texttt{LOAD\_FOLLOWING\_IN\_ORDER} etc. is applied.)
+    \item Fuel consumption and emissions are then computed.
+    \item Model economics are then computed.
+\end{enumerate}
+
+The net load, at any point in time, is here defined as the electrical load minus the sum of all renewable production. That is
+
+\begin{equation}
+    \widehat{L}_i = L_i - \sum_{j=1}^N P_{i,\textrm{asset} j}
+    \label{eqn:net_load}
+\end{equation}
+
+\noindent Where $L_i$ is the $i^\textrm{th}$ load value, $\widehat{L}_i$ is the corresponding net load value, and $P_{i,\textrm{asset} j}$ is the production from the $j^\textrm{th}$ nondispatchable asset at the $i^\textrm{th}$ point in time. Observe that, under this definition, a negative (or zero) net load indicates a surplus of nondispatchable production, and a positive net load indicates a deficit of nondispatchable production.\par 
+Finally, note that the production, dispatch, and curtailment of all nondispatchable assets is modelled and recorded, for every point in time, during the handling of action (1) of \texttt{Model :: run()}. As such, the nondispatchable assets \underline{are always used first} at every point in time, regardless of which dispatch control strategy is applied in action (2) of \texttt{Model :: run()}.
+
 \section{Load Following, In Order}
 
-\begin{large}
-\noindent\underline{Source}:\quad\texttt{source/LoadFollowingInOrder.cpp}\par
-\end{large}
-\vspace{5mm}
+Load following, in order is perhaps the simplest control strategy, and the intent is to meet the load at every point in time using a minimum of production and dispatch. At each point in time, depending on the sign of the net load, dispatch control enters either a charging mode or a discharging mode.\par 
+When in charging mode (i.e., $\widehat{L}_i \leq 0$), the following sequence of actions are taken
 
-Load following, in order control is perhaps the simplest control strategy. All renewable (i.e. \texttt{Nondispatchable}) objects are dispatched first, in the order in which they were added to the \texttt{Model} instance, and then the control takes one of two approaches from there, depending on whether there is a surplus or a deficit of renewable production at that point in time. \par 
-If there is a surplus of renewable production, then the control takes a storage charging approach. All \texttt{Dispatchable} assets (both \texttt{Combustion} and non-\texttt{Combustion}) are set to zero production, and then charging is attempted. In the order in which they were added to the \texttt{Model} instance, each \texttt{Storage} object attempts to accept charge from every \texttt{Combustion} object, in order. Then, each \texttt{Storage} object attempts to accept charge from every non-\texttt{Combustion} object, in order. Finally, each \texttt{Storage} object attempts to accept charge from every \texttt{Nondispatchable} object. In every case, charging is only possible if the object has excess production (possibly as a result of operating constraints) that would otherwise be curtailed. \par 
-If there is a deficit of renewable production, then the control takes a storage discharging approach. First, each \texttt{Storage} object, in order, attempts to discharge to cover the load. If, after exhausting all \texttt{Storage} objects, there is still unsatisfied load, then the non-\texttt{Combustion} objects are dispatched, in order, to cover the load. Finally, if after exhausting all non-\texttt{Combustion} objects, there is still unsatisfied load, then the \texttt{Combustion} objects are dispatched, in order, to cover the load. Of course, any \texttt{Dispatchable} objects that are not used to cover load have their production set to zero.
+\begin{enumerate}
+    \item Zero production is requested from all dispatchable assets (since they do not need to be producing anything in this case to meet the load). The assets may or may not be able to comply depending on their operating constraints.
+    \item All storage assets are charged using any available overproduction. In attempting to charge the storage assets, overproduction from combustion assets is considered first, then non-combustion assets, then nondispatchable assets.
+\end{enumerate}
+
+When in discharging mode (i.e., $\widehat{L}_i > 0$), the following sequence of actions are taken
+
+\begin{enumerate}
+    \item The set of all storage assets is partitioned into depleted and non-depleted.
+    \item All non-depleted storage assets are then used to satisfy as much of the load as possible.
+    \item If there is any load left unsatisfied, then all non-combustion assets are used to satisfy as much of the load as possible.
+    \item If there is any load left unsatisfied, then all combustion assets are used to satisfy as much of the load as possible.
+    \item All depleted storage assets are then charged using any available overproduction. In attempting to charge the storage assets, overproduction from combustion assets is considered first, then non-combustion assets, then nondispatchable assets.
+\end{enumerate}
+
+Finally, the ``in order" part of the control algorithm is important. As detailed above, different classes of asset take priority over others when either producing to meet load or sending overproduction to storage. In every case, sending overproduction to storage is always done in the order combustion, then non-combustion, then nondispatchable. Conversely, when in discharging mode, production/dispatch is always storage first, then non-combustion, then combustion. Furthermore, order within each class is also followed, with this order being defined simply by the order in which objects are added to the \texttt{Model}; understanding this offers the user control over asset priority within any given class.
+
+\section{Cycle Charging, In Order}
+
+Cycle charging, in order control is largely similar to load following, in order control except for one key difference; whenever there are depleted storage assets, the combustion assets are run at at least some proportion of their capacity in order to charge storage assets more quickly while consuming fuel more efficiently. This ``some proportion" is defined by the \texttt{cycle\_charging\_load\_ratio} attribute of \texttt{structCombustion}. The simple logic here is, if the combustion asset would run at less than this proportion in load following mode, then it will run at this proportion in cycle charging mode (with the exception of zero; if the asset can shut down, then it will still do so). Conversely, if the combustion asset would run at greater than this proportion in load following mode, then it will also do so in cycle charging mode. 
 
 \chapter{An Example PGMcpp Project}
 
@@ -1591,22 +1634,6 @@ The \texttt{Storage/} folder contains the results for each \texttt{Storage} obje
     \item \texttt{150kW\_1000kWh\_LIION\_0\_summary.txt}: a summary of aggregate model results for the lithium-ion battery energy storage system, including key economic and environmental metrics.
 \end{enumerate}
 
-% ----- REFERENCES -----
+\section{More Example Code}
 
-%\newpage
-%\addcontentsline{toc}{chapter}{References}
-%\bibliography{refs.bib}{}
-%\bibliographystyle{IEEEtran} 
-%\bibliographystyle{apalike} 
-
-
-% ---- APPENDICES ----
-
-%\appendix
-%\chapter{Supporting Tables}
-%\pagenumbering{arabic}
-%\renewcommand*{\thepage}{A-\arabic{page}}
-
-%[...]
-
-\end{document}
+More examples of how to interact with a \texttt{Model} object can also be found in\\\texttt{test/test\_Model.cpp}.
