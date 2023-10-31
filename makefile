@@ -24,8 +24,8 @@ PROJECT_NAME = example_project
 CXX = g++
 
 # -g is for gdb symbols
-#CXXFLAGS = -O1 -std=c++17 -Wall -g
-CXXFLAGS = -O3 -std=c++17
+#CXXFLAGS = -O1 -std=c++17 -Wall -g -fPIC
+CXXFLAGS = -O3 -std=c++17 -fPIC
 
 DEPS = -lpthread
 
@@ -220,7 +220,15 @@ test: $(OBJ_TEST)
 	$(CXX) $(CXXFLAGS) $(OBJ_TEST) $(OBJ_ALL) -o $(OUT_TEST) $(DEPS)
 
 $(OBJ_TEST): $(SRC_TEST)
-	$(CC) $(CFLAGS) -c $(SRC_TEST) -o $(OBJ_TEST) $(DEPS)
+	$(CXX) $(CFLAGS) -c $(SRC_TEST) -o $(OBJ_TEST) $(DEPS)
+
+
+## ------ lib ------ ##
+
+
+.PHONY: lib
+lib:
+	$(CXX) $(CXXFLAGS) -shared -o lib/libpgmcpp.so $(OBJ_ALL) $(DEPS)
 
 
 ## -------- Project -------- ##
@@ -234,20 +242,21 @@ Project: $(OBJ_PROJECT)
 	$(CXX) $(CXXFLAGS) $(OBJ_PROJECT) $(OBJ_ALL) -o $(OUT_PROJECT) $(DEPS)
 
 $(OBJ_PROJECT): $(SRC_PROJECT)
-	$(CC) $(CFLAGS) -c $(SRC_PROJECT) -o $(OBJ_PROJECT) $(DEPS)
+	$(CXX) $(CFLAGS) -c $(SRC_PROJECT) -o $(OBJ_PROJECT) $(DEPS)
 
 
 #### ---- TARGETS ---- ####
 
 .PHONY: clean
 clean:
-	rm -frv bin;
-	rm -frv core;
-	rm -frv object;
-	rm -frv data/output/test/;
-	rm -frv data/output/test/LoadFollowingInOrder;
-	rm -frv data/output/test/CycleChargingInOrder;
-	rm -frv data/output/example_project;
+	rm -frv bin
+	rm -frv core
+	rm -frv lib
+	rm -frv object
+	rm -frv data/output/test/
+	rm -frv data/output/test/LoadFollowingInOrder
+	rm -frv data/output/test/CycleChargingInOrder
+	rm -frv data/output/example_project
 
 
 .PHONY: all
@@ -255,6 +264,7 @@ all:
 	make clean
 	mkdir -pv bin
 	mkdir -pv core
+	mkdir -pv lib
 	mkdir -pv object
 	mkdir -pv object/assets
 	mkdir -pv object/assets/nondispatchable
@@ -268,7 +278,7 @@ all:
 	#find source/ -exec touch {} +
 	#find test/ -exec touch {} +
 	#find third_party/ -exec touch {} +
-	make $(MAKE_ALL) test
+	make $(MAKE_ALL) test lib
 	./bin/test.out
 
 
