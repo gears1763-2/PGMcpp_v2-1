@@ -29,6 +29,9 @@ CXXFLAGS = -O3 -std=c++17 -fPIC
 
 DEPS = -lpthread
 
+PYBIND11_INCLUDES = $(shell python3 -m pybind11 --includes)
+PYBIND11_EXT_SUFFIX = $(shell python3-config --extension-suffix)
+
 
 #### ---- BUILD ---- ####
 
@@ -220,15 +223,25 @@ test: $(OBJ_TEST)
 	$(CXX) $(CXXFLAGS) $(OBJ_TEST) $(OBJ_ALL) -o $(OUT_TEST) $(DEPS)
 
 $(OBJ_TEST): $(SRC_TEST)
-	$(CXX) $(CFLAGS) -c $(SRC_TEST) -o $(OBJ_TEST) $(DEPS)
+	$(CXX) $(CXXFLAGS) -c $(SRC_TEST) -o $(OBJ_TEST) $(DEPS)
 
 
 ## ------ lib ------ ##
 
-
 .PHONY: lib
 lib:
 	$(CXX) $(CXXFLAGS) -shared -o lib/libpgmcpp.so $(OBJ_ALL) $(DEPS)
+
+
+## ------ Python 3 bindings ------ ##
+
+SRC_BINDINGS = pybindings/PYBIND11_PGM.cpp
+OUT_BINDINGS = pybindings/PGMcpp$(PYBIND11_EXT_SUFFIX)
+
+.PHONY: pybindings
+pybindings:
+	$(CXX) $(CXXFLAGS) -shared $(PYBIND11_INCLUDES) $(SRC_BINDINGS) $(OBJ_ALL) \
+-o $(OUT_BINDINGS)
 
 
 ## -------- Project -------- ##
@@ -242,7 +255,7 @@ Project: $(OBJ_PROJECT)
 	$(CXX) $(CXXFLAGS) $(OBJ_PROJECT) $(OBJ_ALL) -o $(OUT_PROJECT) $(DEPS)
 
 $(OBJ_PROJECT): $(SRC_PROJECT)
-	$(CXX) $(CFLAGS) -c $(SRC_PROJECT) -o $(OBJ_PROJECT) $(DEPS)
+	$(CXX) $(CXXFLAGS) -c $(SRC_PROJECT) -o $(OBJ_PROJECT) $(DEPS)
 
 
 #### ---- TARGETS ---- ####
@@ -257,6 +270,7 @@ clean:
 	rm -frv data/output/test/LoadFollowingInOrder
 	rm -frv data/output/test/CycleChargingInOrder
 	rm -frv data/output/example_project
+	rm -frv $(OUT_BINDINGS)
 
 
 .PHONY: all
