@@ -1,7 +1,7 @@
-- Python wrapper with per timestep callback functionality (so Python objects can work with PGMcpp objects)
 - implement LOAD_FOLLOWING_SMART_COMBUSTION control
 - implement Dispatchable <-- Hydro asset
 - implement Sean's battery degradation model
 - implement some kind of foresight, or receding horizon, control (will need linear programming functionality for this)
+- implement per timestep API functionality between Python 3 and PGMcpp
 
 - ONGOING: update docs!

@@ -273,6 +273,7 @@ clean:
 	rm -frv data/output/test/CycleChargingInOrder
 	rm -frv data/output/example_project
 	rm -frv $(OUT_BINDINGS)
+	rm -frv projects/data
 
 
 .PHONY: all

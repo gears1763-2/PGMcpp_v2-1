@@ -125,7 +125,19 @@ try:
     #   3.2. add Solar resource and asset
     print("\t\tadd Solar resource and asset ...", end="", flush=True)
     
-    #...
+    solar_resource_key = 1
+    test_model.add1dRenewableResource(
+        "solar",
+        "data/input/test/solar_GHI_peak-1kWm2_1yr_dt-1hr.csv",
+        solar_resource_key
+    )
+    
+    struct_nondisp = PGMcpp.structNondispatchable()
+    
+    struct_solar = PGMcpp.structSolar()
+    struct_solar.resource_key = solar_resource_key
+    
+    test_model.addSolar(struct_nondisp, struct_solar)
     
     print("\x1B[32mPASS\033[0m")
     
@@ -133,7 +145,17 @@ try:
     #   3.3. add Tidal resource and asset
     print("\t\tadd Tidal resource and asset ...", end="", flush=True)
     
-    #...
+    tidal_resource_key = 2
+    test_model.add1dRenewableResource(
+        "tidal",
+        "data/input/test/tidal_speed_peak-3ms_1yr_dt-1hr.csv",
+        tidal_resource_key
+    )
+    
+    struct_tidal = PGMcpp.structTidal()
+    struct_tidal.resource_key = tidal_resource_key
+    
+    test_model.addTidal(struct_nondisp, struct_tidal)
     
     print("\x1B[32mPASS\033[0m")
     
@@ -141,7 +163,17 @@ try:
     #   3.4. add Wave resource and asset
     print("\t\tadd Wave resource and asset ...", end="", flush=True)
     
-    #...
+    wave_resource_key = 3
+    test_model.add2dRenewableResource(
+        "wave",
+        "data/input/test/waves_H_s_peak-8m_T_e_peak-15s_1yr_dt-1hr.csv",
+        wave_resource_key
+    )
+    
+    struct_wave = PGMcpp.structWave()
+    struct_wave.resource_key = wave_resource_key
+    
+    test_model.addWave(struct_nondisp, struct_wave)
     
     print("\x1B[32mPASS\033[0m")
     
@@ -149,7 +181,17 @@ try:
     #   3.5. add Wind resource and asset
     print("\t\tadd Wind resource and asset ...", end="", flush=True)
     
-    #...
+    wind_resource_key = 4
+    test_model.add1dRenewableResource(
+        "wind",
+        "data/input/test/wind_speed_peak-25ms_1yr_dt-1hr.csv",
+        wind_resource_key
+    )
+    
+    struct_wind = PGMcpp.structWind()
+    struct_wind.resource_key = wind_resource_key
+    
+    test_model.addWind(struct_nondisp, struct_wind)
     
     print("\x1B[32mPASS\033[0m")
     
@@ -157,15 +199,28 @@ try:
     #   3.6. add Diesel asset
     print("\t\tadd Diesel asset ...", end="", flush=True)
     
-    #...
+    struct_disp = PGMcpp.structDispatchable()
+    struct_disp.cap_kW = 1.2 * max(test_model.load_vec_kW)
+    
+    struct_combustion = PGMcpp.structCombustion()
+    
+    struct_diesel = PGMcpp.structDiesel()
+    
+    test_model.addDiesel(struct_disp, struct_combustion, struct_diesel)
     
     print("\x1B[32mPASS\033[0m")
     
     
     #   3.7. add LiIon asset
     print("\t\tadd LiIon asset ...", end="", flush=True)
+
+    struct_storage = PGMcpp.structStorage()
     
-    #...
+    struct_battery_storage = PGMcpp.structBatteryStorage()
+    
+    struct_liion = PGMcpp.structLiIon()
+    
+    test_model.addLiIon(struct_storage, struct_battery_storage, struct_liion)
     
     print("\x1B[32mPASS\033[0m")
     

@@ -8,7 +8,7 @@
  *  See license terms
  *
  *  Example project file for PGMcpp, showing a grid which models all
- *  currently implemented assets.
+ *  currently implemented assets. This example makes use of PGMcpp directly.
  */
 
 
