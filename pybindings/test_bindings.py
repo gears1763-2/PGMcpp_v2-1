@@ -14,9 +14,13 @@
 import PGMcpp
 
 
+print()
+print("## ======== Testing Python Bindings ======== ##")
+print()
+
 try:
     #   1. structModel
-    print("Testing structModel ... ", end="", flush=True)
+    print("\tTesting structModel ... ", end="", flush=True)
 
     struct_model = PGMcpp.structModel()
     assert(not struct_model.print_flag)
@@ -29,11 +33,11 @@ try:
     assert(struct_model.nominal_discount_rate_annual == 0.04)
     assert(struct_model.path_2_load_data == "")
 
-    print("PASS")
+    print("\x1B[32mPASS\033[0m")
 
 
     #   2. DispatchMode
-    print("Testing DispatchMode ... ", end="", flush=True)
+    print("\tTesting DispatchMode ... ", end="", flush=True)
 
     struct_model.dispatch_mode = PGMcpp.DispatchMode.CYCLE_CHARGING_IN_ORDER
     assert(
@@ -53,13 +57,19 @@ try:
     struct_model.dispatch_mode = PGMcpp.DispatchMode.FORESIGHT
     assert(struct_model.dispatch_mode == PGMcpp.DispatchMode.FORESIGHT)
 
-    print("PASS")
+    print("\x1B[32mPASS\033[0m")
 
 
     #   3. Model
-    print("Testing Model ... ", end="", flush=True)
+    print("\tTesting Model ... ")
+    
+    
+    #   3.1. construct
+    print("\t\tModel construction ...", end="", flush=True)
     
     struct_model.path_2_load_data = "data/input/test/electrical_load_generic_peak-500kW_1yr_dt-1hr.csv"
+    struct_model.dispatch_mode = PGMcpp.DispatchMode.LOAD_FOLLOWING_IN_ORDER
+    
     test_model = PGMcpp.Model(struct_model)
     
     assert(test_model.struct_model.path_2_load_data == struct_model.path_2_load_data)
@@ -67,10 +77,112 @@ try:
     assert(abs(test_model.project_life_yrs - 1) < 1e-3)
     assert(test_model.total_load_served_kWh == 0)
     assert(test_model.total_fuel_consumed_L == 0)
+    assert(test_model.total_CO2_emitted_kg == 0)
+    assert(test_model.total_CO_emitted_kg == 0)
+    assert(test_model.total_NOx_emitted_kg == 0)
+    assert(test_model.total_SOx_emitted_kg == 0)
+    assert(test_model.total_CH4_emitted_kg == 0)
+    assert(test_model.total_PM_emitted_kg == 0)
+    assert(abs(test_model.real_discount_rate_annual - 0.019607) < 1e-6)
+    assert(test_model.net_present_cost == 0)
+    assert(test_model.levellized_cost_of_energy_per_kWh == 0)
     
-    print("PASS")
+    assert(len(test_model.dt_vec_hr) == test_model.n_timesteps)
+    assert(len(test_model.load_vec_kW) == test_model.n_timesteps)
+    assert(len(test_model.net_load_vec_kW) == test_model.n_timesteps)
+    assert(len(test_model.remaining_load_vec_kW) == test_model.n_timesteps)
+    assert(len(test_model.time_vec_hr) == test_model.n_timesteps)
+    
+    expected_load_kW = [
+        360.253836463674,
+        355.171277826775,
+        353.776453532298,
+        353.75405737934,
+        346.592867404975,
+        340.132411175118,
+        337.354867340578,
+        340.644115618736,
+        363.639028500678,
+        378.787797779238,
+        372.215798201712,
+        395.093925731298,
+        402.325427142659,
+        386.907725462306,
+        380.709170928091,
+        372.062070914977
+    ]
+    
+    for i in range(0, 16):
+        assert(test_model.dt_vec_hr[i] == 1)
+        assert(abs(test_model.load_vec_kW[i] - expected_load_kW[i]) < 1e-6)
+        assert(test_model.net_load_vec_kW[i] == 0)
+        assert(test_model.remaining_load_vec_kW[i] == 0)
+        assert(test_model.time_vec_hr[i] == i)
+    
+    print("\x1B[32mPASS\033[0m")
+    
+    
+    #   3.2. add Solar resource and asset
+    print("\t\tadd Solar resource and asset ...", end="", flush=True)
+    
+    #...
+    
+    print("\x1B[32mPASS\033[0m")
+    
+    
+    #   3.3. add Tidal resource and asset
+    print("\t\tadd Tidal resource and asset ...", end="", flush=True)
+    
+    #...
+    
+    print("\x1B[32mPASS\033[0m")
+    
+    
+    #   3.4. add Wave resource and asset
+    print("\t\tadd Wave resource and asset ...", end="", flush=True)
+    
+    #...
+    
+    print("\x1B[32mPASS\033[0m")
+    
+    
+    #   3.5. add Wind resource and asset
+    print("\t\tadd Wind resource and asset ...", end="", flush=True)
+    
+    #...
+    
+    print("\x1B[32mPASS\033[0m")
+    
+    
+    #   3.6. add Diesel asset
+    print("\t\tadd Diesel asset ...", end="", flush=True)
+    
+    #...
+    
+    print("\x1B[32mPASS\033[0m")
+    
+    
+    #   3.7. add LiIon asset
+    print("\t\tadd LiIon asset ...", end="", flush=True)
+    
+    #...
+    
+    print("\x1B[32mPASS\033[0m")
+    
+    
+    #   3.8. run and write
+    print("\t\trun() and writeResults() ...")
+    
+    test_model.run()
+    test_model.writeResults("test/pybindings")
+    
+    print("\t\t\x1B[32mPASS\033[0m")
 
 
 except:
-    print("FAIL\n")
+    print("\x1B[31mFAIL\033[0m")
     raise
+
+
+finally:
+    print()

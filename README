@@ -46,7 +46,7 @@ following sub-directories:
     docs/           (to hold various documentation, including the user manual [which you should read!])
     header/         (to hold header files)
     projects/       (to hold project files)
-    pybindings/     (to hold source and extension files for Python 3 bindings)
+    pybindings/     (to hold source and extension files for Python 3 bindings [and a README])
     source/         (to hold source files)
     test/           (to hold the source files for a suite of tests)
     third_party/    (to hold third party content used in the development of PGMcpp)

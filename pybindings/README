@@ -1,0 +1,36 @@
+    PGMcpp : PRIMED Grid Modelling Code (in C++) - v2.1
+
+    Anthony Truelove MASc, P.Eng.
+    email:   gears1763@tutanota.com
+    github:  gears1763-2
+
+    See license terms
+
+
+    To compile Python 3 bindings for PGMcpp, first run
+
+        $   make all
+
+    from the PGMcpp root directory. Once this step completes sucessfully, you should
+    see ALL TESTS PASSED.
+
+
+    Next, ensure that you have pybind11 installed. To do so, you can just
+
+        $   pip install pybind11
+
+    Once that is done, simply run
+
+        $   make pybindings
+
+    from the PGMcpp root directory. This will compile the Python 3 bindings for PGMcpp
+    (which is then written to pybindings/PGMcpp.<extension-suffix>), and then run the
+    test script at pybindings/test_bindings.py. If all tests pass, then you are set up
+    and ready to go. You should only need to do this step once!
+
+
+    At this point, you should just be able to
+
+        import PGMcpp
+
+    in any of your Python scripts.

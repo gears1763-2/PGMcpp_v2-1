@@ -240,8 +240,10 @@ OUT_BINDINGS = pybindings/PGMcpp$(PYBIND11_EXT_SUFFIX)
 
 .PHONY: pybindings
 pybindings:
+	rm -frv $(OUT_BINDINGS)
 	$(CXX) $(CXXFLAGS) -shared $(PYBIND11_INCLUDES) $(SRC_BINDINGS) $(OBJ_ALL) \
 -o $(OUT_BINDINGS)
+	python3 pybindings/test_bindings.py
 
 
 ## -------- Project -------- ##
