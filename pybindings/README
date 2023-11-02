@@ -45,6 +45,23 @@
     
     // ======== METHOD 2: build Python 3 bindings using setuptools ======== //
     
-    [...]
+    First, ensure that you have both pybind11 and setuptools installed. To do so, you
+    can just
+    
+        $   pip install pybind11
+        $   pip install setuptools
+    
+    Once that is done, simply run
+    
+        $   python(3) setup.py build_ext --inplace
+    
+    from the pybindings/ directory to build the Python 3 bindings, where the (3) is
+    optional depending on your set up.
+    
+    To test the bindings, simply run
+    
+        $ python(3) test_bindings_from_setup.py
+    
+    which is found in pybindings/.
     
     // ======== END METHOD 2 ======== //
