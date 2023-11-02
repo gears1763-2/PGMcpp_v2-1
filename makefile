@@ -243,7 +243,7 @@ pybindings:
 	rm -frv $(OUT_BINDINGS)
 	$(CXX) $(CXXFLAGS) -shared $(PYBIND11_INCLUDES) $(SRC_BINDINGS) $(OBJ_ALL) \
 -o $(OUT_BINDINGS)
-	python3 pybindings/test_bindings.py
+	python3 pybindings/test_bindings_from_make.py
 
 
 ## -------- Project -------- ##
@@ -273,7 +273,12 @@ clean:
 	rm -frv data/output/test/CycleChargingInOrder
 	rm -frv data/output/example_project
 	rm -frv $(OUT_BINDINGS)
+	rm -frv pybindings/build
+	rm -frv pybindings/test_results_from_setup
+	rm -frv pybindings/test_results_from_make
 	rm -frv projects/data
+	rm -frv projects/example_project_cpp
+	rm -frv projects/example_project_py
 
 
 .PHONY: all

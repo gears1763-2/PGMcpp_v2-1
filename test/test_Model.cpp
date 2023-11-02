@@ -1072,7 +1072,7 @@ try {
     std::cout << "\tTesting Model::writeResults() ..." <<
         std::endl;
     
-    test_model.writeResults("test/LoadFollowingInOrder");
+    test_model.writeResults("data/output/test/LoadFollowingInOrder");
     
     
     // ======== CYCLE_CHARGING_IN_ORDER ======== //
@@ -1299,7 +1299,7 @@ try {
     std::cout << "\tTesting Model::writeResults() ..." <<
         std::endl;
     
-    test_model.writeResults("test/CycleChargingInOrder");
+    test_model.writeResults("data/output/test/CycleChargingInOrder");
     
 } catch (...) {
     printRed("\n\t\t\t\tModel Tests:  FAIL\n");

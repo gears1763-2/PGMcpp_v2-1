@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
     
     
     //  write modelling results to disk
-    model.writeResults("example_project");
+    model.writeResults("projects/example_project_cpp");
     
     
     // -------- /\ STOP EDITING HERE /\ -------- //

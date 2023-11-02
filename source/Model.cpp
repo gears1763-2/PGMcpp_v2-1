@@ -1568,11 +1568,8 @@ void Model :: writeResults(std::string project_name) {
      *  Method to write modelling results to given path
      */
     
-    // construct write_path 
-    std::string write_path = "data/output/";
-    write_path += project_name;
-    write_path += "/";
-    
+    // construct write_path
+    std::string write_path = project_name + "/";
     
     // create directories (overwrite if already exists)
     if (std::filesystem::is_directory(write_path)) {
