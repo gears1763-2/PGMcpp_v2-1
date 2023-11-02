@@ -28,6 +28,10 @@
 #include <string>
 #include <vector>
 
+#ifdef _WIN32
+	#include <iso646.h>
+#endif
+
 #include "utilities.h"
 
 #include "../third_party/fast-cpp-csv-parser/csv.h"

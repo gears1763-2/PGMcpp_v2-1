@@ -62,7 +62,7 @@ try {
         372.062070914977
     };
     
-    for (int i = 0; i < exp_load_vec_kW.size(); i++) {
+    for (size_t i = 0; i < exp_load_vec_kW.size(); i++) {
         testFloatEquals(
             test_model.time_vec_hr[i],
             i,
@@ -200,7 +200,7 @@ try {
         1748
     };
     
-    for (int i = 0; i < exp_hydro_resource_vec_m3hr.size(); i++) {
+    for (size_t i = 0; i < exp_hydro_resource_vec_m3hr.size(); i++) {
         testFloatEquals(
             test_model.resource_map_1D[hydro_key][i],
             exp_hydro_resource_vec_m3hr[i],
@@ -237,7 +237,7 @@ try {
         0.005206897515821
     };
     
-    for (int i = 0; i < exp_solar_resource_vec_kWm2.size(); i++) {
+    for (size_t i = 0; i < exp_solar_resource_vec_kWm2.size(); i++) {
         testFloatEquals(
             test_model.resource_map_1D[solar_key][i],
             exp_solar_resource_vec_kWm2[i],
@@ -274,7 +274,7 @@ try {
         1.85047408742869
     };
     
-    for (int i = 0; i < exp_tidal_resource_vec_ms.size(); i++) {
+    for (size_t i = 0; i < exp_tidal_resource_vec_ms.size(); i++) {
         testFloatEquals(
             test_model.resource_map_1D[tidal_key][i],
             exp_tidal_resource_vec_ms[i],
@@ -311,7 +311,7 @@ try {
         13.4454539065912
     };
     
-    for (int i = 0; i < exp_wind_resource_vec_ms.size(); i++) {
+    for (size_t i = 0; i < exp_wind_resource_vec_ms.size(); i++) {
         testFloatEquals(
             test_model.resource_map_1D[wind_key][i],
             exp_wind_resource_vec_ms[i],
@@ -419,7 +419,7 @@ try {
         10.0063487117653
     };
     
-    for (int i = 0; i < exp_energy_period_vec_s.size(); i++) {
+    for (size_t i = 0; i < exp_energy_period_vec_s.size(); i++) {
         testFloatEquals(
             test_model.resource_map_2D[wave_key][i][0],
             exp_significant_wave_height_vec_m[i],

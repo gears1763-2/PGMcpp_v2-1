@@ -48,7 +48,7 @@ try {
         7.75,
     };
     
-    for (int i = 0; i < exp_interp_significant_wave_height_vec_m.size(); i++) {
+    for (size_t i = 0; i < exp_interp_significant_wave_height_vec_m.size(); i++) {
         testFloatEquals(
             test_wave_lookup.interp_sig_wave_height_vec_m[i],
             exp_interp_significant_wave_height_vec_m[i],
@@ -95,7 +95,7 @@ try {
         20
     };
     
-    for (int i = 0; i < exp_interp_energy_period_vec_s.size(); i++) {
+    for (size_t i = 0; i < exp_interp_energy_period_vec_s.size(); i++) {
         testFloatEquals(
             test_wave_lookup.interp_energy_period_vec_s[i],
             exp_interp_energy_period_vec_s[i],
@@ -142,11 +142,11 @@ try {
         {0,0,0,0.0997625,0.1998625,0.2888625,0.3667625,0.4335625,0.4892625,0.5338625,0.5673625,0.5897625,0.6010625,0.6012625,0.5903625,0.5683625}
     };
     
-    for (int i = 0; i < exp_interp_normalized_performance_matrix.size(); i++) {
+    for (size_t i = 0; i < exp_interp_normalized_performance_matrix.size(); i++) {
         std::vector<double> exp_interp_normalized_performance_matrix_row = 
             exp_interp_normalized_performance_matrix[i];
             
-        for (int j = 0; j < exp_interp_normalized_performance_matrix_row.size(); j++) {
+        for (size_t j = 0; j < exp_interp_normalized_performance_matrix_row.size(); j++) {
             testFloatEquals(
                 test_wave_lookup.interp_normalized_performance_matrix[i][j],
                 exp_interp_normalized_performance_matrix_row[j],
@@ -260,8 +260,8 @@ try {
         {0,0.002313049918869,0.036857828651574,0.158911819848354,0.258920172212785,0.312970219639047,0.417704039182849,0.492398193576206,0.506839870365831,0.570813136942389,0.585657473344172,0.616428156813421,0.623817900033061,0.621371483645493,0.604274309252506}
     };
     
-    for (int i = 0; i < test_significant_wave_height_vec_m.size(); i++) {
-        for (int j = 0; j < test_energy_period_vec_s.size(); j++) {
+    for (size_t i = 0; i < test_significant_wave_height_vec_m.size(); i++) {
+        for (size_t j = 0; j < test_energy_period_vec_s.size(); j++) {
             testFloatEquals(
                 test_wave_lookup._productionLookup(
                     test_significant_wave_height_vec_m[i],

@@ -43,6 +43,8 @@ ext_modules = [
     Pybind11Extension(
         "PGMcpp",
         sources=source_list,
+        language="c++",
+        cxx_std=17
     )
 ]
 

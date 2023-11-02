@@ -168,7 +168,7 @@ try {
     std::vector<std::string> string_split_vec =
         splitString(test_string, ',');
     
-    for (int i = 0; i < exp_string_split_vec.size(); i++) {
+    for (size_t i = 0; i < exp_string_split_vec.size(); i++) {
         testTruth(
             string_split_vec[i].compare(exp_string_split_vec[i]) == 0,
             __FILE__,

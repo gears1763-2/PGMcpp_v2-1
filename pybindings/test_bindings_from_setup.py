@@ -8,15 +8,22 @@
     See license terms
  
     Testing script for Python 3 bindings.
+    
+    ref: https://stackoverflow.com/questions/39473297/how-do-i-print-colored-output-with-python-3
 """
 
 
+import os
+import sys
 import PGMcpp
 
 
 print()
 print("## ======== Testing Python Bindings ======== ##")
 print()
+
+os.system("color")
+end = "\n"
 
 try:
     #   1. structModel
@@ -33,7 +40,7 @@ try:
     assert(struct_model.nominal_discount_rate_annual == 0.04)
     assert(struct_model.path_2_load_data == "")
 
-    print("\x1B[32mPASS\033[0m")
+    sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
 
 
     #   2. DispatchMode
@@ -57,7 +64,7 @@ try:
     struct_model.dispatch_mode = PGMcpp.DispatchMode.FORESIGHT
     assert(struct_model.dispatch_mode == PGMcpp.DispatchMode.FORESIGHT)
 
-    print("\x1B[32mPASS\033[0m")
+    sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
 
 
     #   3. Model
@@ -119,7 +126,7 @@ try:
         assert(test_model.remaining_load_vec_kW[i] == 0)
         assert(test_model.time_vec_hr[i] == i)
     
-    print("\x1B[32mPASS\033[0m")
+    sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
     
     
     #   3.2. add Solar resource and asset
@@ -139,7 +146,7 @@ try:
     
     test_model.addSolar(struct_nondisp, struct_solar)
     
-    print("\x1B[32mPASS\033[0m")
+    sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
     
     
     #   3.3. add Tidal resource and asset
@@ -157,7 +164,7 @@ try:
     
     test_model.addTidal(struct_nondisp, struct_tidal)
     
-    print("\x1B[32mPASS\033[0m")
+    sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
     
     
     #   3.4. add Wave resource and asset
@@ -175,7 +182,7 @@ try:
     
     test_model.addWave(struct_nondisp, struct_wave)
     
-    print("\x1B[32mPASS\033[0m")
+    sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
     
     
     #   3.5. add Wind resource and asset
@@ -193,7 +200,7 @@ try:
     
     test_model.addWind(struct_nondisp, struct_wind)
     
-    print("\x1B[32mPASS\033[0m")
+    sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
     
     
     #   3.6. add Diesel asset
@@ -208,7 +215,7 @@ try:
     
     test_model.addDiesel(struct_disp, struct_combustion, struct_diesel)
     
-    print("\x1B[32mPASS\033[0m")
+    sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
     
     
     #   3.7. add LiIon asset
@@ -222,7 +229,7 @@ try:
     
     test_model.addLiIon(struct_storage, struct_battery_storage, struct_liion)
     
-    print("\x1B[32mPASS\033[0m")
+    sys.stdout.write("\x1b[1;32mPASS\x1b[0m" + end)
     
     
     #   3.8. run and write
@@ -230,12 +237,12 @@ try:
     
     test_model.run()
     test_model.writeResults("test_results_from_setup")
-    
-    print("\t\t\x1B[32mPASS\033[0m")
+
+    sys.stdout.write("\t\t\x1b[1;32mPASS\x1b[0m" + end)
 
 
 except:
-    print("\x1B[31mFAIL\033[0m")
+    sys.stdout.write("\x1B[31mFAIL\x1b[0m" + end)
     raise
 
 

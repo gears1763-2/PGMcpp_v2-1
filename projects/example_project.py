@@ -127,7 +127,4 @@ model.run()
 
 
 #   7. write outputs
-if not os.path.exists("data/output/"):  # <-- this dir needs to exist for writeResults() to work
-    os.makedirs("data/output/")
-    
-model.writeResults("example_py_project")  # <-- will write to data/output/example_py_project/
+model.writeResults("example_project_py")

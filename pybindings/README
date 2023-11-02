@@ -9,8 +9,8 @@
 
     // ======== METHOD 1: build Python 3 bindings using make ======== //
 
-    NOTE THAT THIS METHOD DOES NOT WORK ON WINDOWS. FOR WINDOWS, ONE MUST USE
-    METHOD 2.
+    *** NOTE THAT THIS METHOD DOES NOT WORK ON WINDOWS. FOR WINDOWS, ONE MUST USE
+    METHOD 2 ***
 
     To compile Python 3 bindings for PGMcpp, first run
 
@@ -45,6 +45,11 @@
     
     // ======== METHOD 2: build Python 3 bindings using setuptools ======== //
     
+    *** NOTE THAT, IF YOU ARE ON WINDOWS, THEN YOU NEED TO BE USING Python for Windows
+    (AS AVAILABLE FROM https://www.python.org/downloads/) TOGETHER WITH THE Microsoft
+    Visual Studio "Desktop development with C++" WORKLOAD (AS AVAILABLE FROM
+    https://visualstudio.microsoft.com/downloads/). USING MINGW/GCC WILL NOT WORK! ***
+    
     First, ensure that you have both pybind11 and setuptools installed. To do so, you
     can just
     
@@ -56,12 +61,13 @@
         $   python(3) setup.py build_ext --inplace
     
     from the pybindings/ directory to build the Python 3 bindings, where the (3) is
-    optional depending on your set up.
+    optional depending on your set up. This will generate PGMcpp.<extension-suffix>.
     
     To test the bindings, simply run
     
         $ python(3) test_bindings_from_setup.py
     
-    which is found in pybindings/.
+    which is found in pybindings/. If all tests pass, then you are set up and ready to
+    go. You should only need to do this step once!
     
     // ======== END METHOD 2 ======== //

@@ -115,11 +115,11 @@ double Hydro :: requestProductionkW(
      */
     
     // check against hydro resource
+    /*
     double available_flow_m3hr = hydro_resource_m3hr -
         this->minimum_discharge_m3hr +
         this->reservoir_volume_m3 / dt_hrs;
-    
-    //...
+    */
     
     return 0;
 }

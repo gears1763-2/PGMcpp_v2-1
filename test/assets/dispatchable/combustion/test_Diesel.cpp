@@ -141,7 +141,7 @@ try {
         27.254952
     };
     
-    for (int i = 0; i < exp_load_ratio_vec.size(); i++) {
+    for (size_t i = 0; i < exp_load_ratio_vec.size(); i++) {
         testFloatEquals(
             test_diesel_fuel_lookup.fuel_interp_load_ratio_vec[i],
             exp_load_ratio_vec[i],
@@ -172,7 +172,7 @@ try {
         0, 20, 20, 20, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 100, 100
     };
     
-    for (int i = 0; i < requested_production_vec_kW.size(); i++) {
+    for (size_t i = 0; i < requested_production_vec_kW.size(); i++) {
         double requested_production_kW = requested_production_vec_kW[i];
         
         testFloatEquals(
@@ -197,7 +197,7 @@ try {
         0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1
     };
     
-    for (int i = 0; i < requested_production_vec_kW.size(); i++) {
+    for (size_t i = 0; i < requested_production_vec_kW.size(); i++) {
         double requested_production_kW = requested_production_vec_kW[i];
         
         double production_kW = test_diesel.requestProductionkW(
@@ -278,7 +278,7 @@ try {
         26.4290851680678
     };
     
-    for (int i = 0; i < interp_test_load_ratio_vec.size(); i++) {
+    for (size_t i = 0; i < interp_test_load_ratio_vec.size(); i++) {
         testFloatEquals(
             test_diesel_fuel_lookup._fuelConsumptionLookupL(
                 interp_test_load_ratio_vec[i] * struct_disp.cap_kW,

@@ -29,8 +29,13 @@ CXXFLAGS = -O3 -std=c++17 -fPIC
 
 DEPS = -lpthread
 
-PYBIND11_INCLUDES = $(shell python3 -m pybind11 --includes)
-PYBIND11_EXT_SUFFIX = $(shell python3-config --extension-suffix)
+ifeq ($(OS),Windows_NT)
+	PYBIND11_INCLUDES = $(shell python.exe -m pybind11 --includes)
+	PYBIND11_EXT_SUFFIX = *.pyd
+else
+	PYBIND11_INCLUDES = $(shell python3 -m pybind11 --includes)
+	PYBIND11_EXT_SUFFIX = $(shell python3-config --extension-suffix)
+endif
 
 
 #### ---- BUILD ---- ####
@@ -262,6 +267,11 @@ $(OBJ_PROJECT): $(SRC_PROJECT)
 
 #### ---- TARGETS ---- ####
 
+.PHONY: touch
+touch:
+	find * -exec touch {} +
+
+
 .PHONY: clean
 clean:
 	rm -frv bin
@@ -296,10 +306,6 @@ all:
 	mkdir -pv object/assets/storage/batterystorage
 	mkdir -pv data/output
 	mkdir -pv data/output/test
-	#find header/ -exec touch {} +
-	#find source/ -exec touch {} +
-	#find test/ -exec touch {} +
-	#find third_party/ -exec touch {} +
 	make $(MAKE_ALL) test lib
 	./bin/test.out
 
@@ -308,10 +314,6 @@ all:
 project:
 	rm -frv $(OBJ_PROJECT)
 	rm -frv $(OUT_PROJECT)
-	#find header/ -exec touch {} +
-	#find source/ -exec touch {} +
-	#find test/ -exec touch {} +
-	#find third_party/ -exec touch {} +
 	make Project
 	./$(OUT_PROJECT)
 
