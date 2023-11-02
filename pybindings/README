@@ -7,6 +7,9 @@
     See license terms
 
 
+    *** THIS DOES NOT WORK ON WINDOWS ***
+
+
     To compile Python 3 bindings for PGMcpp, first run
 
         $   make all
