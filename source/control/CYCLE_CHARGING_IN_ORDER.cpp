@@ -30,8 +30,9 @@ void Model :: _dispatchCycleChargingInOrderCharging(int timestep) {
         this->_dispatchLoadFollowingInOrderCharging(timestep);
         return;
     }
-    
-    // ======== POTENTIAL IMPLEMENTATION ======== //
+
+    // rescind energy reserve access
+    this->_toggleReserve(false);
     
     // request zero production from all non-Combustion assets
     this->_controlNoncombustion(timestep, 0, dt_hrs);
@@ -71,7 +72,11 @@ void Model :: _dispatchCycleChargingInOrderDischarging(int timestep) {
         return;
     }
     
-    // ======== POTENTIAL IMPLEMENTATION ======== //
+    // check if sufficient production and storage
+    // if not, permit energy reserve access
+    if (not this->_sufficientProductionStorage(load_kW, dt_hrs, timestep)) {
+        this->_toggleReserve(true);
+    }
     
     // discharge all non-depleted Storage assets, update load
     load_kW = this->_dischargeStorage(

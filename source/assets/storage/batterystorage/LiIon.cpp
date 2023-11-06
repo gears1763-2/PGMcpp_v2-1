@@ -19,6 +19,129 @@ LiIon :: LiIon(
      *  LiIon class constructor
      */
     
+    // input bounds checking
+    if (struct_liion.replace_SOH < 0 or struct_liion.replace_SOH > 1) {
+        std::string error_str = "\nERROR  LiIon::LiIon()";
+        error_str += "  structLiIon::replace_SOH must be in ";
+        error_str += "the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_liion.degr_alpha <= 0) {
+        std::string error_str = "\nERROR  LiIon::LiIon()";
+        error_str += "  structLiIon::degr_alpha must be > 0, ";
+        error_str += "See docs/refs/battery_degradation.pdf";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_liion.degr_beta <= 0) {
+        std::string error_str = "\nERROR  LiIon::LiIon()";
+        error_str += "  structLiIon::degr_beta must be > 0, ";
+        error_str += "See docs/refs/battery_degradation.pdf";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_liion.degr_B_hat_cal_0 <= 0) {
+        std::string error_str = "\nERROR  LiIon::LiIon()";
+        error_str += "  structLiIon::degr_B_hat_cal_0 must be > 0, ";
+        error_str += "See docs/refs/battery_degradation.pdf";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_liion.degr_r_cal < 0) {
+        std::string error_str = "\nERROR  LiIon::LiIon()";
+        error_str += "  structLiIon::degr_r_cal must be >= 0, ";
+        error_str += "See docs/refs/battery_degradation.pdf";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_liion.degr_Ea_cal_0 <= 0) {
+        std::string error_str = "\nERROR  LiIon::LiIon()";
+        error_str += "  structLiIon::degr_Ea_cal_0 must be > 0, ";
+        error_str += "See docs/refs/battery_degradation.pdf";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_liion.degr_a_cal < 0) {
+        std::string error_str = "\nERROR  LiIon::LiIon()";
+        error_str += "  structLiIon::degr_a_cal must be >= 0, ";
+        error_str += "See docs/refs/battery_degradation.pdf";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_liion.degr_s_cal < 0) {
+        std::string error_str = "\nERROR  LiIon::LiIon()";
+        error_str += "  structLiIon::degr_s_cal must be >= 0, ";
+        error_str += "See docs/refs/battery_degradation.pdf";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_liion.gas_constant_JmolK <= 0) {
+        std::string error_str = "\nERROR  LiIon::LiIon()";
+        error_str += "  structLiIon::gas_constant_JmolK must be > 0, ";
+        error_str += "See docs/refs/battery_degradation.pdf";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_liion.temperature_K < 0) {
+        std::string error_str = "\nERROR  LiIon::LiIon()";
+        error_str += "  structLiIon::temperature_K must be >= 0, ";
+        error_str += "See docs/refs/battery_degradation.pdf";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    
+    // set attributes
     this->storage_type = LIION;
     this->storage_type_str = "LIION";
     this->struct_liion = struct_liion;
@@ -153,9 +276,13 @@ void LiIon :: _writeSummary(std::string _write_path, int asset_idx) {
     ofs << "\tinitial state of charge: " <<
         this->struct_battery_storage.init_SOC << "\n";
     ofs << "\tminimum state of charge: " <<
-        this->struct_battery_storage.min_SOC << "\n";
+        this->init_min_SOC << "\n";
     ofs << "\tmaximum state of charge: " <<
         this->struct_battery_storage.max_SOC << "\n";
+    ofs << "\thysteresis state of charge: " <<
+        this->struct_battery_storage.hysteresis_SOC << "\n";
+    ofs << "\treserve state of charge: " <<
+        this->struct_battery_storage.reserve_SOC << "\n";
     ofs << "\tcharging efficiency: " <<
         this->struct_battery_storage.charge_efficiency << "\n";
     ofs << "\tdischarging efficiency: " <<
@@ -359,6 +486,17 @@ void LiIon :: writeResults(
     this->_writeSummary(_write_path, asset_idx);
     
     return;
+}
+
+
+void LiIon :: toggleReserve(bool reserve_flag) {
+    /*
+     *  Method to toggle whether or not reserve energy is available for use.
+     */
+     
+     BatteryStorage::toggleReserve(reserve_flag);
+     
+     return;
 }
 
 

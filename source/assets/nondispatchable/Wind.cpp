@@ -17,6 +17,20 @@ Wind :: Wind(
      *  Wind class constructor
      */
     
+    // input bounds checking
+    if (struct_wind.design_speed_ms <= 0) {
+        std::string error_str = "\nERROR  Wind::Wind()";
+        error_str += "  structWind::design_speed_ms must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    
+    // set attributes
     this->nondisp_type = WIND;
     this->nondisp_type_str = "WIND";
     this->struct_wind = struct_wind;

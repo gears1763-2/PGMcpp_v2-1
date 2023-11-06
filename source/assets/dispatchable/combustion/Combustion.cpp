@@ -30,7 +30,109 @@ Combustion :: Combustion(
      *  Combustion class constructor
      */
     
+    // input bounds checking
+    if (
+        struct_combustion.cycle_charging_load_ratio < 0 or
+        struct_combustion.cycle_charging_load_ratio > 1
+    ) {
+        std::string error_str = "\nERROR  Combustion::Combustion()";
+        error_str += "  structCombustion::cycle_charging_load_ratio must be in ";
+        error_str += "the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_combustion.fuel_cost_L < 0) {
+        std::string error_str = "\nERROR  Combustion::Combustion()";
+        error_str += "  structCombustion::fuel_cost_L must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_combustion.diesel_CO2_kgL < 0) {
+        std::string error_str = "\nERROR  Combustion::Combustion()";
+        error_str += "  structCombustion::diesel_CO2_kgL must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_combustion.diesel_CO_kgL < 0) {
+        std::string error_str = "\nERROR  Combustion::Combustion()";
+        error_str += "  structCombustion::diesel_CO_kgL must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_combustion.diesel_NOx_kgL < 0) {
+        std::string error_str = "\nERROR  Combustion::Combustion()";
+        error_str += "  structCombustion::diesel_NOx_kgL must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_combustion.diesel_SOx_kgL < 0) {
+        std::string error_str = "\nERROR  Combustion::Combustion()";
+        error_str += "  structCombustion::diesel_SOx_kgL must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_combustion.diesel_CH4_kgL < 0) {
+        std::string error_str = "\nERROR  Combustion::Combustion()";
+        error_str += "  structCombustion::diesel_CH4_kgL must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_combustion.diesel_PM_kgL < 0) {
+        std::string error_str = "\nERROR  Combustion::Combustion()";
+        error_str += "  structCombustion::diesel_PM_kgL must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    
+    // set attributes
     this->struct_combustion = struct_combustion;
+    
+    if (this->struct_combustion.ramp_rate_constraint_kWperhr == -1) {
+        // assume any Combustion asset can start and ramp up to full load in 30 s, 
+        // but not faster
+        this->struct_combustion.ramp_rate_constraint_kWperhr =
+            this->struct_disp.cap_kW / (30.0 / 3600.0);
+    }
     
     this->fuel_vec_L.resize(this->n_timesteps, 0);
     this->real_fuel_cost_vec.resize(this->n_timesteps, 0);

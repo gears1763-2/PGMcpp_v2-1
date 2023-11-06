@@ -21,6 +21,9 @@ void Model :: _dispatchLoadFollowingInOrderCharging(int timestep) {
     
     double dt_hrs = this->dt_vec_hr[timestep];
     
+    // rescind energy reserve access
+    this->_toggleReserve(false);
+    
     // request zero production from all non-Combustion assets
     this->_controlNoncombustion(timestep, 0, dt_hrs);
     
@@ -52,6 +55,12 @@ void Model :: _dispatchLoadFollowingInOrderDischarging(int timestep) {
     // partition Storage assets into depleted and non-depleted
     std::vector<Storage*> depleted_storage_ptr_vec = this->_getDepletedStorage();
     std::vector<Storage*> nondepleted_storage_ptr_vec = this->_getNondepletedStorage();
+    
+    // check if sufficient production and storage
+    // if not, permit energy reserve access
+    if (not this->_sufficientProductionStorage(load_kW, dt_hrs, timestep)) {
+        this->_toggleReserve(true);
+    }
     
     // discharge all non-depleted Storage assets, update load
     load_kW = this->_dischargeStorage(

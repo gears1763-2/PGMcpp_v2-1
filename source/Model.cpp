@@ -651,11 +651,84 @@ void Model :: _generateNetLoadVector() {
     return;
 }
 
+
+bool Model :: _sufficientProductionStorage(
+    double _load_kW,
+    double dt_hrs,
+    int timestep
+) {
+    /*
+     *  Helper method to detect whether or not there is sufficient production capacity 
+     *  to meet the load.
+     */
+    
+    double load_kW = _load_kW;
+     
+    // check Storage assets
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        Storage* storage_ptr = this->storage_ptr_vec[i];
+        double avail_kW = storage_ptr->getAvailablekW(dt_hrs);
+        load_kW -= avail_kW;
+    }
+    
+    // check non-Combustion assets
+    for (size_t i = 0; i < this->noncombustion_ptr_vec.size(); i++) {
+        Dispatchable* noncombustion_ptr = this->noncombustion_ptr_vec[i];
+        double avail_kW = 0;
+        double cap_kW = noncombustion_ptr->struct_disp.cap_kW;
+        
+        switch (noncombustion_ptr->disp_type) {
+            case (HYDRO): {
+                int resource_key =
+                    ((Hydro*)noncombustion_ptr)->resource_key;
+            
+                double hydro_resource_m3hr = this->resource_map_1D[
+                    resource_key
+                ][timestep];
+                
+                avail_kW =
+                    noncombustion_ptr->requestProductionkW(
+                        cap_kW,
+                        hydro_resource_m3hr,
+                        dt_hrs
+                    );
+                
+                break;
+            }
+            
+            default: {
+                avail_kW = noncombustion_ptr->requestProductionkW(cap_kW);
+                
+                break;
+            }
+        }
+        
+        load_kW -= avail_kW;
+    }
+     
+    // check Combustion assets
+    for (size_t i = 0; i < this->combustion_ptr_vec.size(); i++) {
+        Combustion* combustion_ptr = this->combustion_ptr_vec[i];
+        double cap_kW = combustion_ptr->struct_disp.cap_kW;
+        double avail_kW = combustion_ptr->requestProductionkW(cap_kW, timestep);
+        
+        load_kW -= avail_kW;
+    }
+     
+    if (load_kW > 0) {
+         return false;
+    }
+    
+    return true;
+}
+
+
 void Model :: _handleDispatch() {
     /*
      *  Helper method to handle dispatch under choice of dispatch mode
      */
     
+    // apply chosen control algorithm
     switch (this->struct_model.dispatch_mode) {
         case (LOAD_FOLLOWING_IN_ORDER): {
             for (int i = 0; i < this->n_timesteps; i++) {
@@ -1397,13 +1470,20 @@ void Model :: addSolar(
      *  Method to add Nondispatchable <-- Solar asset to the Model
      */
     
-    Nondispatchable* nondisp_ptr = new Solar(
-        struct_nondisp,
-        struct_solar,
-        this->n_timesteps
-    );
-    
-    this->_addNondispatchable(nondisp_ptr);
+    try {
+        Nondispatchable* nondisp_ptr = new Solar(
+            struct_nondisp,
+            struct_solar,
+            this->n_timesteps
+        );
+        
+        this->_addNondispatchable(nondisp_ptr);
+    }
+
+    catch (...) {
+        this->clearAssets();
+        throw;
+    }
     
     return;
 }
@@ -1417,13 +1497,20 @@ void Model :: addTidal(
      *  Method to add Nondispatchable <-- Tidal asset to the Model
      */
     
-    Nondispatchable* nondisp_ptr = new Tidal(
-        struct_nondisp,
-        struct_tidal,
-        this->n_timesteps
-    );
+    try {
+        Nondispatchable* nondisp_ptr = new Tidal(
+            struct_nondisp,
+            struct_tidal,
+            this->n_timesteps
+        );
+        
+        this->_addNondispatchable(nondisp_ptr);
+    }
     
-    this->_addNondispatchable(nondisp_ptr);
+    catch (...) {
+        this->clearAssets();
+        throw;
+    }
     
     return;
 }
@@ -1437,13 +1524,20 @@ void Model :: addWave(
      *  Method to add Nondispatchable <-- Wave asset to the Model
      */
     
-    Nondispatchable* nondisp_ptr = new Wave(
-        struct_nondisp,
-        struct_wave,
-        this->n_timesteps
-    );
+    try {
+        Nondispatchable* nondisp_ptr = new Wave(
+            struct_nondisp,
+            struct_wave,
+            this->n_timesteps
+        );
+        
+        this->_addNondispatchable(nondisp_ptr);
+    }
     
-    this->_addNondispatchable(nondisp_ptr);
+    catch (...) {
+        this->clearAssets();
+        throw;
+    }
     
     return;
 }
@@ -1457,13 +1551,20 @@ void Model :: addWind(
      *  Method to add Nondispatchable <-- Wind asset to the Model
      */
     
-    Nondispatchable* nondisp_ptr = new Wind(
-        struct_nondisp,
-        struct_wind,
-        this->n_timesteps
-    );
+    try {
+        Nondispatchable* nondisp_ptr = new Wind(
+            struct_nondisp,
+            struct_wind,
+            this->n_timesteps
+        );
+        
+        this->_addNondispatchable(nondisp_ptr);
+    }
     
-    this->_addNondispatchable(nondisp_ptr);
+    catch (...) {
+        this->clearAssets();
+        throw;
+    }
     
     return;
 }
@@ -1479,14 +1580,21 @@ void Model :: addDiesel(
      *  the Model
      */
     
-    Combustion* combustion_ptr = new Diesel(
-        struct_disp,
-        struct_combustion,
-        struct_diesel,
-        this->n_timesteps
-    );
+    try {
+        Combustion* combustion_ptr = new Diesel(
+            struct_disp,
+            struct_combustion,
+            struct_diesel,
+            this->n_timesteps
+        );
+        
+        this->_addCombustion(combustion_ptr);
+    }
     
-    this->_addCombustion(combustion_ptr);
+    catch (...) {
+        this->clearAssets();
+        throw;
+    }
     
     return;
 }
@@ -1499,13 +1607,21 @@ void Model :: addHydro(
     /*
      *  Method to add Dispatchable <-- Hydro asset to the Model
      */
-    Dispatchable* noncombustion_ptr = new Hydro(
-        struct_disp,
-        struct_hydro,
-        this->n_timesteps
-    );
     
-    this->_addNonCombustion(noncombustion_ptr);
+    try {
+        Dispatchable* noncombustion_ptr = new Hydro(
+            struct_disp,
+            struct_hydro,
+            this->n_timesteps
+        );
+        
+        this->_addNonCombustion(noncombustion_ptr);
+    }
+    
+    catch (...) {
+        this->clearAssets();
+        throw;
+    }
     
     return;
 }
@@ -1521,14 +1637,21 @@ void Model :: addLiIon(
      *  Model
      */
     
-    Storage* storage_ptr = new LiIon(
-        struct_storage,
-        struct_battery_storage,
-        struct_liion,
-        this->n_timesteps
-    );
+    try {
+        Storage* storage_ptr = new LiIon(
+            struct_storage,
+            struct_battery_storage,
+            struct_liion,
+            this->n_timesteps
+        );
+        
+        this->_addStorage(storage_ptr);
+    }
     
-    this->_addStorage(storage_ptr);
+    catch (...) {
+        this->clearAssets();
+        throw;
+    }
     
     return;
 }
@@ -1551,8 +1674,7 @@ void Model :: run() {
         
         // compute economics
         this->_computeEconomics();
-        
-    } 
+    }
     
     catch (...) {
         this->clearAssets();

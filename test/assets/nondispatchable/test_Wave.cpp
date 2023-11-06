@@ -28,6 +28,44 @@ try {
     
     Wave test_wave_lookup(struct_nondisp, struct_wave, 16);
     
+    
+    // test input bounds checking
+    bool error_flag = true;
+    
+    try {
+        // bad design_significant_wave_height_m
+        structWave bad_struct_wave;
+        bad_struct_wave.design_significant_wave_height_m = 0;
+        
+        Wave bad_test_wave(struct_nondisp, bad_struct_wave, 16);
+    }
+    
+    catch (...) {
+        // task failed successfully! =P
+    }
+    
+    if (not error_flag) {
+        expectedErrorNotDetected(__LINE__, __FILE__);
+    }
+    
+    
+    try {
+        // bad design_energy_period_s
+        structWave bad_struct_wave;
+        bad_struct_wave.design_energy_period_s = 0;
+        
+        Wave bad_test_wave(struct_nondisp, bad_struct_wave, 16);
+    }
+    
+    catch (...) {
+        // task failed successfully! =P
+    }
+    
+    if (not error_flag) {
+        expectedErrorNotDetected(__LINE__, __FILE__);
+    }
+    
+    
     //  test post-construction attributes
     std::vector<double> exp_interp_significant_wave_height_vec_m = {
         0.25,

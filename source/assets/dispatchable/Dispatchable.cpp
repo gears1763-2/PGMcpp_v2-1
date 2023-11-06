@@ -24,6 +24,31 @@ Dispatchable :: Dispatchable(
      *  Dispatchable class constructor
      */
     
+    // input bounds checking
+    if (struct_disp.cap_kW <= 0) {
+        std::string error_str = "\nERROR  Dispatchable::Dispatchable()";
+        error_str += "  structDispatchable::cap_kW must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_disp.replace_running_hrs <= 0) {
+        std::string error_str = "\nERROR  Dispatchable::Dispatchable()";
+        error_str += "  structDispatchable::replace_running_hrs must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    
+    // set attributes
     this->struct_disp = struct_disp;
     this->n_timesteps = n_timesteps;
     

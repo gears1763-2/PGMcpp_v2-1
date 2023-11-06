@@ -122,6 +122,7 @@ class Model {
         void _chargeStorageFromNoncombustion(int, double, std::vector<Storage*>);
         void _chargeStorageFromNondispatchable(int, double, std::vector<Storage*>);
         void _chargeStorage(int, double, std::vector<Storage*>);
+        void _toggleReserve(bool);
         
         void _dispatchLoadFollowingInOrderCharging(int);
         void _dispatchLoadFollowingInOrderDischarging(int);
@@ -129,6 +130,7 @@ class Model {
         void _dispatchCycleChargingInOrderCharging(int);
         void _dispatchCycleChargingInOrderDischarging(int);
         
+        bool _sufficientProductionStorage(double, double, int);
         void _handleDispatch(void);
         
         void _computeFuelEmissions(void);

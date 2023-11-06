@@ -24,7 +24,24 @@ try {
     Wind test_wind(struct_nondisp, struct_wind, 16);
     
     
-    //...
+    // test input bounds checking
+    bool error_flag = true;
+    
+    try {
+        // bad design_speed_ms
+        structWind bad_struct_wind;
+        bad_struct_wind.design_speed_ms = 0;
+        
+        Wind bad_test_wind(struct_nondisp, bad_struct_wind, 16);
+    }
+    
+    catch (...) {
+        // task failed successfully! =P
+    }
+    
+    if (not error_flag) {
+        expectedErrorNotDetected(__LINE__, __FILE__);
+    }
     
 } catch (...) {
     printRed("\n\t\t\t\tNondispatchable <-- Wind Tests:  FAIL\n");

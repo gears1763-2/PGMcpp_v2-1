@@ -161,6 +161,10 @@ PYBIND11_MODULE(PGMcpp, m) {
             "cycle_charging_load_ratio",
             &structCombustion::cycle_charging_load_ratio
         )
+        .def_readwrite(
+            "ramp_rate_constraint_kWperhr",
+            &structCombustion::ramp_rate_constraint_kWperhr
+        )
         .def_readwrite("fuel_cost_L", &structCombustion::fuel_cost_L)
         .def_readwrite(
             "nominal_fuel_escalation_rate_annual",
@@ -227,6 +231,7 @@ PYBIND11_MODULE(PGMcpp, m) {
         .def_readwrite("min_SOC", &structBatteryStorage::min_SOC)
         .def_readwrite("max_SOC", &structBatteryStorage::max_SOC)
         .def_readwrite("hysteresis_SOC", &structBatteryStorage::hysteresis_SOC)
+        .def_readwrite("reserve_SOC", &structBatteryStorage::reserve_SOC)
         .def_readwrite("charge_efficiency", &structBatteryStorage::charge_efficiency)
         .def_readwrite(
             "discharge_efficiency",

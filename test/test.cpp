@@ -229,6 +229,25 @@ void testTruth(
 }
 
 
+void expectedErrorNotDetected(int line, std::string file) {
+    /*
+     *  Helper function to handle when expected errors are not detected.
+     */
+    
+    std::string error_str = "\n ERROR  failed to throw expected error prior to line ";
+    error_str += std::to_string(line);
+    error_str += " of ";
+    error_str += file;
+    
+    #ifdef _WIN32
+        std::cout << error_str << std::endl;
+    #endif
+    
+    throw std::runtime_error(error_str);
+    return;
+}
+
+
 void printGreen(std::string input_str) {
     /*
      *  Helper function to stream a green string to std::cout
@@ -263,6 +282,8 @@ void printGold(std::string input_str) {
 
 
 int main(int argc, char** argv) {
+    srand(time(NULL));
+    
     #ifdef _WIN32
         activateVirtualTerminal();
     #endif  /* _WIN32 */

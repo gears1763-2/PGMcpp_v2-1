@@ -27,10 +27,11 @@ struct structBatteryStorage {
     //  input attributes (structured)
     //  these are the only attributes the user should interact with
     double init_SOC = 0.5;  // SOC = state of charge
-    double min_SOC = 0.2;
+    double min_SOC = 0.4;
     double max_SOC = 0.9;
     
-    double hysteresis_SOC = 0.5;
+    double hysteresis_SOC = 0.8;
+    double reserve_SOC = 0.2;
     
     double charge_efficiency = 0.9;
     double discharge_efficiency = 0.9;
@@ -42,7 +43,7 @@ class BatteryStorage : public Storage {
         //  modelling and output attributes (unstructured)
         //  the user should not interact with these attributes
         structBatteryStorage struct_battery_storage;
-        
+        double init_min_SOC;
         
         //  methods
         BatteryStorage(structStorage, structBatteryStorage, int);
@@ -54,6 +55,7 @@ class BatteryStorage : public Storage {
         virtual void commitDischargekW(double, int);
         
         virtual void writeResults(std::string, int) {return;}
+        virtual void toggleReserve(bool);
         
         ~BatteryStorage(void);
 };

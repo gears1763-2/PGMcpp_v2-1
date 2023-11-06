@@ -17,7 +17,116 @@ BatteryStorage :: BatteryStorage(
      *  BatteryStorage class constructor
      */
     
+    // input bounds checking
+    if (
+        struct_battery_storage.init_SOC < 0 or
+        struct_battery_storage.init_SOC > 1
+    ) {
+        std::string error_str = "\nERROR  BatteryStorage::BatteryStorage()";
+        error_str += "  structBatteryStorage::init_SOC must be in ";
+        error_str += "the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (
+        struct_battery_storage.min_SOC < 0 or
+        struct_battery_storage.min_SOC > 1
+    ) {
+        std::string error_str = "\nERROR  BatteryStorage::BatteryStorage()";
+        error_str += "  structBatteryStorage::min_SOC must be in ";
+        error_str += "the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (
+        struct_battery_storage.max_SOC < 0 or
+        struct_battery_storage.max_SOC > 1
+    ) {
+        std::string error_str = "\nERROR  BatteryStorage::BatteryStorage()";
+        error_str += "  structBatteryStorage::max_SOC must be in ";
+        error_str += "the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (
+        struct_battery_storage.hysteresis_SOC < 0 or
+        struct_battery_storage.hysteresis_SOC > 1
+    ) {
+        std::string error_str = "\nERROR  BatteryStorage::BatteryStorage()";
+        error_str += "  structBatteryStorage::hysteresis_SOC must be in ";
+        error_str += "the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (
+        struct_battery_storage.reserve_SOC < 0 or
+        struct_battery_storage.reserve_SOC > 1
+    ) {
+        std::string error_str = "\nERROR  BatteryStorage::BatteryStorage()";
+        error_str += "  structBatteryStorage::reserve_SOC must be in ";
+        error_str += "the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (
+        struct_battery_storage.charge_efficiency <= 0 or
+        struct_battery_storage.charge_efficiency > 1
+    ) {
+        std::string error_str = "\nERROR  BatteryStorage::BatteryStorage()";
+        error_str += "  structBatteryStorage::charge_efficiency must be in ";
+        error_str += "the half-open interval (0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (
+        struct_battery_storage.discharge_efficiency <= 0 or
+        struct_battery_storage.discharge_efficiency > 1
+    ) {
+        std::string error_str = "\nERROR  BatteryStorage::BatteryStorage()";
+        error_str += "  structBatteryStorage::discharge_efficiency must be in ";
+        error_str += "the half-open interval (0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    
+    // set attributes
     this->struct_battery_storage = struct_battery_storage;
+    this->init_min_SOC = this->struct_battery_storage.min_SOC;
 
     this->charge_kWh =
         this->struct_battery_storage.init_SOC *
@@ -196,6 +305,54 @@ void BatteryStorage :: commitDischargekW(
         double SOC = this->charge_kWh / this->struct_storage.cap_kWh;
         if (SOC <= this->struct_battery_storage.min_SOC) {
             this->depleted_flag = true;
+        }
+    }
+    
+    return;
+}
+
+
+void BatteryStorage :: toggleReserve(bool reserve_flag) {
+    /*
+     *  Method to toggle whether or not reserve energy is available for use.
+     */
+    
+    // from false to true
+    if (not this->reserve_flag and reserve_flag) {
+        this->reserve_flag = true;
+        
+        this->struct_battery_storage.min_SOC =
+            this->struct_battery_storage.reserve_SOC;
+        
+        this->min_charge_kWh =
+            this->struct_battery_storage.min_SOC *
+            this->struct_storage.cap_kWh;
+        
+        if (this->depleted_flag) {
+            double SOC = this->charge_kWh / this->struct_storage.cap_kWh;
+            if (SOC >= this->struct_battery_storage.reserve_SOC) {
+                this->depleted_flag = false;
+            }
+        }
+    }
+    
+    
+    // from true to false
+    else if (this->reserve_flag and not reserve_flag) {
+        this->reserve_flag = false;
+        
+        this->struct_battery_storage.min_SOC =
+            this->init_min_SOC;
+        
+        this->min_charge_kWh =
+            this->struct_battery_storage.min_SOC *
+            this->struct_storage.cap_kWh;
+        
+        if (not this->depleted_flag) {
+            double SOC = this->charge_kWh / this->struct_storage.cap_kWh;
+            if (SOC <= this->struct_battery_storage.min_SOC) {
+                this->depleted_flag = true;
+            }
         }
     }
     

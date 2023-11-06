@@ -1,5 +1,6 @@
-- implement LOAD_FOLLOWING_SMART_COMBUSTION control
+- implement ESS deep vs shallow discharge logic (emerg reserve)  *** BEING REVIEWED ***
 - implement Dispatchable <-- Hydro asset
+- implement LOAD_FOLLOWING_SMART_COMBUSTION control
 - implement Sean's battery degradation model
 - implement some kind of foresight, or receding horizon, control (will need linear programming functionality for this)
 - implement per timestep API functionality between Python 3 and PGMcpp

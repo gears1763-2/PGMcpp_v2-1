@@ -22,6 +22,12 @@ double Model :: _controlCombustion(
      */
     
     double load_kW = _load_kW;
+    
+    double dt_hrs = 0;
+    if (timestep > 0) {
+        // previous dt_hrs for checking ramp rate constraints
+        dt_hrs = this->dt_vec_hr[timestep - 1];
+    }
      
     // for all Combustion assets, request production and commit,
     // record production, dispatch, and curtailment, update load
@@ -42,11 +48,11 @@ double Model :: _controlCombustion(
                 request_kW = load_kW;
             }
             
-            production_kW = combustion_ptr->requestProductionkW(request_kW);
+            production_kW = combustion_ptr->requestProductionkW(request_kW, timestep);
         }
         
         else {
-            production_kW = combustion_ptr->requestProductionkW(load_kW);
+            production_kW = combustion_ptr->requestProductionkW(load_kW, timestep);
         }
         
         combustion_ptr->commitProductionkW(production_kW, timestep);

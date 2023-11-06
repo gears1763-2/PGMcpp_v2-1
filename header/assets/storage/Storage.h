@@ -47,6 +47,7 @@ class Storage {
         //  modelling and output attributes (unstructured)
         //  the user should not interact with these attributes
         bool depleted_flag;
+        bool reserve_flag;
         
         StorageType storage_type = LIION;
         structStorage struct_storage;
@@ -98,6 +99,7 @@ class Storage {
         void computeLevellizedCostOfEnergy(void);
         
         virtual void writeResults(std::string, int) {return;}
+        virtual void toggleReserve(bool) {return;}
         
         virtual ~Storage(void);
 };

@@ -17,6 +17,32 @@ Solar :: Solar(
      *  Solar class constructor
      */
     
+    // input bounds checking
+    if (struct_solar.derating < 0 or struct_solar.derating > 1) {
+        std::string error_str = "\nERROR  Solar::Solar()";
+        error_str += "  structSolar::derating must be in ";
+        error_str += "the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_solar.capital_cost_per_kW < 0) {
+        std::string error_str = "\nERROR  Solar::Solar()";
+        error_str += "  structSolar::capital_cost_per_kW must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    
+    // set attributes
     this->nondisp_type = SOLAR;
     this->nondisp_type_str = "SOLAR";
     this->struct_solar = struct_solar;

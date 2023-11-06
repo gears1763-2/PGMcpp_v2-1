@@ -66,6 +66,7 @@ class LiIon : public BatteryStorage {
         void commitDischargekW(double, int);
         
         void writeResults(std::string, int);
+        void toggleReserve(bool);
         
         ~LiIon(void);
 };

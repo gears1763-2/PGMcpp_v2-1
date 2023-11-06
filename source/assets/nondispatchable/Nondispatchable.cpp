@@ -15,6 +15,31 @@ Nondispatchable :: Nondispatchable(
      *  Nondispatchable class constructor
      */
     
+    // input bounds checking
+    if (struct_nondisp.cap_kW <= 0) {
+        std::string error_str = "\nERROR  Nondispatchable::Nondispatchable()";
+        error_str += "  structNondispatchable::cap_kW must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_nondisp.replace_running_hrs <= 0) {
+        std::string error_str = "\nERROR  Nondispatchable::Nondispatchable()";
+        error_str += "  structNondispatchable::replace_running_hrs must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    
+    // set attributes
     this->struct_nondisp = struct_nondisp;
     this->n_timesteps = n_timesteps;
     

@@ -17,6 +17,20 @@ Tidal :: Tidal(
      *  Tidal class constructor
      */
     
+    // input bounds checking
+    if (struct_tidal.design_speed_ms <= 0) {
+        std::string error_str = "\nERROR  Tidal::Tidal()";
+        error_str += "  structTidal::design_speed_ms must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    
+    // set attributes
     this->nondisp_type = TIDAL;
     this->nondisp_type_str = "TIDAL";
     this->struct_tidal = struct_tidal;

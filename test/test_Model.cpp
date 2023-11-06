@@ -125,21 +125,24 @@ try {
     // test add1dRenewableResource()
     std::cout << "\tTesting Model::add1dRenewableResource() ..." <<
         std::endl;
-        
+    
+    bool error_flag = true;
     int hydro_key = 0;
 
     try {
         test_model.add1dRenewableResource("balls", "", hydro_key);
         
-        std::string error_str = "Model::add1dRenewableResource() fails ";
-        error_str += "to throw expected runtime error at line ";
-        error_str += std::to_string(__LINE__);
-        throw std::runtime_error(error_str);
+        error_flag = false;
     }
     
     catch (...) {
         // task failed successfully! =P
     }
+    
+    if (not error_flag) {
+        expectedErrorNotDetected(__LINE__, __FILE__);
+    }
+    
     
     try {
         test_model.add1dRenewableResource(
@@ -148,15 +151,17 @@ try {
             hydro_key
         );
         
-        std::string error_str = "Model::add1dRenewableResource() fails ";
-        error_str += "to throw expected runtime error at line ";
-        error_str += std::to_string(__LINE__);
-        throw std::runtime_error(error_str);
+        error_flag = false;
     }
     
     catch (...) {
         // task failed successfully! =P
     }
+    
+    if (not error_flag) {
+        expectedErrorNotDetected(__LINE__, __FILE__);
+    }
+    
     
     try {
         test_model.add1dRenewableResource(
@@ -165,15 +170,17 @@ try {
             hydro_key
         );
         
-        std::string error_str = "Model::add1dRenewableResource() fails ";
-        error_str += "to throw expected runtime error at line ";
-        error_str += std::to_string(__LINE__);
-        throw std::runtime_error(error_str);
+        error_flag = false;
     }
     
     catch (...) {
         // task failed successfully! =P
     }
+    
+    if (not error_flag) {
+        expectedErrorNotDetected(__LINE__, __FILE__);
+    }
+    
     
     test_model.add1dRenewableResource(
         "Hydro",
@@ -331,15 +338,17 @@ try {
     try {
         test_model.add2dRenewableResource("balls", "", wave_key);
         
-        std::string error_str = "Model::add2dRenewableResource() fails ";
-        error_str += "to throw expected runtime error at line ";
-        error_str += std::to_string(__LINE__);
-        throw std::runtime_error(error_str);
+        error_flag = false;
     }
     
     catch (...) {
         // task failed successfully! =P
     }
+    
+    if (not error_flag) {
+        expectedErrorNotDetected(__LINE__, __FILE__);
+    }
+    
     
     try {
         test_model.add2dRenewableResource(
@@ -348,15 +357,17 @@ try {
             wave_key
         );
         
-        std::string error_str = "Model::add2dRenewableResource() fails ";
-        error_str += "to throw expected runtime error at line ";
-        error_str += std::to_string(__LINE__);
-        throw std::runtime_error(error_str);
+        error_flag = false;
     }
     
     catch (...) {
         // task failed successfully! =P
     }
+    
+    if (not error_flag) {
+        expectedErrorNotDetected(__LINE__, __FILE__);
+    }
+    
     
     try {
         test_model.add2dRenewableResource(
@@ -365,15 +376,17 @@ try {
             wave_key
         );
         
-        std::string error_str = "Model::add2dRenewableResource() fails ";
-        error_str += "to throw expected runtime error at line ";
-        error_str += std::to_string(__LINE__);
-        throw std::runtime_error(error_str);
+        error_flag = false;
     }
     
     catch (...) {
         // task failed successfully! =P
     }
+    
+    if (not error_flag) {
+        expectedErrorNotDetected(__LINE__, __FILE__);
+    }
+    
     
     test_model.add2dRenewableResource(
         "Wave",

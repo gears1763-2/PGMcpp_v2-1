@@ -43,6 +43,8 @@ struct structCombustion {
     
     double cycle_charging_load_ratio = 0.85;
     
+    double ramp_rate_constraint_kWperhr = -1;   // sentinel
+    
     double fuel_cost_L = 1.50;
     double nominal_fuel_escalation_rate_annual = 0.05;
     
@@ -124,7 +126,7 @@ class Combustion : public Dispatchable {
         void recordEmissions(structEmissions, int);
         
         virtual void commitProductionkW(double, int) {return;}
-        virtual double requestProductionkW(double) {return 0;}
+        virtual double requestProductionkW(double, int) {return 0;}
         
         void computeLevellizedCostOfEnergy(void);
         

@@ -252,3 +252,17 @@ void Model :: _chargeStorage(
     
     return;
 }
+
+
+void Model :: _toggleReserve(bool reserve_flag) {
+    /*
+     *  Helper method to toggle whether or not Storage reserve energy is available for
+     *  use.
+     */
+     
+    for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
+        this->storage_ptr_vec[i]->toggleReserve(reserve_flag);
+    }
+    
+    return;
+}

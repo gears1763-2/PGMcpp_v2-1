@@ -31,6 +31,35 @@ Diesel :: Diesel(
      *  Diesel class constructor
      */
     
+    // input bounds checking
+    if (
+        struct_diesel.minimum_load_ratio < 0 or
+        struct_diesel.minimum_load_ratio > 1
+    ) {
+        std::string error_str = "\nERROR  Diesel::Diesel()";
+        error_str += "  structDiesel::minimum_load_ratio must be in ";
+        error_str += "the closed interval [0, 1]";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_diesel.minimum_runtime_hrs < 0) {
+        std::string error_str = "\nERROR  Diesel::Diesel()";
+        error_str += "  structDiesel::minimum_runtime_hrs must be >= 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    
+    // set attributes
     this->disp_type = DIESEL;
     this->disp_type_str = "DIESEL";
     this->fuel_type = FUEL_DIESEL;
@@ -122,6 +151,10 @@ void Diesel :: _writeSummary(std::string _write_path, int asset_idx) {
         << "\n";
     ofs << "\tminimum runtime: " << this->struct_diesel.minimum_runtime_hrs
         << " hrs\n";
+    ofs << "\tcycle charging load ratio: " <<
+        this->struct_combustion.cycle_charging_load_ratio << "\n";
+    ofs << "\tramp rate constraint: " <<
+        this->struct_combustion.ramp_rate_constraint_kWperhr << " kW/hr\n";
     ofs << "\tfuel mode: " << this->struct_combustion.fuel_mode;
     
     switch (this->struct_combustion.fuel_mode) {
@@ -298,7 +331,7 @@ void Diesel :: commitProductionkW(
 }
 
 
-double Diesel :: requestProductionkW(double requested_production_kW) {
+double Diesel :: requestProductionkW(double requested_production_kW, int timestep) {
     /*
      *  Method to handle production requests (subject to active
      *  operating constraints) and return provided production
@@ -319,6 +352,24 @@ double Diesel :: requestProductionkW(double requested_production_kW) {
     // check against capacity
     if (production_kW > this->struct_disp.cap_kW) {
         production_kW = this->struct_disp.cap_kW;
+    }
+    
+    // enforce ramp rate constraint
+    // only after first time step and only if production is changing
+    if (timestep > 0 and production_kW != this->production_vec_kW[timestep - 1]) {
+        double dt_hrs = this->ptr_2_dt_vec_hr->at(timestep - 1);
+        double ramp_rate_kWperhr =
+            (production_kW - this->production_vec_kW[timestep - 1]) / dt_hrs;
+        
+        if (
+            fabs(ramp_rate_kWperhr) >
+            this->struct_combustion.ramp_rate_constraint_kWperhr
+        ) {
+            double sign = ramp_rate_kWperhr / fabs(ramp_rate_kWperhr);
+            production_kW =
+                this->production_vec_kW[timestep - 1] +
+                sign * this->struct_combustion.ramp_rate_constraint_kWperhr * dt_hrs;
+        }
     }
     
     return production_kW;

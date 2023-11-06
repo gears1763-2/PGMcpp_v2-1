@@ -15,7 +15,32 @@ Storage :: Storage(
      *  Storage class constructor
      */
     
+    // input bounds checking
+    if (struct_storage.cap_kW <= 0) {
+        std::string error_str = "\nERROR  Storage::Storage()";
+        error_str += "  structStorage::cap_kW must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_storage.cap_kWh <= 0) {
+        std::string error_str = "\nERROR  Storage::Storage()";
+        error_str += "  structStorage::cap_kWh must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    // set attributes
     this->depleted_flag = false;
+    this->reserve_flag = false;
     
     this->struct_storage = struct_storage;
     this->n_timesteps = n_timesteps;

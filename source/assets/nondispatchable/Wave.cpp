@@ -17,6 +17,31 @@ Wave :: Wave(
      *  Wave class constructor
      */
     
+    // input bounds checking
+    if (struct_wave.design_significant_wave_height_m <= 0) {
+        std::string error_str = "\nERROR  Wave::Wave()";
+        error_str += "  structWave::design_significant_wave_height_m must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    else if (struct_wave.design_energy_period_s <= 0) {
+        std::string error_str = "\nERROR  Wave::Wave()";
+        error_str += "  structWave::design_energy_period_s must be > 0";
+        
+        #ifdef _WIN32
+            std::cout << error_str << std::endl;
+        #endif
+        
+        throw std::invalid_argument(error_str);
+    }
+    
+    
+    // set attributes
     this->nondisp_type = WAVE;
     this->nondisp_type_str = "WAVE";
     this->struct_wave = struct_wave;
