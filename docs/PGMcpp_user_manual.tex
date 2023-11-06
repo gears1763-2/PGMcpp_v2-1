@@ -943,6 +943,8 @@ The \texttt{Combustion} class is the root of its branch of the class hierarchy. 
         FuelMode fuel_mode = LINEAR;
 
         double cycle_charging_load_ratio = 0.85;
+
+        double ramp_rate_constraint_kWperhr = -1;   // sentinel
         
         double fuel_cost_L = 1.50;
         double nominal_fuel_escalation_rate_annual = 0.05;
@@ -972,6 +974,7 @@ The \texttt{Combustion} class is the root of its branch of the class hierarchy. 
         \textbf{Attribute} & \textbf{Type} & \textbf{Default Value} & \textbf{Description} \\\hline\hline
         \texttt{fuel\_mode} & {FuelMode} & {LINEAR} & {Defines the approach to be used in modelling fuel consumption.} \\\hline
         \texttt{cycle\_charging\_load\_ratio} & {double} & {0.85} & {Defines the proportion of \texttt{cap\_kW} at which the object produces when running in cycle charging mode.} \\\hline
+        \texttt{ramp\_rate\_constraint\_kWperhr} & {double} & {-1 (sentinel)} & {Defines the ramp rate constraint. The default value of -1 is a sentinel value, which triggers a default ramp rate constraint. The default constraint is taken to be that rate which ramps production from zero up to rated capacity in 30 seconds.} \\\hline
         \texttt{fuel\_cost\_L} & {double} & {1.50} & {Defines the price of fuel per unit volume (expressed in litres). The units of currency are left undefined.} \\\hline
         \texttt{nominal\_fuel\_escalation\_rate} & {double} & {0.05} & {Defines the nominal escalation rate in fuel cost (annual), used in computing real fuel costs. This rate is used instead of the given nominal inflation rate.} \\\hline
         \texttt{linear\_fuel\_intercept\_LkWh} & {double} & {-1 (sentinel)} & {Defines the linear fuel intercept, expressed in litres per kiloWatt-hour produced, to be used in modelling fuel consumption. The default value of -1 is a sentinel value, which triggers a generic fuel intercept model within the constructor. This is only used if \texttt{fuel\_mode} = LINEAR.} \\\hline
@@ -1226,10 +1229,11 @@ The \texttt{BatteryStorage} class is the root of its branch of the class hierarc
 \begin{verbatim}
     struct structBatteryStorage {
         double init_SOC = 0.5;  // SOC = state of charge
-        double min_SOC = 0.2;
+        double min_SOC = 0.4;
         double max_SOC = 0.9;
-
-        double hysteresis_SOC = 0.5;
+        
+        double hysteresis_SOC = 0.8;
+        double reserve_SOC = 0.2;
         
         double charge_efficiency = 0.9;
         double discharge_efficiency = 0.9;
@@ -1246,9 +1250,10 @@ The \texttt{BatteryStorage} class is the root of its branch of the class hierarc
         \hline
         \textbf{Attribute} & \textbf{Type} & \textbf{Default Value} & \textbf{Description} \\\hline\hline
         \texttt{init\_SOC} & {double} & {0.5} & {Defines the initial state of charge (SOC) of the object. This is defined as \texttt{Storage :: charge\_kWh} / \texttt{Storage :: structStorage :: cap\_kWh}. This attribute will alter the initial value of \texttt{Storage :: charge\_kWh}.} \\\hline
-        \texttt{min\_SOC} & {double} & {0.2} & {Defines the minimum SOC of the object. This attribute will alter the initial value of \texttt{Storage :: min\_charge\_kWh}.} \\\hline
+        \texttt{min\_SOC} & {double} & {0.4} & {Defines the minimum SOC of the object. This attribute will alter the initial value of \texttt{Storage :: min\_charge\_kWh}.} \\\hline
         \texttt{max\_SOC} & {double} & {0.9} & {Defines the maximum SOC of the object. This attribute will alter the initial value of \texttt{Storage :: max\_charge\_kWh}.} \\\hline
-        \texttt{hysteresis\_SOC} & {double} & {0.5} & {Defines the SOC that must be attained after reaching the minimum SOC before the object can be discharged again.} \\\hline
+        \texttt{hysteresis\_SOC} & {double} & {0.8} & {Defines the SOC that must be attained after reaching the minimum SOC before the object can be discharged again.} \\\hline
+        \texttt{reserve\_SOC} & {double} & {0.2} & {Defines a minimum SOC that comes into effect whenever there is otherwise insufficient production and stored energy to meet demand.} \\\hline
         \texttt{charge\_efficiency} & {double} & {0.9} & {Defines how efficiently the object transforms a charging (i.e., input) power into an increase in charge (i.e., energy content).} \\\hline
         \texttt{discharge\_efficiency} & {double} & {0.9} & {Defines how efficiently the object transforms a decrease in charge (i.e., energy content) into a discharging (i.e., output) power.} \\\hline
     \end{tabular}
