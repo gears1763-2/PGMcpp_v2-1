@@ -302,8 +302,7 @@ void BatteryStorage :: commitDischargekW(
     
     // set depleted flag
     if (not this->depleted_flag) {
-        double SOC = this->charge_kWh / this->struct_storage.cap_kWh;
-        if (SOC <= this->struct_battery_storage.min_SOC) {
+        if (this->charge_kWh <= this->min_charge_kWh) {
             this->depleted_flag = true;
         }
     }

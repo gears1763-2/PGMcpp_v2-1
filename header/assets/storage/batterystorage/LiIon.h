@@ -31,13 +31,13 @@ struct structLiIon {
     //
     //  ref: docs/refs/battery_degradation.pdf
     //
-    double degr_alpha = 10;             // [ ]
-    double degr_beta = 1.1;             // [ ]
-    double degr_B_hat_cal_0 = 5.222e6;  // [1/sqrt(hr)]
-    double degr_r_cal = 0.350;          // [ ]
+    double degr_alpha = 8.935;             // [ ]
+    double degr_beta = 1;             // [ ]
+    double degr_B_hat_cal_0 = 5.22226e6;  // [1/sqrt(hr)]
+    double degr_r_cal = 0.4361;          // [ ]
     double degr_Ea_cal_0 = 5.279e4;     // [J/mol]
-    double degr_a_cal = 108.5;          // [J/mol]
-    double degr_s_cal = 1.895;          // [ ]
+    double degr_a_cal = 100;          // [J/mol]
+    double degr_s_cal = 2;          // [ ]
     double gas_constant_JmolK = 8.31446;
     double temperature_K = 273 + 20;    
 };
@@ -58,6 +58,9 @@ class LiIon : public BatteryStorage {
         void _writeTimeSeriesResults(std::string, int);
         void _writeSummary(std::string, int);
         
+        double _getEacal(void);
+        double _getBcal(void);
+        double _getdSOHdtcal(void);
         double _getdSOHdt(double);
         void _handleDegradation(double, int);
         void _handleReplacement(int);
