@@ -107,7 +107,7 @@ void Hydro :: commitProductionkW(
 double Hydro :: requestProductionkW(
     double requested_production_kW,
     double hydro_resource_m3hr,
-    double dt_hrs
+    int timestep
 ) {
     /*
      *  Method to handle production requests (subject to active
@@ -116,6 +116,7 @@ double Hydro :: requestProductionkW(
     
     // check against hydro resource
     /*
+    double dt_hrs = this->ptr_2_dt_vec_hr->at(timestep);
     double available_flow_m3hr = hydro_resource_m3hr -
         this->minimum_discharge_m3hr +
         this->reservoir_volume_m3 / dt_hrs;

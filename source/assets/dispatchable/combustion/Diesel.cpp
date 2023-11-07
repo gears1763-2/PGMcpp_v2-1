@@ -294,7 +294,7 @@ void Diesel :: commitProductionkW(
     if (this->is_running) {
         // handle fuel consumption
         double fuel_consumption_L =
-            Combustion::getFuelConsumptionL(production_kW, dt_hrs);
+            Combustion::getFuelConsumptionL(production_kW, timestep);
             
         this->fuel_vec_L[timestep] = fuel_consumption_L;
         

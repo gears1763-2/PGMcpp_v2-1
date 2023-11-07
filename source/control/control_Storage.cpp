@@ -50,7 +50,6 @@ std::vector<Storage*> Model :: _getNondepletedStorage() {
 double Model :: _dischargeStorage(
     int timestep,
     double _load_kW,
-    double dt_hrs,
     std::vector<Storage*> storage_ptr_vec
 ) {
     /*
@@ -64,7 +63,7 @@ double Model :: _dischargeStorage(
     for (size_t i = 0; i < storage_ptr_vec.size(); i++) {
         // get available power
         Storage* storage_ptr = this->storage_ptr_vec[i];
-        double discharging_kW = storage_ptr->getAvailablekW(dt_hrs);
+        double discharging_kW = storage_ptr->getAvailablekW(timestep);
         
         // discharge up to load
         if (discharging_kW >= load_kW) {
@@ -84,7 +83,6 @@ double Model :: _dischargeStorage(
 
 void Model :: _chargeStorageFromCombustion(
     int timestep,
-    double dt_hrs,
     std::vector<Storage*> storage_ptr_vec
 ) {
     /*
@@ -128,7 +126,6 @@ void Model :: _chargeStorageFromCombustion(
 
 void Model :: _chargeStorageFromNoncombustion(
     int timestep,
-    double dt_hrs,
     std::vector<Storage*> storage_ptr_vec
 ) {
     /*
@@ -172,7 +169,6 @@ void Model :: _chargeStorageFromNoncombustion(
 
 void Model :: _chargeStorageFromNondispatchable(
     int timestep,
-    double dt_hrs,
     std::vector<Storage*> storage_ptr_vec
 ) {
     /*
@@ -216,7 +212,6 @@ void Model :: _chargeStorageFromNondispatchable(
 
 void Model :: _chargeStorage(
     int timestep,
-    double dt_hrs,
     std::vector<Storage*> storage_ptr_vec
 ) {
     /*
@@ -230,19 +225,19 @@ void Model :: _chargeStorage(
         Storage* storage_ptr = storage_ptr_vec[i];
         
         storage_ptr->acceptable_kW =
-            storage_ptr->getAcceptablekW(dt_hrs);
+            storage_ptr->getAcceptablekW(timestep);
         
         storage_ptr->charging_kW = 0;
     }
     
     // charge from Combustion overproduction
-    this->_chargeStorageFromCombustion(timestep, dt_hrs, storage_ptr_vec);
+    this->_chargeStorageFromCombustion(timestep, storage_ptr_vec);
     
     // charge from non-Combustion overproduction
-    this->_chargeStorageFromNoncombustion(timestep, dt_hrs, storage_ptr_vec);
+    this->_chargeStorageFromNoncombustion(timestep, storage_ptr_vec);
     
     // chrage from Nondispatchable overproduction
-    this->_chargeStorageFromNondispatchable(timestep, dt_hrs, storage_ptr_vec);
+    this->_chargeStorageFromNondispatchable(timestep, storage_ptr_vec);
     
     // commit charge
     for (size_t i = 0; i < storage_ptr_vec.size(); i++) {

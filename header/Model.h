@@ -111,17 +111,17 @@ class Model {
         void _generateNetLoadVector(void);
         
         double _controlCombustion(int, double, bool);
-        double _controlNoncombustion(int, double, double);
+        double _controlNoncombustion(int, double);
         
         std::vector<Storage*> _getDepletedStorage(void);
         std::vector<Storage*> _getNondepletedStorage(void);
         
-        double _dischargeStorage(int, double, double, std::vector<Storage*>);
+        double _dischargeStorage(int, double, std::vector<Storage*>);
         
-        void _chargeStorageFromCombustion(int, double, std::vector<Storage*>);
-        void _chargeStorageFromNoncombustion(int, double, std::vector<Storage*>);
-        void _chargeStorageFromNondispatchable(int, double, std::vector<Storage*>);
-        void _chargeStorage(int, double, std::vector<Storage*>);
+        void _chargeStorageFromCombustion(int, std::vector<Storage*>);
+        void _chargeStorageFromNoncombustion(int, std::vector<Storage*>);
+        void _chargeStorageFromNondispatchable(int, std::vector<Storage*>);
+        void _chargeStorage(int, std::vector<Storage*>);
         void _toggleReserve(bool);
         
         void _dispatchLoadFollowingInOrderCharging(int);
@@ -130,7 +130,7 @@ class Model {
         void _dispatchCycleChargingInOrderCharging(int);
         void _dispatchCycleChargingInOrderDischarging(int);
         
-        bool _sufficientProductionStorage(double, double, int);
+        bool _sufficientProductionStorage(double, int);
         void _handleDispatch(void);
         
         void _computeFuelEmissions(void);

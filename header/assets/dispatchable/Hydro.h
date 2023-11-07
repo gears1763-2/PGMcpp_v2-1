@@ -59,7 +59,7 @@ class Hydro : public Dispatchable {
         void _writeSummary(std::string, int);
         void commitProductionkW(double, int);
         
-        double requestProductionkW(double, double, double);
+        double requestProductionkW(double, double, int);
         
         void writeResults(std::string, int);
         

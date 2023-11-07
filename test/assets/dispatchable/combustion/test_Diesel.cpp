@@ -459,7 +459,7 @@ try {
         std::endl;
     
     testFloatEquals(
-        test_diesel_fuel_lookup._fuelConsumptionLookupL(0, 1),
+        test_diesel_fuel_lookup._fuelConsumptionLookupL(0, 0),
         exp_fuel_consumption_vec_Lhr[0],
         FLOAT_TOLERANCE,
         __FILE__,
@@ -468,7 +468,7 @@ try {
     
     testFloatEquals(
         test_diesel_fuel_lookup._fuelConsumptionLookupL(
-            struct_disp.cap_kW, 1),
+            struct_disp.cap_kW, 0),
         exp_fuel_consumption_vec_Lhr[
             exp_fuel_consumption_vec_Lhr.size() - 1
         ],
@@ -517,7 +517,7 @@ try {
         testFloatEquals(
             test_diesel_fuel_lookup._fuelConsumptionLookupL(
                 interp_test_load_ratio_vec[i] * struct_disp.cap_kW,
-                1
+                0
             ),
             interp_test_fuel_consumption_vec_L[i],
             FLOAT_TOLERANCE,

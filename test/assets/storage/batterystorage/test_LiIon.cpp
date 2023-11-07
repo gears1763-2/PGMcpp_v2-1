@@ -585,7 +585,7 @@ try {
     test_liion.ptr_2_dt_vec_hr = &dt_vec_hr;
     
     for (size_t i = 0; i < 16; i++) {
-        double avail_kW = test_liion.getAvailablekW(dt_vec_hr[i]);
+        double avail_kW = test_liion.getAvailablekW(i);
 
         test_liion.commitDischargekW(0.666 * avail_kW, i);
         
@@ -604,7 +604,7 @@ try {
     test_liion.toggleReserve(true);
     
     for (size_t i = 16; i < time_vec_hr.size(); i++) {
-        double avail_kW = test_liion.getAvailablekW(dt_vec_hr[i]);
+        double avail_kW = test_liion.getAvailablekW(i);
 
         test_liion.commitDischargekW(0.666 * avail_kW, i);
         
@@ -738,8 +738,6 @@ try {
     int cycles = 0;
     
     for (int i = 0; i < n_timesteps; i++) {
-        double dt_hrs = dt_vec_hr[i];
-        
         if (fabs(test_liion_cycling.SOH - 0.8) <= 1e-4) {
             int cycles_to_failure = 3000;
             
@@ -755,7 +753,7 @@ try {
         }
         
         if (charge_flag) {
-            double accept_kW = test_liion_cycling.getAcceptablekW(dt_hrs);
+            double accept_kW = test_liion_cycling.getAcceptablekW(i);
             
             if (accept_kW < FLOAT_TOLERANCE) {
                 charge_flag = false;
@@ -770,7 +768,7 @@ try {
         }
         
         else {
-            double avail_kW = test_liion_cycling.getAvailablekW(dt_hrs);
+            double avail_kW = test_liion_cycling.getAvailablekW(i);
             
             // enforce 1C discharging
             if (avail_kW > test_liion_cycling.struct_storage.cap_kWh) {

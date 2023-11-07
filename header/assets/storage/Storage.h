@@ -90,8 +90,8 @@ class Storage {
         //  methods
         Storage(structStorage, int);
         
-        virtual double getAvailablekW(double) {return 0;}
-        virtual double getAcceptablekW(double) {return 0;}
+        virtual double getAvailablekW(int) {return 0;}
+        virtual double getAcceptablekW(int) {return 0;}
         
         virtual void commitChargekW(double, int) {return;}
         virtual void commitDischargekW(double, int) {return;}

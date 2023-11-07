@@ -118,10 +118,10 @@ class Combustion : public Dispatchable {
         Combustion(structDispatchable, structCombustion, int);
         
         void _readInFuelConsumptionData(void);
-        double _fuelConsumptionLookupL(double, double);
+        double _fuelConsumptionLookupL(double, int);
         void _writeTimeSeriesResults(std::string, int);
         
-        double getFuelConsumptionL(double, double);
+        double getFuelConsumptionL(double, int);
         structEmissions getEmissions(double);
         void recordEmissions(structEmissions, int);
         

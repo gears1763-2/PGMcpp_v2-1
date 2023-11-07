@@ -149,10 +149,12 @@ BatteryStorage :: BatteryStorage(
 }
 
 
-double BatteryStorage :: getAvailablekW(double dt_hrs) {
+double BatteryStorage :: getAvailablekW(int timestep) {
     /*
      *  Method to compute and return available power [kW] over timestep
      */
+    
+    double dt_hrs = this->ptr_2_dt_vec_hr->at(timestep);
     
     // check if depleted
     if (this->depleted_flag) {
@@ -181,10 +183,12 @@ double BatteryStorage :: getAvailablekW(double dt_hrs) {
 }
 
 
-double BatteryStorage :: getAcceptablekW(double dt_hrs) {
+double BatteryStorage :: getAcceptablekW(int timestep) {
     /*
      *  Method to compute and return acceptable power [kW] over timestep
      */
+    
+    double dt_hrs = this->ptr_2_dt_vec_hr->at(timestep);
     
     // compute acceptable energy
     double acceptable_kWh = this->max_charge_kWh - 
@@ -328,8 +332,7 @@ void BatteryStorage :: toggleReserve(bool reserve_flag) {
             this->struct_storage.cap_kWh;
         
         if (this->depleted_flag) {
-            double SOC = this->charge_kWh / this->struct_storage.cap_kWh;
-            if (SOC >= this->struct_battery_storage.reserve_SOC) {
+            if (this->charge_kWh >= this->min_charge_kWh) {
                 this->depleted_flag = false;
             }
         }
@@ -348,8 +351,7 @@ void BatteryStorage :: toggleReserve(bool reserve_flag) {
             this->struct_storage.cap_kWh;
         
         if (not this->depleted_flag) {
-            double SOC = this->charge_kWh / this->struct_storage.cap_kWh;
-            if (SOC <= this->struct_battery_storage.min_SOC) {
+            if (this->charge_kWh <= this->min_charge_kWh) {
                 this->depleted_flag = true;
             }
         }

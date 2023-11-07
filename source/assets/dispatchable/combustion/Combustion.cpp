@@ -207,7 +207,7 @@ void Combustion :: _readInFuelConsumptionData() {
 
 double Combustion :: _fuelConsumptionLookupL(
     double production_kW,
-    double dt_hrs
+    int timestep
 ) {
     /*
      *  Helper method to get fuel consumption from given fuel
@@ -215,6 +215,7 @@ double Combustion :: _fuelConsumptionLookupL(
      */
     
     double load_ratio = production_kW / this->struct_disp.cap_kW;
+    double dt_hrs = this->ptr_2_dt_vec_hr->at(timestep);
     
     if (load_ratio <= 0) {
         return this->fuel_interp_consumption_vec_Lhr[0] * dt_hrs;
@@ -327,12 +328,14 @@ void Combustion :: _writeTimeSeriesResults(
 
 double Combustion :: getFuelConsumptionL(
     double production_kW,
-    double dt_hrs
+    int timestep
 ) {
     /*
      *  Method to compute and return fuel consumption under given
      *  production and time step
      */
+    
+    double dt_hrs = this->ptr_2_dt_vec_hr->at(timestep);
     
     // check running state
     if (not this->is_running) {
@@ -349,7 +352,7 @@ double Combustion :: getFuelConsumptionL(
             
             fuel_consumption_L = this->_fuelConsumptionLookupL(
                 production_kW,
-                dt_hrs
+                timestep
             );
             
             break;

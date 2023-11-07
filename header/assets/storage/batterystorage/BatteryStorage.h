@@ -48,8 +48,8 @@ class BatteryStorage : public Storage {
         //  methods
         BatteryStorage(structStorage, structBatteryStorage, int);
 
-        double getAcceptablekW(double);
-        double getAvailablekW(double);
+        double getAcceptablekW(int);
+        double getAvailablekW(int);
         
         virtual void commitChargekW(double, int);
         virtual void commitDischargekW(double, int);

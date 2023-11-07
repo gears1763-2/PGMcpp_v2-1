@@ -13,8 +13,7 @@
 
 double Model :: _controlNoncombustion(
     int timestep,
-    double _load_kW,
-    double dt_hrs
+    double _load_kW
 ) {
     /*
      *  Helper method to handle the control of non-Combustion assets.
@@ -44,7 +43,7 @@ double Model :: _controlNoncombustion(
                     noncombustion_ptr->requestProductionkW(
                         load_kW,
                         hydro_resource_m3hr,
-                        dt_hrs
+                        timestep
                     );
                 
                 break;

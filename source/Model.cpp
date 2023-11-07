@@ -654,7 +654,6 @@ void Model :: _generateNetLoadVector() {
 
 bool Model :: _sufficientProductionStorage(
     double _load_kW,
-    double dt_hrs,
     int timestep
 ) {
     /*
@@ -667,7 +666,7 @@ bool Model :: _sufficientProductionStorage(
     // check Storage assets
     for (size_t i = 0; i < this->storage_ptr_vec.size(); i++) {
         Storage* storage_ptr = this->storage_ptr_vec[i];
-        double avail_kW = storage_ptr->getAvailablekW(dt_hrs);
+        double avail_kW = storage_ptr->getAvailablekW(timestep);
         load_kW -= avail_kW;
     }
     
@@ -690,7 +689,7 @@ bool Model :: _sufficientProductionStorage(
                     noncombustion_ptr->requestProductionkW(
                         cap_kW,
                         hydro_resource_m3hr,
-                        dt_hrs
+                        timestep
                     );
                 
                 break;
